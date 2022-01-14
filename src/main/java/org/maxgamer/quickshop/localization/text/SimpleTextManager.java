@@ -185,7 +185,7 @@ public class SimpleTextManager implements TextManager, Reloadable {
      */
     private void applyOverrideConfiguration(@NotNull JsonConfiguration distributionConfiguration, @NotNull JsonConfiguration overrideConfiguration) {
         for (String key : overrideConfiguration.getKeys(true)) {
-            if ("language-version".equals(key) || "config-version".equals(key) || "version".equals(key)) {
+            if ("language-version".equals(key) || "config-version".equals(key) || "_comment".equals(key) || "version".equals(key)) {
                 continue;
             }
             Object content = overrideConfiguration.get(key);
@@ -280,7 +280,8 @@ public class SimpleTextManager implements TextManager, Reloadable {
     }
 
     private String findRelativeLanguages(String langCode) {
-        if (langCode.isEmpty()) {
+        //langCode may null when some plugins providing fake player
+        if (langCode == null || langCode.isEmpty()) {
             return "en_us";
         }
         String result = languagesCache.getIfPresent(langCode);
@@ -329,7 +330,13 @@ public class SimpleTextManager implements TextManager, Reloadable {
             localOverrideFile.getParentFile().mkdirs();
             localOverrideFile.createNewFile();
         }
-        return JsonConfiguration.loadConfiguration(localOverrideFile);
+        JsonConfiguration result = JsonConfiguration.loadConfiguration(localOverrideFile);
+        //Add a comment for user guide if file is empty
+        if (result.getKeys(false).isEmpty()) {
+            result.set("_comment", "Please visit https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Use-translation-override-system for override language file tutorial.");
+            result.save(localOverrideFile);
+        }
+        return result;
     }
 
     /**

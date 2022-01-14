@@ -51,10 +51,7 @@ import org.maxgamer.quickshop.api.event.*;
 import org.maxgamer.quickshop.api.shop.*;
 import org.maxgamer.quickshop.economy.Trader;
 import org.maxgamer.quickshop.integration.SimpleIntegrationManager;
-import org.maxgamer.quickshop.util.CalculateUtil;
-import org.maxgamer.quickshop.util.ChatSheetPrinter;
-import org.maxgamer.quickshop.util.MsgUtil;
-import org.maxgamer.quickshop.util.Util;
+import org.maxgamer.quickshop.util.*;
 import org.maxgamer.quickshop.util.economyformatter.EconomyFormatter;
 import org.maxgamer.quickshop.util.holder.Result;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
@@ -113,17 +110,23 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                         plugin.getServer().getOfflinePlayer(UUID.fromString(taxAccount)));
             } else {
                 this.cacheTaxAccount = new Trader(taxAccount,
-                        plugin.getServer().getOfflinePlayer(taxAccount));
+                        PlayerFinder.findOfflinePlayerByName(taxAccount));
             }
         } else {
             // disable tax account
             cacheTaxAccount = null;
         }
-        String uAccount = plugin.getConfig().getString("unlimited-shop-owner-change-account", "quickshop");
-        if (Util.isUUID(uAccount)) {
-            cacheUnlimitedShopAccount = new Trader(uAccount, Bukkit.getOfflinePlayer(UUID.fromString(uAccount)));
-        } else {
-            cacheUnlimitedShopAccount = new Trader(uAccount, Bukkit.getOfflinePlayer(uAccount));
+        if (plugin.getConfig().getBoolean("unlimited-shop-owner-change")) {
+            String uAccount = plugin.getConfig().getString("unlimited-shop-owner-change-account", "");
+            if (uAccount.isEmpty()) {
+                uAccount = "quickshop";
+                plugin.getLogger().log(Level.WARNING, "unlimited-shop-owner-change-account is empty, default to \"quickshop\"");
+            }
+            if (Util.isUUID(uAccount)) {
+                cacheUnlimitedShopAccount = new Trader(uAccount, Bukkit.getOfflinePlayer(UUID.fromString(uAccount)));
+            } else {
+                cacheUnlimitedShopAccount = new Trader(uAccount, PlayerFinder.findOfflinePlayerByName(uAccount));
+            }
         }
         this.priceLimiter = new SimplePriceLimiter(
                 plugin.getConfig().getDouble("shop.minimum-price"),
@@ -647,7 +650,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             plugin.text().of(buyer, "shop-has-no-space", Integer.toString(space), MsgUtil.getTranslateText(shop.getItem())).send();
             return;
         }
-        int count = Util.countItems(buyerInventory, shop.getItem());
+        int count = Util.countItems(buyerInventory, shop);
         // Not enough items
         if (amount > count) {
             plugin.text().of(buyer,
@@ -889,12 +892,12 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             case REACHED_PRICE_MIN_LIMIT:
                 plugin.text().of(p, "price-too-cheap",
                         (decFormat) ? MsgUtil.decimalFormat(this.priceLimiter.getMaxPrice())
-                                : Double.toString(this.priceLimiter.getMinPrice()));
+                                : Double.toString(this.priceLimiter.getMinPrice())).send();
                 return;
             case REACHED_PRICE_MAX_LIMIT:
                 plugin.text().of(p, "price-too-high",
                         (decFormat) ? MsgUtil.decimalFormat(this.priceLimiter.getMaxPrice())
-                                : Double.toString(this.priceLimiter.getMinPrice()));
+                                : Double.toString(this.priceLimiter.getMinPrice())).send();
                 return;
             case PRICE_RESTRICTED:
                 plugin.text().of(p, "restricted-prices",
@@ -1034,7 +1037,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             plugin.text().of(seller, "negative-amount").send();
             return;
         }
-        int pSpace = Util.countSpace(sellerInventory, shop.getItem());
+        int pSpace = Util.countSpace(sellerInventory, shop);
         if (amount > pSpace) {
             plugin.text().of(seller, "not-enough-space", String.valueOf(pSpace)).send();
             return;
@@ -1122,7 +1125,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                     Integer.toString(shop.getLocation().getBlockX()),
                     Integer.toString(shop.getLocation().getBlockY()),
                     Integer.toString(shop.getLocation().getBlockZ()),
-                    MsgUtil.convertItemStackToTranslateText(shop.getItem().getType())).forLocale();
+                    MsgUtil.getTranslateText(shop.getItem())).forLocale();
             transactionMessage = new MsgUtil.TransactionMessage(msg, Util.serialize(shop.getItem()), null);
 
             MsgUtil.send(shop, shop.getOwner(), transactionMessage);
@@ -1322,8 +1325,8 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                 if (message.equalsIgnoreCase(
                         plugin.getConfig().getString("shop.word-for-trade-all-items", "all"))) {
                     int shopHaveSpaces =
-                            Util.countSpace(((ContainerShop) shop).getInventory(), shop.getItem());
-                    int invHaveItems = Util.countItems(p.getInventory(), shop.getItem());
+                            Util.countSpace(((ContainerShop) shop).getInventory(), shop);
+                    int invHaveItems = Util.countItems(p.getInventory(), shop);
                     // Check if shop owner has enough money
                     double ownerBalance = eco
                             .getBalance(shop.getOwner(), shop.getLocation().getWorld(),
@@ -1336,11 +1339,11 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                         ownerCanAfford = Integer.MAX_VALUE;
                     }
 
-                    if (!shop.isUnlimited()) {
+                    if (shop.isAlwaysCountingContainer() || !shop.isUnlimited()) {
                         amount = Math.min(shopHaveSpaces, invHaveItems);
                         amount = Math.min(amount, ownerCanAfford);
                     } else {
-                        amount = Util.countItems(p.getInventory(), shop.getItem());
+                        amount = Util.countItems(p.getInventory(), shop);
                         // even if the shop is unlimited, the config option pay-unlimited-shop-owners is set to
                         // true,
                         // the unlimited shop owner should have enough money.
@@ -1391,13 +1394,13 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             } else {
                 if (message.equalsIgnoreCase(plugin.getConfig().getString("shop.word-for-trade-all-items", "all"))) {
                     int shopHaveItems = shop.getRemainingStock();
-                    int invHaveSpaces = Util.countSpace(p.getInventory(), shop.getItem());
-                    if (!shop.isUnlimited()) {
+                    int invHaveSpaces = Util.countSpace(p.getInventory(), shop);
+                    if (shop.isAlwaysCountingContainer() || !shop.isUnlimited()) {
                         amount = Math.min(shopHaveItems, invHaveSpaces);
                     } else {
                         // should check not having items but having empty slots, cause player is trying to buy
                         // items from the shop.
-                        amount = Util.countSpace(p.getInventory(), shop.getItem());
+                        amount = Util.countSpace(p.getInventory(), shop);
                     }
                     // typed 'all', check if player has enough money than price * amount
                     double price = shop.getPrice();
@@ -1406,7 +1409,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                     amount = Math.min(amount, (int) Math.floor(balance / price));
                     if (amount < 1) { // typed 'all' but the auto set amount is 0
                         // when typed 'all' but player can't buy any items
-                        if (!shop.isUnlimited() && shopHaveItems < 1) {
+                        if ((shop.isAlwaysCountingContainer() || !shop.isUnlimited()) && shopHaveItems < 1) {
                             // but also the shop's stock is 0
                             plugin.text().of(p, "shop-stock-too-low",
                                     Integer.toString(shop.getRemainingStock()),

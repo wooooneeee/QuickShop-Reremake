@@ -31,6 +31,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
@@ -38,6 +39,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.AbstractEconomy;
 import org.maxgamer.quickshop.api.shop.Info;
@@ -292,11 +294,12 @@ public class PlayerListener extends AbstractQSListener {
     }
 
     private int getPlayerCanBuy(Shop shop, double traderBalance, double price, Inventory playerInventory) {
+        boolean isContainerCountingNeeded = shop.isUnlimited() && !shop.isAlwaysCountingContainer();
         if (shop.isFreeShop()) { // Free shop
-            return shop.isUnlimited() ? Util.countSpace(playerInventory, shop.getItem()) : Math.min(shop.getRemainingStock(), Util.countSpace(playerInventory, shop.getItem()));
+            return isContainerCountingNeeded ? Util.countSpace(playerInventory, shop) : Math.min(shop.getRemainingStock(), Util.countSpace(playerInventory, shop));
         }
-        int itemAmount = Math.min(Util.countSpace(playerInventory, shop.getItem()), (int) Math.floor(traderBalance / price));
-        if (!shop.isUnlimited()) {
+        int itemAmount = Math.min(Util.countSpace(playerInventory, shop), (int) Math.floor(traderBalance / price));
+        if (!isContainerCountingNeeded) {
             itemAmount = Math.min(itemAmount, shop.getRemainingStock());
         }
         if (itemAmount < 0) {
@@ -306,13 +309,14 @@ public class PlayerListener extends AbstractQSListener {
     }
 
     private int getPlayerCanSell(Shop shop, double ownerBalance, double price, Inventory playerInventory) {
+        boolean isContainerCountingNeeded = shop.isUnlimited() && !shop.isAlwaysCountingContainer();
         if (shop.isFreeShop()) {
-            return shop.isUnlimited() ? Util.countItems(playerInventory, shop.getItem()) : Math.min(shop.getRemainingSpace(), Util.countItems(playerInventory, shop.getItem()));
+            return isContainerCountingNeeded ? Util.countItems(playerInventory, shop) : Math.min(shop.getRemainingSpace(), Util.countItems(playerInventory, shop));
         }
 
-        int items = Util.countItems(playerInventory, shop.getItem());
+        int items = Util.countItems(playerInventory, shop);
         final int ownerCanAfford = (int) (ownerBalance / price);
-        if (!shop.isUnlimited()) {
+        if (!isContainerCountingNeeded) {
             // Amount check player amount and shop empty slot
             items = Math.min(items, shop.getRemainingSpace());
             // Amount check player selling item total cost and the shop owner's balance
@@ -378,6 +382,27 @@ public class PlayerListener extends AbstractQSListener {
     @EventHandler(ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent e) {
         onMove(new PlayerMoveEvent(e.getPlayer(), e.getFrom(), e.getTo()));
+    }
+
+    /*
+     * Cancels the menu for broken shop block
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerBreakShopCreationChest(BlockBreakEvent event) {
+        @Nullable Player player = event.getPlayer();
+        if (player == null) {
+            return;
+        }
+        Map<UUID, Info> actionMap = plugin.getShopManager().getActions();
+        final Info info = actionMap.get(player.getUniqueId());
+        if (info != null && info.getLocation().equals(event.getBlock().getLocation())) {
+            actionMap.remove(player.getUniqueId());
+            if (info.getAction() == ShopAction.BUY) {
+                plugin.text().of(player, "shop-purchase-cancelled").send();
+            } else if (info.getAction() == ShopAction.CREATE) {
+                plugin.text().of(player, "shop-creation-cancelled").send();
+            }
+        }
     }
 
     /*

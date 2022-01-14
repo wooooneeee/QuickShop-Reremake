@@ -96,6 +96,7 @@
     "owner": "&aВладелец: {0}",
     "item": "&aТовар: &e{0}",
     "item-holochat-error": "&c[Ошибка]",
+    "item-holochat-data-too-large": "&c[Error] Item NBT is too large for showing",
     "preview": "&b[Просмотреть товар]",
     "space": "&aСвободное место: &e{0}",
     "stock": "&aДоступно: &e{0}",
@@ -111,7 +112,7 @@
   "bypassing-lock": "Обход блокировки магазина!",
   "that-is-locked": "&cЭтот магазин заперт.",
   "how-many-buy": "&aВведите в чат, сколько вы хотите &bКУПИТЬ&a. Вы можете купить &e{0}&a. Введите &b{1}&a чтобы купить их все.",
-  "how-many-sell": "&aEnter in chat, how much you wish to &dSELL&a. You can sell &e{0}&a. Enter &b{1}&a in chat, to sell all.",
+  "how-many-sell": "&aВведите в чат, сколько вы хотите &dПРОДАТЬ&a. Вы можете продать &e{0}&a. Введите &b{1}&a в чате, чтобы продать все.",
   "not-allowed-to-create": "&cВы не можете создать магазин здесь.",
   "blacklisted-item": "&cВы не можете продать, оно находится в черном списке",
   "how-much-to-trade-for": "&aВводите в чат, сколько вы хотите обменивать &e{1}x {0}&a.",
@@ -121,6 +122,10 @@
     "toggle-unlimited": {
       "unlimited": "&aМагазин теперь неограничен",
       "limited": "&aМагазин теперь ограничен"
+    },
+    "toggle-always-counting": {
+      "counting": "&aShop is now always counting container even is unlimited",
+      "not-counting": "&aShop is now respect if shop is unlimited"
     },
     "transfer-success": "&aПеремещено &e{0} &aмагазин(ов) в &e{1}",
     "transfer-success-other": "&aПеремещено &e{0} {1}&a магазин(ов) в &e{2}",
@@ -203,6 +208,8 @@
     "freeze": "Обмен отключен"
   },
   "controlpanel": {
+    "alwayscounting": "&aAlways counting: {0} &e[&d&lChange&e]",
+    "alwayscounting-hover": "&eClick to toggle if the shop is always counting container.",
     "setowner": "&aВладелец: &b{0} &e[&d&lИзменить&e]",
     "infomation": "&aПанель управления магазином:",
     "setowner-hover": "&eНажмите для смены владельца.",
@@ -271,7 +278,8 @@
       "Аххххх! Новое обновление {0}! Обновитесь!",
       "Что вы думаете? {0} был выпущен! Обновитесь!",
       "Доктор, QuickShop уже есть новое обновление {0}! Вы должны обновить~",
-      "Ко~ко~да~ё~ QuickShop появились новое обновление {0} ~"
+      "Ко~ко~да~ё~ QuickShop появились новое обновление {0} ~",
+      "Paimon want told you the QuickShop have new update {0}!"
     ],
     "remote-disable-warning": "&cТекущая версия QuickShop отмечена как отключенная удалённым сервером, означая, что эта версия может иметь серьезные проблемы, получить подробную информацию с нашей страницы плагина SpigotMC: {0}. Это предупреждение будет отображаться до тех пор, пока вы не переключитесь на стабильную версию, но это не повлияет на перфорирование вашего сервера.",
     "label": {
@@ -307,8 +315,8 @@
   "shop-cannot-trade-when-freezing": "&cВы не можете торговать с этим магазином, потому что он заморожен.",
   "shop-freezed-at-location": "&eВаш магазин {0} на {1} был заморожен!",
   "denied-put-in-item": "&cВы не можете поместить этот товар в ваш магазин!",
-  "how-many-buy-stack": "&eEnter in chat, how many bulks you wish to &bBUY&a. There are &e{0}&a items in each bulk and you can buy &e{1}&a bulks. Enter &b{2}&a in chat to buy all.",
-  "how-many-sell-stack": "&aEnter in chat, how many bulk you wish to &dSELL&a. There are &e{0}&a items per bulk and you can sell &e{1}&a bulks. Enter &b{2}&a in chat to sell all.",
+  "how-many-buy-stack": "&eВведите в чат, сколько массу вы хотите &bКУПИТЬ&а. &e{0} товар в каждой массой и вы можете купить за &e{1}&a. Введите &b{2}&a в чате, чтобы купить все.",
+  "how-many-sell-stack": "&eВведите в чат, сколько массу вы хотите &bПРОДАТЬ&а. &e{0} товар в каждой массой и вы можете продать за &e{1}&a. Введите &b{2}&a в чате, чтобы купить все.",
   "language": {
     "name": "&eИмя: &6{0}",
     "code": "&eКод: &6{0}",
@@ -348,5 +356,7 @@
   "display-turn-off": "&aОтображение товара успешно выключено.",
   "shop-purged-start": "&aНачато очистки магазина, проверьте консоль для получения подробностей.",
   "purchase-out-of-stock": "&cВ этом магазине закончился запас, свяжитесь с владельцем магазина или сотрудниками для пополнения.",
-  "purchase-out-of-space": "&cВ этом магазине закончилось место, свяжитесь с владельцем магазина или сотрудниками, чтобы освободились место."
+  "purchase-out-of-space": "&cВ этом магазине закончилось место, свяжитесь с владельцем магазина или сотрудниками, чтобы освободились место.",
+  "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
 }

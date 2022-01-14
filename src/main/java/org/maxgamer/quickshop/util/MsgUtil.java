@@ -40,11 +40,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.ServiceInjector;
-import org.maxgamer.quickshop.api.annotations.Unstable;
 import org.maxgamer.quickshop.api.database.WarpedResultSet;
 import org.maxgamer.quickshop.api.event.ShopControlPanelOpenEvent;
 import org.maxgamer.quickshop.api.shop.Shop;
@@ -132,7 +132,7 @@ public class MsgUtil {
      * @param itemBukkitName ItemBukkitName(e.g. Material.STONE.name())
      * @return String Item's i18n name.
      */
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static String getItemi18n(@NotNull String itemBukkitName) {
         if (itemBukkitName.isEmpty()) {
@@ -156,6 +156,7 @@ public class MsgUtil {
      * @param args args
      * @return filled text
      */
+    @NotNull
     public static String fillArgs(@Nullable String raw, @Nullable String... args) {
         if (StringUtils.isEmpty(raw)) {
             return "";
@@ -170,6 +171,7 @@ public class MsgUtil {
 
     private volatile static Map.Entry<String, String> cachedGameLanguageCode = null;
 
+    @NotNull
     public static String getDefaultGameLanguageCode() {
         String languageCode = plugin.getConfig().getString("game-language", "default");
         if (cachedGameLanguageCode != null && cachedGameLanguageCode.getKey().equals(languageCode)) {
@@ -180,7 +182,8 @@ public class MsgUtil {
         return result;
     }
 
-    @Unstable
+    @ApiStatus.Experimental
+    @NotNull
     public static String getGameLanguageCode(String languageCode) {
         if ("default".equalsIgnoreCase(languageCode)) {
             Locale locale = Locale.getDefault();
@@ -209,7 +212,7 @@ public class MsgUtil {
         }
     }
 
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static void loadGameLanguage(@NotNull String languageCode) {
         gameLanguage = ServiceInjector.getGameLanguage();
@@ -231,7 +234,7 @@ public class MsgUtil {
         return TextSplitter.bakeComponent(new BungeeQuickChat.BungeeComponentBuilder().append(Util.getTranslateComponentForMaterial(mat)).create());
     }
 
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static void loadI18nFile() {
         //Update instance
@@ -242,7 +245,7 @@ public class MsgUtil {
         loadGameLanguage(plugin.getConfig().getString("game-language", "default"));
     }
 
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static void loadEnchi18n() {
         plugin.getLogger().info("Loading enchantments translations...");
@@ -279,7 +282,7 @@ public class MsgUtil {
     /**
      * Load Itemi18n fron file
      */
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static void loadItemi18n() {
         plugin.getLogger().info("Loading items translations...");
@@ -315,7 +318,7 @@ public class MsgUtil {
         }
     }
 
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static void loadPotioni18n() {
         plugin.getLogger().info("Loading potions translations...");
@@ -337,7 +340,7 @@ public class MsgUtil {
                 continue;
             }
             String potionI18n = potioni18n.getString("potioni18n." + potion.getName());
-            if (potionI18n != null && StringUtils.isEmpty(potionI18n)) {
+            if (potionI18n != null && !StringUtils.isEmpty(potionI18n)) {
                 continue;
             }
             String potionName = gameLanguage.getPotion(potion);
@@ -363,8 +366,7 @@ public class MsgUtil {
                 if (Util.isUUID(owner)) {
                     ownerUUID = UUID.fromString(owner);
                 } else {
-                    //noinspection deprecation
-                    ownerUUID = Bukkit.getOfflinePlayer(owner).getUniqueId();
+                    ownerUUID = PlayerFinder.findUUIDByName(owner);
                 }
                 String message = rs.getString("message");
                 List<TransactionMessage> msgs = OUTGOING_MESSAGES.computeIfAbsent(ownerUUID, k -> new LinkedList<>());
@@ -495,6 +497,17 @@ public class MsgUtil {
             String clickCommand =
                     MsgUtil.fillArgs(
                             "/qs silentunlimited {0}",
+                            shop.getRuntimeRandomUniqueId().toString());
+            chatSheetPrinter.printExecutableCmdLine(text, hoverText, clickCommand);
+        }
+        // Always Counting
+        if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.alwayscounting")) {
+            String text =
+                    plugin.text().of(sender, "controlpanel.alwayscounting", bool2String(shop.isAlwaysCountingContainer())).forLocale();
+            String hoverText = plugin.text().of(sender, "controlpanel.alwayscounting-hover").forLocale();
+            String clickCommand =
+                    MsgUtil.fillArgs(
+                            "/qs silentalwayscounting {0}",
                             shop.getRuntimeRandomUniqueId().toString());
             chatSheetPrinter.printExecutableCmdLine(text, hoverText, clickCommand);
         }
@@ -637,7 +650,7 @@ public class MsgUtil {
      * @param key The Enchantment.
      * @return Enchantment's i18n name.
      */
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static String getEnchi18n(@NotNull Enchantment key) {
         String enchString = key.getKey().getKey();
@@ -689,7 +702,7 @@ public class MsgUtil {
      * @param potion potionType
      * @return Potion's i18n name.
      */
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Deprecated
     public static String getPotioni18n(@NotNull PotionEffectType potion) {
         String potionString = potion.getName().trim();

@@ -33,6 +33,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.command.CommandContainer;
 import org.maxgamer.quickshop.api.command.CommandManager;
 import org.maxgamer.quickshop.command.subcommand.*;
+import org.maxgamer.quickshop.command.subcommand.silent.*;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
 
@@ -77,10 +78,17 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
                         .build());
         registerCmd(
                 CommandContainer.builder()
-                        .prefix("slientunlimited")
+                        .prefix("alwayscounting")
+                        .hidden(false)
+                        .permission("quickshop.alwayscounting")
+                        .executor(new SubCommand_AlwaysCounting(plugin))
+                        .build());
+        registerCmd(
+                CommandContainer.builder()
+                        .prefix("silentalwayscounting")
                         .hidden(true)
-                        .permission("quickshop.unlimited")
-                        .executor(new SubCommand_SilentUnlimited(plugin))
+                        .permission("quickshop.alwayscounting")
+                        .executor(new SubCommand_SilentAlwaysCounting(plugin))
                         .build());
         registerCmd(
                 CommandContainer.builder()
@@ -293,8 +301,7 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
                 .permission("quickshop.create.stacks")
                 .permission("quickshop.create.changeamount")
                 .executor(new SubCommand_Size(plugin))
-                .disabled(!plugin.isAllowStack())
-                // TODO: Check the sender
+                .disabledSupplier(() -> !plugin.isAllowStack())
                 .disablePlaceholder(plugin.text().of("command.feature-not-enabled").forLocale())
                 .build());
         registerCmd(CommandContainer.builder()
@@ -331,6 +338,7 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
         registerCmd(CommandContainer.builder()
                 .prefix("purge")
                 .permission("quickshop.purge")
+                .disabledSupplier(() -> !plugin.getConfig().getBoolean("purge.enabled"))
                 .executor(new SubCommand_Purge(plugin))
                 .build());
     }
@@ -407,7 +415,7 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
                 if (!container.getPrefix().equalsIgnoreCase(cmdArg[0])) {
                     continue;
                 }
-                if (container.isDisabled()) {
+                if (container.isDisabled() || (container.getDisabledSupplier() != null && container.getDisabledSupplier().get())) {
                     MsgUtil.sendDirectMessage(sender, container.getDisableText(sender));
                     return true;
                 }

@@ -46,10 +46,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.api.QuickShopAPI;
-import org.maxgamer.quickshop.api.annotations.Unstable;
 import org.maxgamer.quickshop.api.chat.QuickChat;
 import org.maxgamer.quickshop.api.command.CommandManager;
 import org.maxgamer.quickshop.api.compatibility.CompatibilityManager;
@@ -92,6 +92,7 @@ import org.maxgamer.quickshop.util.reporter.error.RollbarErrorReporter;
 import org.maxgamer.quickshop.watcher.*;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -101,7 +102,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 
 public class QuickShop extends JavaPlugin implements QuickShopAPI {
-
     /**
      * The active instance of QuickShop
      * You shouldn't use this if you really need it.
@@ -260,6 +260,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     private NBTAPI nbtapi = null;
 
     private int loggingLocation = 0;
+
+    public void disableNBTAPI() {
+        nbtapi = null;
+    }
 
     /**
      * Use for mock bukkit
@@ -477,9 +481,9 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                             if (!taxAccount.isEmpty()) {
                                 OfflinePlayer tax;
                                 if (Util.isUUID(taxAccount)) {
-                                    tax = Bukkit.getOfflinePlayer(UUID.fromString(taxAccount));
+                                    tax = PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount));
                                 } else {
-                                    tax = Bukkit.getOfflinePlayer(Objects.requireNonNull(taxAccount));
+                                    tax = PlayerFinder.findOfflinePlayerByName((Objects.requireNonNull(taxAccount)));
                                 }
                                 Economy_Vault vault = (Economy_Vault) economy;
                                 if (vault.isValid()) {
@@ -553,7 +557,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                 .createYaml() : configurationForCompatibility;
     }
 
-    @Unstable
+    @ApiStatus.ScheduledForRemoval
     @Override
     @Deprecated
     public void saveConfig() {
@@ -769,18 +773,79 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         testing = true;
         environmentChecker = new org.maxgamer.quickshop.util.envcheck.EnvironmentChecker(this);
         ResultReport resultReport = environmentChecker.run(stage);
+        StringJoiner joiner = new StringJoiner("\n", "", "");
         if (resultReport.getFinalResult().ordinal() > CheckResult.WARNING.ordinal()) {
-            StringJoiner joiner = new StringJoiner("\n", "", "");
             for (Entry<EnvCheckEntry, ResultContainer> result : resultReport.getResults().entrySet()) {
                 if (result.getValue().getResult().ordinal() > CheckResult.WARNING.ordinal()) {
                     joiner.add(String.format("- [%s/%s] %s", result.getValue().getResult().getDisplay(), result.getKey().name(), result.getValue().getResultMessage()));
                 }
             }
-            setupBootError(new BootError(this.getLogger(), joiner.toString()), true);
-            //noinspection ConstantConditions
-            Util.mainThreadRun(() -> getCommand("qs").setTabCompleter(this)); //Disable tab completer
+        }
+        // Check If we need kill the server or disable plugin
+
+        switch (resultReport.getFinalResult()) {
+            case DISABLE_PLUGIN:
+                Bukkit.getPluginManager().disablePlugin(this);
+                break;
+            case STOP_WORKING:
+                setupBootError(new BootError(this.getLogger(), joiner.toString()), true);
+                PluginCommand command = getCommand("qs");
+                if (command != null) {
+                    Util.mainThreadRun(() -> command.setTabCompleter(this)); //Disable tab completer
+                }
+                break;
+            case KILL_SERVER:
+                getLogger().severe("[Security Risk Detected] QuickShop forcing crash the server for security, contact the developer for details.");
+                String result = environmentChecker.getReportMaker().bake();
+                File reportFile = writeSecurityReportToFile();
+                URI uri = null;
+                if (reportFile != null) {
+                    uri = reportFile.toURI();
+                }
+                if (uri != null) {
+                    getLogger().warning("[Security Risk Detected] To get more details, please check: " + uri);
+                    try {
+                        if (java.awt.Desktop.isDesktopSupported()) {
+                            java.awt.Desktop dp = java.awt.Desktop.getDesktop();
+                            if (dp.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                                dp.browse(uri);
+                                getLogger().warning("[Security Risk Detected] A browser already open for you. ");
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                        //If failed, write directly to console
+                        getLogger().severe(result);
+                    }
+                } else {
+                    //If write failed, write directly to console
+                    getLogger().severe(result);
+                }
+                //Wait for a while for user and logger outputting
+                try {
+                    //10 seconds
+                    Thread.yield();
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // Halt the process, kill the server
+                Runtime.getRuntime().halt(-1);
+            default:
+                break;
         }
         testing = false;
+    }
+
+    private File writeSecurityReportToFile() {
+        File file = new File(getDataFolder(), UUID.randomUUID() + ".security.letter.txt");
+        try {
+            Files.write(new File(getDataFolder(), UUID.randomUUID() + ".security.letter.txt").toPath(), environmentChecker.getReportMaker().bake().getBytes(StandardCharsets.UTF_8));
+            file = file.getCanonicalFile();
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Failed to write security report!", e);
+            return null;
+        }
+        return file;
     }
 
     @Override
@@ -914,10 +979,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         internalListener.register();
 
         if (this.display && AbstractDisplayItem.getNowUsing() != DisplayType.VIRTUALITEM) {
-            if (getConfig().getInt("shop.display-items-check-ticks") < 3000) {
-                getLogger().severe("Shop.display-items-check-ticks is too low! It may cause HUGE lag! Pick a number > 3000");
-            }
             if (getDisplayItemCheckTicks() > 0) {
+                if (getConfig().getInt("shop.display-items-check-ticks") < 3000) {
+                    getLogger().severe("Shop.display-items-check-ticks is too low! It may cause HUGE lag! Pick a number > 3000");
+                }
                 getLogger().info("Registering DisplayCheck task....");
                 timerTaskList.add(getServer().getScheduler().runTaskTimer(this, () -> {
                     for (Shop shop : getShopManager().getLoadedShops()) {
@@ -929,7 +994,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                     }
                 }, 1L, getDisplayItemCheckTicks()));
             } else {
-                getLogger().severe("Shop.display-items-check-ticks is invalid! Pick a number > 3000");
+                if (getDisplayItemCheckTicks() != 0) {
+                    getLogger().severe("Shop.display-items-check-ticks is invalid! Pick a number > 3000");
+                } else {
+                    getLogger().severe("Shop.display-items-check-ticks is zero, display check is disabled");
+                }
             }
             new DisplayProtectionListener(this, this.shopCache).register();
             if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
@@ -990,7 +1059,9 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         calendarWatcher.start();
         tpsWatcher.runTaskTimer(this, 1000, 50);
         this.shopPurger = new ShopPurger(this);
-        shopPurger.purge();
+        if (getConfig().getBoolean("purge.at-server-startup")) {
+            shopPurger.purge();
+        }
         Util.debugLog("Now using display-type: " + AbstractDisplayItem.getNowUsing().name());
         getLogger().info("QuickShop Loaded! " + enableTimer.stopAndGetTimePassed() + " ms.");
     }
@@ -1997,6 +2068,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
             getConfig().set("config-version", ++selectedVersion);
         }
+        if (selectedVersion == 150) {
+            getConfig().set("purge.at-server-startup", true);
+            getConfig().set("purge.backup", true);
+            getConfig().set("config-version", ++selectedVersion);
+        }
         if (getConfig().getInt("matcher.work-type") != 0 && GameVersion.get(ReflectFactory.getServerVersion()).name().contains("1_16")) {
             getLogger().warning("You are not using QS Matcher, it may meeting item comparing issue mentioned there: https://hub.spigotmc.org/jira/browse/SPIGOT-5063");
         }
@@ -2007,10 +2083,21 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
 
+        //Check if server software support comment saving
+        if (Util.isMethodAvailable("org.bukkit.configuration.MemoryConfiguration", "getInlineComments", String.class)) {
+            //If so, clean the comment
+            ConfigurationSection configurationSection = getConfig();
+            List<String> emptyList = Collections.emptyList();
+            for (String key : configurationSection.getKeys(true)) {
+                configurationSection.setComments(key, emptyList);
+                configurationSection.setInlineComments(key, emptyList);
+            }
+        }
+
         saveConfiguration();
         reloadConfiguration();
 
-        //Add comment for config.yml
+        //Re-add comment for config.yml
         try (InputStream inputStream = Objects.requireNonNull(getResource("config.yml"))) {
             new ConfigCommentUpdater(this, inputStream, new File(getDataFolder(), "config.yml")).updateComment();
         }
@@ -2023,6 +2110,9 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         try {
             if (new File(getDataFolder(), "messages.json").exists())
                 Files.move(new File(getDataFolder(), "messages.json").toPath(), new File(getDataFolder(), "messages.json.outdated").toPath());
+            if (new File(getDataFolder(), "messages.json.outdated").exists()) {
+                Files.write(new File(getDataFolder(), "about-messages.json.outdated.txt").toPath(), Collections.singletonList("Please read v4 migrate guide there, after migration you can delete messages.json.outdated and this file: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Migrate:-v4-to-v5"));
+            }
         } catch (Exception ignore) {
         }
 

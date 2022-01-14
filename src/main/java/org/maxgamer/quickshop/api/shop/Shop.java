@@ -613,4 +613,21 @@ public interface Shop {
      * @return Free Shop
      */
     boolean isFreeShop();
+
+    /**
+     * If this shop is always counting space or stocks, even is unlimited
+     */
+    default boolean isAlwaysCountingContainer() {
+        return false;
+    }
+
+    /**
+     * Set if this shop is always a limited shop, even is unlimited
+     *
+     * @param value is always counting space or stocks
+     */
+    default void setAlwaysCountingContainer(boolean value) {
+        //For back-ward compatibility
+        throw new UnsupportedOperationException("setAlwaysCountingContainer is not implemented");
+    }
 }

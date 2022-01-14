@@ -22,6 +22,7 @@ package org.maxgamer.quickshop.util.matcher.item;
 import de.tr7zw.nbtapi.NBTItem;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.configuration.ConfigurationSection;
@@ -41,6 +42,7 @@ import org.maxgamer.quickshop.util.reload.ReloadStatus;
 import org.maxgamer.quickshop.util.reload.Reloadable;
 
 import java.util.*;
+import java.util.logging.Level;
 
 @AllArgsConstructor
 public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
@@ -146,12 +148,18 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
         givenStack = givenStack.clone();
         givenStack.setAmount(1);
         if (plugin.getNbtapi() != null) {
-            NBTItem nbtItemOriginal = new NBTItem(requireStack);
-            NBTItem nbtItemTester = new NBTItem(givenStack);
-            String tagOriginal = nbtItemOriginal.getString("shopItemId");
-            String tagTester = nbtItemTester.getString("shopItemId");
-            if (StringUtils.isNotEmpty(tagOriginal) && StringUtils.isNotEmpty(tagTester) && tagOriginal.equals(tagTester)) {
-                return true;
+            try {
+                NBTItem nbtItemOriginal = new NBTItem(requireStack);
+                NBTItem nbtItemTester = new NBTItem(givenStack);
+                String tagOriginal = nbtItemOriginal.getString("shopItemId");
+                String tagTester = nbtItemTester.getString("shopItemId");
+                if (StringUtils.isNotEmpty(tagOriginal) && StringUtils.isNotEmpty(tagTester) && tagOriginal.equals(tagTester)) {
+                    return true;
+                }
+            } catch (Exception e) {
+                plugin.disableNBTAPI();
+                plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, dsiable and fallback... (You can safely ignore this)", e);
+                Util.debugLog("NBTAPI is broken, error: " + e.getMessage() + "\n stacktrace:  \n" + Arrays.toString(e.getStackTrace()));
             }
         }
         if (workType == 1) {
@@ -168,10 +176,10 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
         if (requireStack.isSimilar(givenStack)) {
             return true;
         }
-
+        /* If they are the same type, they should also have item meta
         if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
             return false;
-        }
+        }*/
         if (requireStack.hasItemMeta()) {
             return itemMetaMatcher.matches(requireStack, givenStack);
         }
@@ -207,7 +215,15 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
                 if (meta1 instanceof Damageable) {
                     Damageable damage1 = (Damageable) meta1;
                     Damageable damage2 = (Damageable) meta2;
-                    // Check them damages, if givenDamage >= requireDamage, allow it.
+                    //Given item damaged but matching item doesn't, allow it
+                    if (damage1.hasDamage() && !damage2.hasDamage()) {
+                        return true;
+                    }
+                    //Given item NOT damaged but matching item damaged, denied it
+                    if (!damage1.hasDamage() && damage2.hasDamage()) {
+                        return false;
+                    }
+                    //last condition: Check them damages, if givenDamage >= requireDamage, allow it.
                     return damage2.getDamage() <= damage1.getDamage();
                 }
                 return true;
@@ -219,12 +235,18 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
                 if (meta1 instanceof Repairable) {
                     Repairable repairable1 = (Repairable) meta1;
                     Repairable repairable2 = (Repairable) meta2;
-                    if (repairable1.hasRepairCost() != repairable2.hasRepairCost()) {
+                    boolean hasRepairCost1 = repairable1.hasRepairCost();
+                    boolean hasRepairCost2 = repairable2.hasRepairCost();
+                    //Given item have repair cost but matching item doesn't, allow it
+                    if (hasRepairCost1 && !hasRepairCost2) {
+                        return true;
+                    }
+                    //Given item DOESN'T have repair cost but matching item have, denied it
+                    if (!hasRepairCost1 && hasRepairCost2) {
                         return false;
                     }
-                    if (repairable1.hasRepairCost()) {
-                        return repairable2.getRepairCost() <= repairable1.getRepairCost();
-                    }
+                    //last condition: both having repair cost, so allow items lesser than or equals given item Repair Cost
+                    return repairable2.getRepairCost() <= repairable1.getRepairCost();
                 }
                 return true;
             });
@@ -521,14 +543,22 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
         }
 
         boolean matches(ItemStack requireStack, ItemStack givenStack) {
+            /* If they are the same type, they should also have item meta
             if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
                 return false;
-            }
+            }*/
             if (!requireStack.hasItemMeta()) {
                 return true; // Passed check. no meta need to check.
             }
             ItemMeta meta1 = requireStack.getItemMeta();
             ItemMeta meta2 = givenStack.getItemMeta();
+            //If givenStack don't have meta, try to generate one
+            if (meta2 == null) {
+                meta2 = Bukkit.getItemFactory().getItemMeta(givenStack.getType());
+                if (meta2 == null) {
+                    return true; // Passed check. givenStack still have no meta need to check.
+                }
+            }
             for (Matcher matcher : matcherList) {
                 if (!matcher.match(meta1, meta2)) {
                     return false;

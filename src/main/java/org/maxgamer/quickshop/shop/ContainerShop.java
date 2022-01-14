@@ -19,7 +19,7 @@
 
 package org.maxgamer.quickshop.shop;
 
-import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.IOpenInv;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import io.papermc.lib.PaperLib;
 import lombok.EqualsAndHashCode;
@@ -80,6 +80,7 @@ public class ContainerShop implements Shop {
     private double price;
     private ShopType shopType;
     private boolean unlimited;
+    private boolean isAlwaysCountingContainer;
     @NotNull
     private ItemStack item;
     @Nullable
@@ -108,7 +109,7 @@ public class ContainerShop implements Shop {
     private boolean disableDisplay;
     private UUID taxAccount;
 
-    @SuppressWarnings("CopyConstructorMissesField")
+
     private ContainerShop(@NotNull ContainerShop s) {
         Util.ensureThread(false);
         this.shopType = s.shopType;
@@ -127,6 +128,7 @@ public class ContainerShop implements Shop {
         this.currency = s.currency;
         this.disableDisplay = s.disableDisplay;
         this.taxAccount = s.taxAccount;
+        this.isAlwaysCountingContainer = s.isAlwaysCountingContainer;
         initDisplayItem();
     }
 
@@ -184,6 +186,7 @@ public class ContainerShop implements Shop {
         initDisplayItem();
         this.dirty = false;
         updateShopData();
+        isAlwaysCountingContainer = getExtra(plugin).getBoolean("is-always-counting-container", false);
     }
 
     private void updateShopData() {
@@ -193,7 +196,6 @@ public class ContainerShop implements Shop {
             section.set("currency", null);
             Util.debugLog("Shop " + this + " currency data upgrade successful.");
         }
-        setExtra(plugin, section);
         setDirty();
         this.update();
     }
@@ -315,7 +317,7 @@ public class ContainerShop implements Shop {
             return;
         }
         ItemStack[] contents = buyerInventory.getContents();
-        if (this.isUnlimited()) {
+        if (this.isUnlimited() && !isAlwaysCountingContainer) {
             for (int i = 0; amount > 0 && i < contents.length; i++) {
                 ItemStack stack = contents[i];
                 if (stack == null || stack.getType() == Material.AIR) {
@@ -513,11 +515,11 @@ public class ContainerShop implements Shop {
         if (item == null) {
             return false;
         }
-        ItemStack guest = item.clone();
-        guest.setAmount(1);
-        ItemStack owner = this.item.clone();
-        owner.setAmount(1);
-        return plugin.getItemMatcher().matches(guest, owner);
+        ItemStack givenItem = item.clone();
+        givenItem.setAmount(1);
+        ItemStack shopItem = this.item.clone();
+        shopItem.setAmount(1);
+        return plugin.getItemMatcher().matches(shopItem, givenItem);
     }
 
     @Override
@@ -584,6 +586,18 @@ public class ContainerShop implements Shop {
     }
 
     @Override
+    public boolean isAlwaysCountingContainer() {
+        return isAlwaysCountingContainer;
+    }
+
+    public void setAlwaysCountingContainer(boolean value) {
+        isAlwaysCountingContainer = value;
+        getExtra(plugin).set("is-always-counting-container", value);
+        setDirty();
+        update();
+    }
+
+    @Override
     public @NotNull String ownerName() {
         return ownerName(false);
     }
@@ -633,7 +647,7 @@ public class ContainerShop implements Shop {
         // Items to drop on floor
         ArrayList<ItemStack> floor = new ArrayList<>(5);
         int itemMaxStackSize = Util.getItemMaxStackSize(this.item.getType());
-        if (this.isUnlimited()) {
+        if (this.isUnlimited() && !isAlwaysCountingContainer()) {
             ItemStack item = this.item.clone();
             while (amount > 0) {
                 int stackSize = Math.min(amount, itemMaxStackSize);
@@ -679,7 +693,7 @@ public class ContainerShop implements Shop {
     }
 
     public boolean inventoryAvailable() {
-        if (isUnlimited()) {
+        if (isUnlimited() && !isAlwaysCountingContainer()) {
             return true;
         }
         if (isSelling()) {
@@ -785,14 +799,22 @@ public class ContainerShop implements Shop {
         Util.ensureThread(false);
         List<Sign> signs = this.getSigns();
         for (Sign sign : signs) {
-            NBTTileEntity tileSign = null;
             if (this.plugin.getNbtapi() != null) {
-                tileSign = new NBTTileEntity(sign);
-            }
-            for (int i = 0; i < lines.size(); i++) {
-                if (tileSign != null) {
-                    tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
-                } else {
+                NBTTileEntity tileSign = new NBTTileEntity(sign);
+                for (int i = 0; i < lines.size(); i++) {
+                    try {
+                        tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
+                    } catch (Exception e) {
+                        plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, dsiable and fallback... (You can safely ignore this)", e);
+                        plugin.disableNBTAPI();
+                        Util.debugLog("NBTAPI is broken, error: " + e.getMessage() + "\n stacktrace:  \n" + Arrays.toString(e.getStackTrace()));
+                        //Reset it since we disable nbt api, text need to change
+                        setSignText();
+                        return;
+                    }
+                }
+            } else {
+                for (int i = 0; i < lines.size(); i++) {
                     sign.setLine(i, toLegacyText(lines.get(i).getComponents()));
                 }
             }
@@ -1064,10 +1086,10 @@ public class ContainerShop implements Shop {
     @Override
     public int getRemainingSpace() {
         Util.ensureThread(false);
-        if (this.unlimited) {
+        if (this.unlimited && !isAlwaysCountingContainer()) {
             return -1;
         }
-        int space = Util.countSpace(this.getInventory(), this.getItem());
+        int space = Util.countSpace(this.getInventory(), this);
         new ShopInventoryCalculateEvent(this, space, -1).callEvent();
         return space;
     }
@@ -1080,10 +1102,10 @@ public class ContainerShop implements Shop {
     @Override
     public int getRemainingStock() {
         Util.ensureThread(false);
-        if (this.unlimited) {
+        if (this.unlimited && !isAlwaysCountingContainer()) {
             return -1;
         }
-        int stock = Util.countItems(this.getInventory(), this.getItem());
+        int stock = Util.countItems(this.getInventory(), this);
         new ShopInventoryCalculateEvent(this, -1, stock).callEvent();
         return stock;
     }
@@ -1294,7 +1316,7 @@ public class ContainerShop implements Shop {
         try {
             if (state.getType() == Material.ENDER_CHEST
                     && plugin.getOpenInvPlugin() != null) { //FIXME: Need better impl
-                OpenInv openInv = ((OpenInv) plugin.getOpenInvPlugin());
+                IOpenInv openInv = ((IOpenInv) plugin.getOpenInvPlugin());
                 inv = openInv.getSpecialEnderChest(
                         Objects.requireNonNull(
                                 openInv.loadPlayer(
@@ -1507,6 +1529,7 @@ public class ContainerShop implements Shop {
      */
     @Override
     public void setExtra(@NotNull Plugin plugin, @NotNull ConfigurationSection data) {
+        extra.set(plugin.getName(), data);
         setDirty();
         update();
     }

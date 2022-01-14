@@ -6,12 +6,12 @@
   "translation-contributors": "Közreműködők: Timtower, Netherfoam, KaiNoMood and Mgazul",
   "translation-country": "Nyelv Zóna: Magyar (hu_HU)",
   "language-version": "63",
-  "not-looking-at-valid-shop-block": "&cCould not find a block for creating shop. You need to look at one.",
+  "not-looking-at-valid-shop-block": "&cNem tudtuk létrehozni a boltot, mert nem találtunk blokkot. Nézz egy blokkra.",
   "not-looking-at-shop": "&cEz nem egy bolt amire nézel.",
   "no-anythings-in-your-hand": "&cNincs semmi a kezedben.",
   "no-permission": "&cNincs jogod ehhez!",
-  "integrations-check-failed-create": "&cIntegration {0} denied the shop-creation",
-  "integrations-check-failed-trade": "&cIntegration {0} denied the Shop trading",
+  "integrations-check-failed-create": "A {0} integráció elutasította a bolt-készítést",
+  "integrations-check-failed-trade": "A {0} integráció elutasította a bolttal való kereskedelmet",
   "3rd-plugin-build-check-failed": "&c3rd party plugin &l{0}&r&c denied the permission checks, did you have permission setup in there?",
   "no-creative-break": "&cYou cannot break other players shops in the creative mode, switch to survival mode or try to use supertool {0} instead.",
   "trading-in-creative-mode-is-disabled": "&cYou cannot trade with shop in the creative mode.",
@@ -96,6 +96,7 @@
     "owner": "&aTulajdonos: {0}",
     "item": "&aTárgy: &e{0}",
     "item-holochat-error": "&c[Error]",
+    "item-holochat-data-too-large": "&c[Error] Item NBT is too large for showing",
     "preview": "&b[Preview Item]",
     "space": "&aHely: &e{0}",
     "stock": "&aEltárolt &e{0}",
@@ -121,6 +122,10 @@
     "toggle-unlimited": {
       "unlimited": "&aA bolt korlátlan",
       "limited": "&aA bolt korlátozott"
+    },
+    "toggle-always-counting": {
+      "counting": "&aShop is now always counting container even is unlimited",
+      "not-counting": "&aShop is now respect if shop is unlimited"
     },
     "transfer-success": "&aTransferred &e{0} &ashop(s) to &e{1}",
     "transfer-success-other": "&aTransferred &e{0} {1}&a's shop(s) to &e{2}",
@@ -203,6 +208,8 @@
     "freeze": "Trading disabled"
   },
   "controlpanel": {
+    "alwayscounting": "&aAlways counting: {0} &e[&d&lChange&e]",
+    "alwayscounting-hover": "&eClick to toggle if the shop is always counting container.",
     "setowner": "&aTulajdonos: &b{0} &e[&d&lMegváltoztatás&e]",
     "infomation": "&aBolt vezérlőpult:",
     "setowner-hover": "&eKattintson ide, hogy megváltoztassa a tulajdonost.",
@@ -271,7 +278,8 @@
       "Uh! Új frissítés jelent meg {0} verzióra! Frissítsd most!",
       "Mire gondolsz? Csak nem arra, hogy a {0} verzió most jött ki? Frissítsd most!",
       "Doki, a QuickShopnak van egy új frissítése: {0}! Jó lenne frissíteni~",
-      "Ko~ko~da~yo~ a QuickShopnak van egy új frissítése: {0}~"
+      "Ko~ko~da~yo~ a QuickShopnak van egy új frissítése: {0}~",
+      "Paimon want told you the QuickShop have new update {0}!"
     ],
     "remote-disable-warning": "&cThis version of QuickShop is marked as disabled by the remote server, which means this version may have serious problem, get details from our SpigotMC page: {0}. This warning will continue to appear until you switch to a stable version, but it will not affect your server's performance.",
     "label": {
@@ -348,5 +356,7 @@
   "display-turn-off": "&aSuccessfully turn off the shop display.",
   "shop-purged-start": "&aShop purge started, check the console for details.",
   "purchase-out-of-stock": "&cThis shop run out of the stock, Contact shop owner or staffs to refill the stock.",
-  "purchase-out-of-space": "&cThis shop run out of the space, Contact shop owner or staffs to empty the shop."
+  "purchase-out-of-space": "&cThis shop run out of the space, Contact shop owner or staffs to empty the shop.",
+  "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
 }
