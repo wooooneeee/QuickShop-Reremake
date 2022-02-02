@@ -110,7 +110,9 @@ public class ContainerShop implements Shop {
     @NotNull
     private volatile String inventoryWrapperProvider;
     @Nullable
-    private volatile InventoryWrapper inventory;
+    //Use inventoryWrapper name to prevent conflicting with getter when generating hashcode method
+    //Also prevent chunk load
+    private volatile InventoryWrapper inventoryWrapper;
     @Nullable
     private volatile String symbolLink;
 
@@ -133,7 +135,7 @@ public class ContainerShop implements Shop {
         this.disableDisplay = s.disableDisplay;
         this.taxAccount = s.taxAccount;
         this.isAlwaysCountingContainer = s.isAlwaysCountingContainer;
-        this.inventory = s.inventory;
+        this.inventoryWrapper = s.inventoryWrapper;
         this.inventoryWrapperProvider = s.inventoryWrapperProvider;
         this.symbolLink = s.symbolLink;
         initDisplayItem();
@@ -207,9 +209,9 @@ public class ContainerShop implements Shop {
             BlockState block = getLocation().getBlock().getState();
             if (block instanceof BlockInventoryHolder) {
                 this.inventoryWrapperProvider = plugin.getInventoryWrapperRegistry().find(plugin.getInventoryWrapperManager());
-                this.inventory = new BukkitInventoryWrapper(((BlockInventoryHolder) block).getInventory());
-                this.symbolLink = plugin.getInventoryWrapperManager().mklink(inventory);
-                return this.inventory;
+                this.inventoryWrapper = new BukkitInventoryWrapper(((BlockInventoryHolder) block).getInventory());
+                this.symbolLink = plugin.getInventoryWrapperManager().mklink(inventoryWrapper);
+                return this.inventoryWrapper;
             } else {
                 if (block instanceof EnderChest) {
                     throw new IllegalStateException("Failed to load ender chest shop: You need install QuickShop EnderChest addon to make it works.");
@@ -959,7 +961,7 @@ public class ContainerShop implements Shop {
         if (provider == null) {
             throw new IllegalArgumentException("The manager " + manager.getClass().getName() + " not registered in registry.");
         }
-        this.inventory = wrapper;
+        this.inventoryWrapper = wrapper;
         this.inventoryWrapperProvider = provider;
         this.symbolLink = manager.mklink(wrapper);
         setDirty();
@@ -1058,7 +1060,7 @@ public class ContainerShop implements Shop {
             return;
         }
         this.isLoaded = true;
-        inventory = locateInventory(symbolLink);
+        inventoryWrapper = locateInventory(symbolLink);
         //Shop manger done this already
         //plugin.getShopManager().loadShop(this.getLocation().getWorld().getName(), this);
         plugin.getShopManager().getLoadedShops().add(this);
@@ -1404,12 +1406,12 @@ public class ContainerShop implements Shop {
      * @return The chest this shop is based on.
      */
     public @Nullable InventoryWrapper getInventory() {
-        if (inventory == null) {
+        if (inventoryWrapper == null) {
             Util.ensureThread(false);
-            inventory = locateInventory(symbolLink);
+            inventoryWrapper = locateInventory(symbolLink);
         }
-        if (this.inventory.isValid()) {
-            return this.inventory;
+        if (this.inventoryWrapper.isValid()) {
+            return this.inventoryWrapper;
         }
         if (!createBackup) {
             createBackup = Util.backupDatabase();
