@@ -22,10 +22,8 @@ package org.maxgamer.quickshop.localization.game.game.distributions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonElement;
-import lombok.val;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +35,6 @@ import org.maxgamer.quickshop.util.ReflectFactory;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.mojangapi.MojangApiMirror;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,16 +49,12 @@ public class MojangDistribution {
             .recordStats()
             .build();
     private final QuickShop plugin;
-    private final OkHttpClient client;
     private final MojangApiMirror mirror;
 
     public MojangDistribution(QuickShop plugin, MojangApiMirror mirror) {
         this.plugin = plugin;
         this.mirror = mirror;
         Util.getCacheFolder().mkdirs();
-        this.client = new OkHttpClient.Builder()
-                .build();
-
     }
 
     @Nullable
@@ -116,26 +109,15 @@ public class MojangDistribution {
         }
         return languages;
     }
-
-
     public boolean grabIntoCaches(String url) {
-        String data;
-        try (Response response = client.newCall(new Request.Builder().get().url(url).build()).execute()) {
-            val body = response.body();
-            if (body == null) {
-                return true;
-            }
-            data = body.string();
-            if (response.code() != 200) {
-                plugin.getLogger().warning("Couldn't get manifest: " + response.code() + ", please report to QuickShop!");
-                return false;
-            }
-            requestCachePool.put(url, data);
-        } catch (IOException e) {
-            e.printStackTrace();
-            plugin.getLogger().log(Level.WARNING, "Failed to download mojang manifest.json, multi-language system won't work");
-            return false;
+        HttpResponse<String> response = Unirest.get(url)
+                .asString();
+
+        if(response.isSuccess()){
+            requestCachePool.put(url, response.getBody());
+            return true;
         }
-        return true;
+        plugin.getLogger().log(Level.WARNING, "Failed to download mojang manifest.json, multi-language system won't work");
+        return false;
     }
 }

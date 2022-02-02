@@ -19,6 +19,7 @@
 
 package org.maxgamer.quickshop;
 
+import com.ghostchu.simplereloadlib.ReloadManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -27,6 +28,7 @@ import de.leonhard.storage.Yaml;
 import de.leonhard.storage.internal.settings.ConfigSettings;
 import de.leonhard.storage.internal.settings.ReloadSettings;
 import de.tr7zw.nbtapi.plugin.NBTAPI;
+import kong.unirest.Unirest;
 import lombok.Getter;
 import lombok.Setter;
 import me.minebuilders.clearlag.Clearlag;
@@ -90,7 +92,6 @@ import org.maxgamer.quickshop.util.config.ConfigurationFixer;
 import org.maxgamer.quickshop.util.envcheck.*;
 import org.maxgamer.quickshop.util.matcher.item.BukkitItemMatcherImpl;
 import org.maxgamer.quickshop.util.matcher.item.QuickShopItemMatcherImpl;
-import com.ghostchu.simplereloadlib.ReloadManager;
 import org.maxgamer.quickshop.util.reporter.error.RollbarErrorReporter;
 import org.maxgamer.quickshop.watcher.*;
 
@@ -102,6 +103,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class QuickShop extends JavaPlugin implements QuickShopAPI {
@@ -648,6 +650,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     @Override
     public final void onDisable() {
         getLogger().info("QuickShop is finishing remaining work, this may need a while...");
+        Unirest.shutDown();
         if (sentryErrorReporter != null) {
             sentryErrorReporter.unregister();
         }
@@ -886,6 +889,14 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         getLogger().info("Developers: " + Util.list2String(this.getDescription().getAuthors()));
         getLogger().info("Original author: Netherfoam, Timtower, KaiNoMood");
         getLogger().info("Let's start loading the plugin");
+
+        Unirest.config()
+                .cacheResponses(new kong.unirest.Cache.Builder()
+                        .depth(200) // Depth is the max number of entries cached
+                        .maxAge(30, TimeUnit.DAYS))
+                .addDefaultHeader("UserAgent","QuickShop/"+QuickShop.getVersion())
+                .followRedirects(true);
+
         getLogger().info("Chat processor selected: Hardcoded BungeeChat Lib");
         /* Process Metrics and Sentry error reporter. */
         metrics = new Metrics(this, 3320);

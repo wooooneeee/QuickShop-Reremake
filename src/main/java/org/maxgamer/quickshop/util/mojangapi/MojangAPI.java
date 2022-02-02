@@ -24,12 +24,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import kong.unirest.Unirest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.util.HttpUtil;
 import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.Util;
 
@@ -86,7 +86,7 @@ public class MojangAPI {
 
         public Optional<String> get(@NotNull String hash) {
             String url = apiMirror.getResourcesDownloadRoot() + "/" + hash.substring(0, 2) + "/" + hash;
-            return Optional.ofNullable(HttpUtil.createGet(url));
+            return Optional.ofNullable(Unirest.get(url).asString().getBody());
         }
     }
 
@@ -116,7 +116,7 @@ public class MojangAPI {
             if (assetIndexBean == null || assetIndexBean.getUrl() == null || assetIndexBean.getId() == null) {
                 return Optional.empty();
             }
-            String data = HttpUtil.createGet(assetIndexBean.getUrl());
+            String data = Unirest.get(assetIndexBean.getUrl()).asString().getBody();
             return Optional.of(new AssetsFileData(data, assetIndexBean.getSha1(), assetIndexBean.getId()));
         }
 
@@ -199,7 +199,7 @@ public class MojangAPI {
         @SneakyThrows
         public Optional<String> get() {
 
-            String result = HttpUtil.createGet(this.metaEndpoint);
+            String result = Unirest.get(this.metaEndpoint).asString().getBody();
             if (result == null) {
                 Util.debugLog("Request Meta Endpoint failed.");
                 return Optional.empty();
@@ -218,7 +218,7 @@ public class MojangAPI {
                         JsonElement gameId = gameVersionData.getAsJsonObject().get("id");
                         JsonElement gameIndexUrl = gameVersionData.getAsJsonObject().get("url");
                         if (Objects.equals(gameId.getAsString(), version)) {
-                            return Optional.ofNullable(HttpUtil.createGet(gameIndexUrl.getAsString()));
+                            return Optional.ofNullable(Unirest.get(gameIndexUrl.getAsString()).asString().getBody());
                         }
                     }
                 }

@@ -212,14 +212,6 @@
                             <shadedPattern>org.maxgamer.quickshop.shade.com.flowpowered.math.</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>okio.</pattern>
-                            <shadedPattern>org.maxgamer.quickshop.shade.okio.</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>okhttp3.</pattern>
-                            <shadedPattern>org.maxgamer.quickshop.shade.okhttp3.</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>net.kyori.minecraft.</pattern>
                             <shadedPattern>org.maxgamer.quickshop.shade.net.kyori.minecraft.</shadedPattern>
                         </relocation>
@@ -992,27 +984,6 @@
             <systemPath>${project.basedir}/lib/IridiumSkyblock-3.2.3.jar</systemPath>
             <scope>system</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.9.3</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>annotations</artifactId>
-                    <groupId>org.jetbrains</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>kotlin-stdlib-common</artifactId>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>kotlin-stdlib</artifactId>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
@@ -1047,6 +1018,16 @@
             <groupId>com.ghostchu</groupId>
             <artifactId>simplereloadlib</artifactId>
             <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.konghq</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>3.13.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.konghq</groupId>
+            <artifactId>unirest-object-mappers-gson</artifactId>
+            <version>3.11.09</version>
         </dependency>
     </dependencies>
 </project>
