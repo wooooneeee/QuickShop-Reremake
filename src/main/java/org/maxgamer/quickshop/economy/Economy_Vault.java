@@ -38,8 +38,8 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.AbstractEconomy;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.economyformatter.BuiltInEconomyFormatter;
-import org.maxgamer.quickshop.util.reload.ReloadResult;
-import org.maxgamer.quickshop.util.reload.ReloadStatus;
+import com.ghostchu.simplereloadlib.ReloadResult;
+import com.ghostchu.simplereloadlib.ReloadStatus;
 
 import java.util.Objects;
 import java.util.UUID;

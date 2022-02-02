@@ -22,7 +22,7 @@ package org.maxgamer.quickshop.api.integration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.util.reload.Reloadable;
+import com.ghostchu.simplereloadlib.Reloadable;
 
 /**
  * Integration module

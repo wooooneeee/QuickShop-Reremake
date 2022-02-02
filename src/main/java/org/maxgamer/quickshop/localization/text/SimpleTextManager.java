@@ -42,9 +42,9 @@ import org.maxgamer.quickshop.localization.text.postprocessing.impl.FillerProces
 import org.maxgamer.quickshop.localization.text.postprocessing.impl.PlaceHolderApiProcessor;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
-import org.maxgamer.quickshop.util.reload.ReloadResult;
-import org.maxgamer.quickshop.util.reload.ReloadStatus;
-import org.maxgamer.quickshop.util.reload.Reloadable;
+import com.ghostchu.simplereloadlib.ReloadResult;
+import com.ghostchu.simplereloadlib.ReloadStatus;
+import com.ghostchu.simplereloadlib.Reloadable;
 
 import java.io.File;
 import java.io.IOException;

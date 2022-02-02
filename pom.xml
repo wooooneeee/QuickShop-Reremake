@@ -235,6 +235,11 @@
                             <pattern>de.leonhard.storage.</pattern>
                             <shadedPattern>org.maxgamer.quickshop.shade.de.leonhard.storage.</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>com.ghostchu.</pattern>
+                            <shadedPattern>org.maxgamer.quickshop.shade.com.ghostchu.</shadedPattern>
+                        </relocation>
+
                     </relocations>
                     <transformers>
                         <transformer
@@ -454,6 +459,10 @@
                     <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -481,6 +490,12 @@
             <artifactId>ProtocolLib</artifactId>
             <version>4.7.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>byte-buddy</artifactId>
+                    <groupId>net.bytebuddy</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--JsonConfiguration Dependency Start-->
         <dependency>
@@ -610,6 +625,10 @@
                     <artifactId>annotations</artifactId>
                     <groupId>org.jetbrains</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>junit-jupiter</artifactId>
+                    <groupId>org.junit.jupiter</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- Database lib for testing-->
@@ -631,6 +650,12 @@
             <artifactId>spigot-api</artifactId>
             <version>1.18.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -708,6 +733,50 @@
                     <artifactId>truevfs-comp-tardriver</artifactId>
                     <groupId>net.java.truevfs</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>ST4</artifactId>
+                    <groupId>org.antlr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>antlr-runtime</artifactId>
+                    <groupId>org.antlr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>antlr4</artifactId>
+                    <groupId>org.antlr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>antlr4-runtime</artifactId>
+                    <groupId>org.antlr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>core</artifactId>
+                    <groupId>com.sk89q.worldedit.worldedit-libs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>gson</artifactId>
+                    <groupId>com.google.code.gson</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>icu4j</artifactId>
+                    <groupId>com.ibm.icu</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>javax.json</artifactId>
+                    <groupId>org.glassfish</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j-api</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino-runtime</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>org.abego.treelayout.core</artifactId>
+                    <groupId>org.abego.treelayout</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -752,6 +821,12 @@
         <dependency>
             <groupId>com.rollbar</groupId>
             <version>1.8.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
             <artifactId>rollbar-java</artifactId>
         </dependency>
         <dependency>
@@ -829,6 +904,20 @@
             <artifactId>helper</artifactId>
             <version>5.6.9</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jsr305</artifactId>
+                    <groupId>com.google.code.findbugs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>checker-qual</artifactId>
+                    <groupId>org.checkerframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>
@@ -857,6 +946,44 @@
             <artifactId>advanced-region-market</artifactId>
             <version>3.3.6</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mc1-12adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>mc1-13adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>mc1-14adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>we6adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>we6faweadapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>we7adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wg6_1adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wg6_2adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wg7adapter</artifactId>
+                    <groupId>com.github.alex9849.advanced-region-market</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.iridium</groupId>
@@ -871,6 +998,20 @@
             <artifactId>okhttp</artifactId>
             <version>4.9.3</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>annotations</artifactId>
+                    <groupId>org.jetbrains</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>kotlin-stdlib-common</artifactId>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>kotlin-stdlib</artifactId>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
@@ -883,6 +1024,12 @@
             <groupId>org.maxgamer.storage</groupId>
             <artifactId>simplixstorage</artifactId>
             <version>3.2.3.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>annotations</artifactId>
+                    <groupId>org.jetbrains</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.tr7zw</groupId>
@@ -895,6 +1042,11 @@
             <artifactId>Reserve</artifactId>
             <version>0.1.5.4</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ghostchu</groupId>
+            <artifactId>simplereloadlib</artifactId>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 </project>

@@ -40,9 +40,9 @@ import org.maxgamer.quickshop.api.eventmanager.QuickEventManager;
 import org.maxgamer.quickshop.eventmanager.BukkitEventManager;
 import org.maxgamer.quickshop.eventmanager.QSEventManager;
 import org.maxgamer.quickshop.util.holder.Result;
-import org.maxgamer.quickshop.util.reload.ReloadResult;
-import org.maxgamer.quickshop.util.reload.ReloadStatus;
-import org.maxgamer.quickshop.util.reload.Reloadable;
+import com.ghostchu.simplereloadlib.ReloadResult;
+import com.ghostchu.simplereloadlib.ReloadStatus;
+import com.ghostchu.simplereloadlib.Reloadable;
 import org.primesoft.blockshub.BlocksHubBukkit;
 
 import java.util.List;
