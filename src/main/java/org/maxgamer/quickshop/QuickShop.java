@@ -632,8 +632,6 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
 
     @Override
     public final void onDisable() {
-        getLogger().info("[DEBUG] QuickShop is shutting down, printing stack trace.");
-        new RuntimeException("Shutdown Tracing").printStackTrace();
         getLogger().info("QuickShop is finishing remaining work, this may need a while...");
         if (sentryErrorReporter != null) {
             sentryErrorReporter.unregister();
