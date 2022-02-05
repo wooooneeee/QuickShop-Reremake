@@ -649,7 +649,8 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getLogger().warning("If you need reload QuickShop configuration, use /qs reload command instead.");
             if (sentryErrorReporter != null)
                 sentryErrorReporter.ignoreThrow();
-            new RuntimeException("Hot unload QuickShop while server running may cause unexpected behavior, don't do that!").printStackTrace();
+            // Record the stacktrace because some other plugin will unload quickshop while running.
+            getLogger().log(Level.WARNING, "Hot unload QuickShop while server running may cause unexpected behavior, don't do that!", new Exception("Hot unloading"));
         }
         if (sentryErrorReporter != null) {
             sentryErrorReporter.unregister();
