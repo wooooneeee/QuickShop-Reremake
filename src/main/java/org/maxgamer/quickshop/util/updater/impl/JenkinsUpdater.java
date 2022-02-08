@@ -36,12 +36,15 @@ import org.maxgamer.quickshop.util.updater.VersionType;
 import java.io.*;
 import java.net.URL;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class JenkinsUpdater implements QuickUpdater {
     private final BuildInfo pluginBuildInfo;
     private final String jobUrl;
     private BuildInfo lastRemoteBuildInfo;
     private File updatedJar;
+    private boolean isLatest;
+    private long lastCheckingTime;
 
     public JenkinsUpdater(BuildInfo pluginBuildInfo) {
         this.pluginBuildInfo = pluginBuildInfo;
@@ -95,16 +98,21 @@ public class JenkinsUpdater implements QuickUpdater {
         if (versionType != getCurrentRunning()) {
             return true;
         }
+        if (System.currentTimeMillis() - lastCheckingTime < TimeUnit.DAYS.toMillis(1)) {
+            return isLatest;
+        }
         try (InputStream inputStream = HttpRequest.get(new URL(jobUrl + "lastSuccessfulBuild/artifact/target/BUILDINFO"))
                 .header("User-Agent", "Java-QuickShop-" + QuickShop.getFork() + " " + QuickShop.getVersion())
                 .execute()
                 .expectResponseCode(200)
                 .getInputStream()) {
             this.lastRemoteBuildInfo = new BuildInfo(inputStream);
-            return lastRemoteBuildInfo.getBuildId() <= pluginBuildInfo.getBuildId() || lastRemoteBuildInfo.getGitCommit().equalsIgnoreCase(pluginBuildInfo.getGitCommit());
+            return isLatest = lastRemoteBuildInfo.getBuildId() <= pluginBuildInfo.getBuildId() || lastRemoteBuildInfo.getGitCommit().equalsIgnoreCase(pluginBuildInfo.getGitCommit());
         } catch (IOException ioException) {
             MsgUtil.sendDirectMessage(Bukkit.getConsoleSender(), ChatColor.RED + "[QuickShop] Failed to check for an update on build server! It might be an internet issue or the build server host is down. If you want disable the update checker, you can disable in config.yml, but we still high-recommend check for updates on SpigotMC.org often, Error: " + ioException.getMessage());
-            return true;
+            return isLatest = true;
+        } finally {
+            lastCheckingTime = System.currentTimeMillis();
         }
     }
 

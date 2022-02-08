@@ -6,13 +6,14 @@
   "translation-contributors": "Người đóng góp: huyhhuy",
   "translation-country": "Vùng ngôn ngữ: Tiếng Việt (vi_VN)",
   "language-version": "63",
-  "not-looking-at-valid-shop-block": "&cCould not find a block for creating shop. You need to look at one.",
+  "not-looking-at-valid-shop-block": "&cKhông thể tìm ra block để tạo Shop. Bạn cần phải nhìn vào block trước.",
   "not-looking-at-shop": "&cKhông thể tìm ra QuickShop. Bạn cần phải nhìn vào nó trước.",
   "no-anythings-in-your-hand": "&cChẳng có gì trong tay bạn cả.",
   "no-permission": "&cBạn không có quyền làm thế.",
   "integrations-check-failed-create": "&cTích hợp {0} đã từ chối sự khởi tạo shop",
   "integrations-check-failed-trade": "&cTích hợp {0} đã từ chối Shop trao đổi",
   "3rd-plugin-build-check-failed": "&cPlugin bên thứ 3 &l{0}&r&c đã từ chối quyền kiểm tra, bạn đã có quyền thiết lập ở đó chưa?",
+  "3rd-plugin-build-check-failed-admin": "&7(AdminOnly) &d{0} &8denied the permission checks, If this not excepted, try add &d{1} &7to listener blacklist. &7Configure Guide: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Use-protection-listener-filter",
   "no-creative-break": "&cYou cannot break other players shops in creative mode, switch to survival mode or try to use the supertool {0} instead.",
   "trading-in-creative-mode-is-disabled": "&cYou cannot trade with this shop while being in creative mode.",
   "supertool-is-disabled": "&cSupertool is disabled. Cannot break any shops.",
@@ -60,7 +61,7 @@
   "refill-success": "&aRefill successful",
   "empty-success": "&aEmptying shop successful",
   "admin-shop": "AdminShop",
-  "unknown-owner": "Unknown",
+  "unknown-owner": "Không xác định",
   "owner-bypass-check": "&eBypassed all checks. Trade successful! (You are now the shop owner!)",
   "reached-maximum-can-create": "&cYou already created a maximum of {0}/{1} shops!",
   "restricted-prices": "&cRestricted price for {0}: Min {1}, max {2}",
@@ -149,6 +150,7 @@
     "now-nolonger-debuging": "&aSuccessfully disabled Developer mode. Reloading QuickShop...",
     "wrong-args": "&cInvalid argument. Use &l/qs help &cto see a list of commands.",
     "description": {
+      "alwayscounting": "&eSet if shop always counting container even is unlimited",
       "title": "&aQuickShop help",
       "unlimited": "&eGives a shop unlimited stock.",
       "setowner": "&eChanges the ownership of a shop.",
@@ -358,5 +360,6 @@
   "purchase-out-of-stock": "&cThis shop run out of the stock, Contact shop owner or staffs to refill the stock.",
   "purchase-out-of-space": "&cThis shop run out of the space, Contact shop owner or staffs to empty the shop.",
   "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
-  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors.",
+  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
 }

@@ -13,6 +13,7 @@
   "integrations-check-failed-create": "&cL'integrazione {0} ha negato la creazione del negozio",
   "integrations-check-failed-trade": "&cL'ntegrazione {0} ha negato lo scambio del negozio",
   "3rd-plugin-build-check-failed": "&cIl plugin di terze parti &l{0}&r&c ha negato i controlli dei permessi, hai già i permessi impostati?",
+  "3rd-plugin-build-check-failed-admin": "&7(AdminOnly) &d{0} &8denied the permission checks, If this not excepted, try add &d{1} &7to listener blacklist. &7Configure Guide: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Use-protection-listener-filter",
   "no-creative-break": "&cNon puoi rompere i negozi degli altri giocatori in modalità creativa, passa alla modalità Sopravvivenza o prova ad usare il supertool {0}.",
   "trading-in-creative-mode-is-disabled": "&cNon puoi scambiare con questo negozio mentre sei in modalità creativa.",
   "supertool-is-disabled": "&cSupertool è disabilitato. Impossibile rompere alcun negozio.",
@@ -149,6 +150,7 @@
     "now-nolonger-debuging": "&aModalità sviluppatore disabilitata con successo. Ricaricando QuickShop...",
     "wrong-args": "&cArgomento non valido. Usa &l/qs help &cper vedere un elenco di comandi.",
     "description": {
+      "alwayscounting": "&eSet if shop always counting container even is unlimited",
       "title": "&aAiuto di QuickShop",
       "unlimited": "&eDà a un negozio scorte illimitate.",
       "setowner": "&eCambia la proprietà di un negozio.",
@@ -358,5 +360,6 @@
   "purchase-out-of-stock": "&cQuesto negozio ha esaurito le scorte, contatta il proprietario del negozio o il personale per rifornire le scorte.",
   "purchase-out-of-space": "&cQuesto negozio ha esaurito lo spazio, contatta il proprietario del negozio o il personale per svuotare il negozio.",
   "safe-mode": "&cQuickShop ora in modalità provvisoria, non puoi aprire questo contenitore del negozio, contatta l'amministratore del server per correggere gli errori.",
-  "safe-mode-admin": "&c&lATTENZIONE: &cIl QuickShop su questo server ora funziona in modalità provvisoria, nessuna funzione funzionerà, per favore digita il comando &e/qs &c per controllare eventuali errori."
+  "safe-mode-admin": "&c&lATTENZIONE: &cIl QuickShop su questo server ora funziona in modalità provvisoria, nessuna funzione funzionerà, per favore digita il comando &e/qs &c per controllare eventuali errori.",
+  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
 }

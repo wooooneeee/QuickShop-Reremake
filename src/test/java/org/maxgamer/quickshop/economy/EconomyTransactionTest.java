@@ -13,20 +13,20 @@
  *  for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program. If not, see <http:www.gnu.org/licenses/>.
  *
  */
 
 package org.maxgamer.quickshop.economy;
 
-import org.bukkit.*;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.TestBukkitBase;
 import org.maxgamer.quickshop.api.economy.EconomyCore;
 import org.maxgamer.quickshop.api.economy.EconomyTransaction;
 
@@ -37,180 +37,24 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EconomyTransactionTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class EconomyTransactionTest extends TestBukkitBase {
 
 
-    static final EconomyCore economy = new TestEconomy();
-    static final Trader taxAccount = Trader.adapt(new OfflinePlayer() {
-        private final UUID uuid = UUID.randomUUID();
+    static EconomyCore economy = new TestEconomy();
+    static Trader taxAccount;
 
-        @Override
-        public boolean isOnline() {
-            return false;
+    public static Trader getTaxAccount() {
+        if (taxAccount == null) {
+            taxAccount = Trader.adapt(QuickShop.getInstance().getServer().getOfflinePlayer("Tax"));
+            economy.getBalance(taxAccount, null, null);
         }
-
-        @Override
-        public @Nullable String getName() {
-            return null;
-        }
-
-        @Override
-        public @NotNull UUID getUniqueId() {
-            return uuid;
-        }
-
-        @Override
-        public boolean isBanned() {
-            return false;
-        }
-
-        @Override
-        public boolean isWhitelisted() {
-            return false;
-        }
-
-        @Override
-        public void setWhitelisted(boolean value) {
-
-        }
-
-        @Override
-        public @Nullable Player getPlayer() {
-            return null;
-        }
-
-        @Override
-        public long getFirstPlayed() {
-            return 0;
-        }
-
-        @Override
-        public long getLastPlayed() {
-            return 0;
-        }
-
-        @Override
-        public boolean hasPlayedBefore() {
-            return false;
-        }
-
-        @Override
-        public @Nullable Location getBedSpawnLocation() {
-            return null;
-        }
-
-        @Override
-        public void incrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void decrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void incrementStatistic(@NotNull Statistic statistic, int amount) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void decrementStatistic(@NotNull Statistic statistic, int amount) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void setStatistic(@NotNull Statistic statistic, int newValue) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public int getStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
-            return 0;
-        }
-
-        @Override
-        public void incrementStatistic(@NotNull Statistic statistic, @NotNull Material material) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void decrementStatistic(@NotNull Statistic statistic, @NotNull Material material) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public int getStatistic(@NotNull Statistic statistic, @NotNull Material material) throws IllegalArgumentException {
-            return 0;
-        }
-
-        @Override
-        public void incrementStatistic(@NotNull Statistic statistic, @NotNull Material material, int amount) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void decrementStatistic(@NotNull Statistic statistic, @NotNull Material material, int amount) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void setStatistic(@NotNull Statistic statistic, @NotNull Material material, int newValue) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void incrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void decrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public int getStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType) throws IllegalArgumentException {
-            return 0;
-        }
-
-        @Override
-        public void incrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType, int amount) throws IllegalArgumentException {
-
-        }
-
-        @Override
-        public void decrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType, int amount) {
-
-        }
-
-        @Override
-        public void setStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType, int newValue) {
-
-        }
-
-        @Override
-        public @NotNull Map<String, Object> serialize() {
-            return null;
-        }
-
-        @Override
-        public boolean isOp() {
-            return false;
-        }
-
-        @Override
-        public void setOp(boolean value) {
-
-        }
-    });
-
-    static {
-        economy.getBalance(taxAccount, null, null);
+        return taxAccount;
     }
 
     private static EconomyTransaction genTransaction(UUID from, UUID to, double amount, double taxModifier, boolean allowLoan) {
-        return EconomyTransaction.builder().core(economy).from(from).to(to).amount(amount).taxAccount(taxAccount).taxModifier(taxModifier).allowLoan(allowLoan).build();
+        return EconomyTransaction.builder().core(economy).from(from).to(to).amount(amount).taxAccount(getTaxAccount()).taxModifier(taxModifier).allowLoan(allowLoan).build();
     }
 
     @Test
@@ -239,36 +83,35 @@ public class EconomyTransactionTest {
                 }
             });
         }
-        Assert.assertEquals((Double) (20 * 1000 * 0.06D), (Double) economy.getBalance(taxAccount, null, null));
+        assertEquals((Double) (20 * 1000 * 0.06D), (Double) economy.getBalance(taxAccount, null, null));
 
-        Assert.assertEquals((Double) (1000 * 0.94D), (Double) economy.getBalance(UUIDList.get(0), null, null));
+        assertEquals((Double) (1000 * 0.94D), (Double) economy.getBalance(UUIDList.get(0), null, null));
 
-//        genTransaction(UUIDList.get(5), null, 1000, 0.0, true).commit(new EconomyTransaction.TransactionCallback() {
-//            @Override
-//            public void onSuccess(@NotNull EconomyTransaction economyTransaction) {
-//                assertEquals(-1000 * 0.06D, economy.getBalance(economyTransaction.getFrom(), null, null));
-//            }
-//
-//            @Override
-//            public void onFailed(@NotNull EconomyTransaction economyTransaction) {
-//                throw new RuntimeException("Loan Test Failed");
-//            }
-//        });
-//
-//        genTransaction(UUIDList.get(4), UUIDList.get(5), 1000, 0.06, true).commit(new EconomyTransaction.TransactionCallback() {
-//            @Override
-//            public void onSuccess(@NotNull EconomyTransaction economyTransaction) {
-//                assertEquals(-1000 * 0.06D, economy.getBalance(economyTransaction.getFrom(), null, null));
-//                assertEquals(-1000 * 0.06D + 1000 * 0.94D, economy.getBalance(economyTransaction.getTo(), null, null));
-//                assertEquals(20 * 1000 * 0.06D + (1000 * 0.06D), economy.getBalance(taxAccount, null, null));
-//            }
-//
-//            @Override
-//            public void onFailed(@NotNull EconomyTransaction economyTransaction) {
-//                throw new RuntimeException("Transfer Test Failed");
-//            }
-//        });
-//    }
+        genTransaction(UUIDList.get(5), null, 1000, 0.0, true).commit(new EconomyTransaction.TransactionCallback() {
+            @Override
+            public void onSuccess(@NotNull EconomyTransaction economyTransaction) {
+                assertEquals(-1000 * 0.06D, economy.getBalance(economyTransaction.getFrom(), null, null));
+            }
+
+            @Override
+            public void onFailed(@NotNull EconomyTransaction economyTransaction) {
+                throw new RuntimeException("Loan Test Failed");
+            }
+        });
+
+        genTransaction(UUIDList.get(4), UUIDList.get(5), 1000, 0.06, true).commit(new EconomyTransaction.TransactionCallback() {
+            @Override
+            public void onSuccess(@NotNull EconomyTransaction economyTransaction) {
+                assertEquals(-1000 * 0.06D, economy.getBalance(economyTransaction.getFrom(), null, null));
+                assertEquals(-1000 * 0.06D + 1000 * 0.94D, economy.getBalance(economyTransaction.getTo(), null, null));
+                assertEquals(20 * 1000 * 0.06D + (1000 * 0.06D), economy.getBalance(taxAccount, null, null));
+            }
+
+            @Override
+            public void onFailed(@NotNull EconomyTransaction economyTransaction) {
+                throw new RuntimeException("Transfer Test Failed");
+            }
+        });
     }
 
     @Test
@@ -357,6 +200,11 @@ public class EconomyTransactionTest {
         @Override
         public boolean supportCurrency() {
             return false;
+        }
+
+        @Override
+        public @Nullable String getLastError() {
+            return "ErrorTracing: Unit Test";
         }
 
         @Override

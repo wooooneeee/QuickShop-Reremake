@@ -96,7 +96,7 @@ public interface ShopManager {
     void createShop(@NotNull Shop shop, @NotNull Info info);
 
     /**
-     * Format the price use economy system
+     * Format the price use formatter
      *
      * @param d        price
      * @param currency currency
@@ -106,7 +106,7 @@ public interface ShopManager {
     @Nullable String format(double d, @NotNull World world, @Nullable String currency);
 
     /**
-     * Format the price use economy system
+     * Format the price use formatter
      *
      * @param d    price
      * @param shop The shop
@@ -252,9 +252,10 @@ public interface ShopManager {
      * @param purchaser Target player
      * @param shop      Target shop
      * @param amount    Trading item amounts.
+     * @param total     the total money payed
      */
     @ApiStatus.Experimental
-    void sendPurchaseSuccess(@NotNull UUID purchaser, @NotNull Shop shop, int amount);
+    void sendPurchaseSuccess(@NotNull UUID purchaser, @NotNull Shop shop, int amount, double total);
 
     /**
      * Send a sellSuccess message for a player.
@@ -262,9 +263,10 @@ public interface ShopManager {
      * @param seller Target player
      * @param shop   Target shop
      * @param amount Trading item amounts.
+     * @param total  the total money payed
      */
     @ApiStatus.Experimental
-    void sendSellSuccess(@NotNull UUID seller, @NotNull Shop shop, int amount);
+    void sendSellSuccess(@NotNull UUID seller, @NotNull Shop shop, int amount, double total);
 
     /**
      * Send a shop infomation to a player.

@@ -25,7 +25,6 @@ import com.google.gson.JsonPrimitive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +47,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class CrowdinOTA implements Distribution {
-    protected static final String CROWDIN_OTA_HOST = "https://distributions.crowdin.net/daf1a8db40f132ce157c457xrm4/";
+    //DO NOT final it! Unit-test needs to change it to prevent network flow
+    protected static String CROWDIN_OTA_HOST = "https://distributions.crowdin.net/daf1a8db40f132ce157c457xrm4/";
     private final QuickShop plugin;
     private final OTACacheControl otaCacheControl = new OTACacheControl();
 
@@ -175,7 +175,9 @@ public class CrowdinOTA implements Distribution {
         String data = HttpUtil.createGet(url, forceFlush);
         if (data == null) {
             // Failed to grab data
-            throw new OTAException("Failed to grab data");
+            plugin.getLogger().warning("Translation " + crowdinLocale + " update failed, fallback to built-in translation...");
+            // Use Local File
+            return "{}";
         }
         // Successfully grab the data from the remote server
         otaCacheControl.writeObjectCache(postProcessingPath, data.getBytes(StandardCharsets.UTF_8), manifestTimestamp);
@@ -225,13 +227,6 @@ public class CrowdinOTA implements Distribution {
 //        }
     }
 
-    @EqualsAndHashCode(callSuper = true)
-    @Data
-    public static class OTAException extends RuntimeException {
-        public OTAException(String message) {
-            super(message);
-        }
-    }
 
     @AllArgsConstructor
     @Builder

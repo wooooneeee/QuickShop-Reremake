@@ -13,6 +13,7 @@
   "integrations-check-failed-create": "&cИнтеграция {0} отказалась от создание магазина",
   "integrations-check-failed-trade": "&cИнтеграция {0} отказалась от обменников в магазине",
   "3rd-plugin-build-check-failed": "&cСторонний плагин &l{0}&r&c отказался в проверке прав доступа, у вас ли здесь есть права установки?",
+  "3rd-plugin-build-check-failed-admin": "&7(AdminOnly) &d{0} &8denied the permission checks, If this not excepted, try add &d{1} &7to listener blacklist. &7Configure Guide: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Use-protection-listener-filter",
   "no-creative-break": "&cВы не можете сломать чужой магазин в творческом режиме, переключитесь на режим выживания или попробуйте использовать супер-инструментом {0}.",
   "trading-in-creative-mode-is-disabled": "&cВы не можете торговать в творческом режиме.",
   "supertool-is-disabled": "&cСупер-инструмент отключен, вы не можете сломать чужой магазин.",
@@ -149,6 +150,7 @@
     "now-nolonger-debuging": "&aУспешно выключен режим разработчика. Перезагружаю...",
     "wrong-args": "&cНеверный аргумент. Используйте &l/qs help &cчтобы узнать список командов.",
     "description": {
+      "alwayscounting": "&eSet if shop always counting container even is unlimited",
       "title": "&aQuickShop справка",
       "unlimited": "&eДает магазину неограниченный товар.",
       "setowner": "&eУстанавливает владельца магазина.",
@@ -358,5 +360,6 @@
   "purchase-out-of-stock": "&cВ этом магазине закончился запас, свяжитесь с владельцем магазина или сотрудниками для пополнения.",
   "purchase-out-of-space": "&cВ этом магазине закончилось место, свяжитесь с владельцем магазина или сотрудниками, чтобы освободились место.",
   "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
-  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors.",
+  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
 }

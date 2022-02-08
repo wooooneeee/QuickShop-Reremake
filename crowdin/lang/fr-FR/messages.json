@@ -6,13 +6,14 @@
   "translation-contributors": "Contributeurs : Timtower, Netherfoam, KaiNoMood, Mgazul, JackThePicken, Andre_601 et brunopaiva15, HiiRaZ",
   "translation-country": "Langue: Français (fr_FR)",
   "language-version": "63",
-  "not-looking-at-valid-shop-block": "&cCould not find a block for creating shop. You need to look at one.",
+  "not-looking-at-valid-shop-block": "&cImpossible de trouver un bloc pour créer une boutique. Vous devez en regarder un.",
   "not-looking-at-shop": "&cImpossible de trouver un QuickShop. Vous devez en regarder un.",
   "no-anythings-in-your-hand": "&cVous n'avez aucun objet dans votre main.",
   "no-permission": "&cVous n'avez pas la permission de faire ceci.",
   "integrations-check-failed-create": "&cIntégration {0} à refusé la création de la boutique",
   "integrations-check-failed-trade": "&cIntégration {0} à refusé la création de la boutique",
   "3rd-plugin-build-check-failed": "Un plugin tiers &l{0}&r&c a refusé les vérifications de permission, avez-vous les droits pour paramétrer ici ?",
+  "3rd-plugin-build-check-failed-admin": "&7(AdminOnly) &d{0} &8denied the permission checks, If this not excepted, try add &d{1} &7to listener blacklist. &7Configure Guide: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Use-protection-listener-filter",
   "no-creative-break": "&cVous ne pouvez pas détruire les boutiques des autres joueurs en mode créatif, basculez en mode survie ou essayez d'utiliser le super-outil {0} à la place.",
   "trading-in-creative-mode-is-disabled": "&cVous ne pouvez pas utiliser une boutique en mode créatif.",
   "supertool-is-disabled": "&cLe super-outil est désactivé, impossible de détruire une boutique avec.",
@@ -149,6 +150,7 @@
     "now-nolonger-debuging": "&aPassage réussi en mode développeur. Actualisation de QuickShop...",
     "wrong-args": "&cCommande invalide. Utilisez &l/qs help &cpour voir une liste de commandes.",
     "description": {
+      "alwayscounting": "&eSet if shop always counting container even is unlimited",
       "title": "&aAide QuickShop",
       "unlimited": "&eDonne à une boutique un stock illimité.",
       "setowner": "&eModifie le propriétaire d'une boutique.",
@@ -358,5 +360,6 @@
   "purchase-out-of-stock": "&cCette boutique est en rupture de stock, contactez le propriétaire ou le personnel de la boutique pour recharger le stock.",
   "purchase-out-of-space": "&cCette boutique est à court d'espace, contactez le propriétaire ou le personnel de la boutique pour vider la boutique.",
   "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
-  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors.",
+  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
 }

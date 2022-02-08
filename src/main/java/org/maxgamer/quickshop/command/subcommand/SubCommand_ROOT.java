@@ -19,7 +19,6 @@
 
 package org.maxgamer.quickshop.command.subcommand;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
@@ -31,14 +30,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@AllArgsConstructor
+
 public class SubCommand_ROOT implements CommandHandler<CommandSender> {
 
     private final QuickShop plugin;
 
+    private final CommandHandler<CommandSender> helpCommand;
+
+    public SubCommand_ROOT(QuickShop plugin) {
+        this.plugin = plugin;
+        this.helpCommand = new SubCommand_Help(plugin);
+    }
+
     @Override
     public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
-        new SubCommand_Help(plugin).onCommand(sender, commandLabel, cmdArg);
+        helpCommand.onCommand(sender, commandLabel, cmdArg);
     }
 
     @NotNull

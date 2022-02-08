@@ -53,7 +53,7 @@ public class ReflectFactory {
     private static Class<?> cachedNMSClass;
     private static String nmsVersion;
     private static Method getMinecraftKeyNameMethod;
-    private static boolean isMinecraftKeyNameMethodUnavailable = false;
+    private static final boolean isMinecraftKeyNameMethodUnavailable = false;
 //    private static Object serverInstance;
 //    private static Field tpsField;
 
@@ -195,7 +195,7 @@ public class ReflectFactory {
      */
     @Nullable
     public static String convertBukkitItemStackToJson(@NotNull ItemStack bStack) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
-        if (bStack.getType() == Material.AIR || craftItemStack_asNMSCopyMethod == null || nbtTagCompoundClass == null) {
+        if (bStack.getType() == Material.AIR || craftItemStack_asNMSCopyMethod == null || nbtTagCompoundClass == null || itemStack_saveMethod == null) {
             return null;
         }
         Object mcStack = craftItemStack_asNMSCopyMethod.invoke(null, bStack);

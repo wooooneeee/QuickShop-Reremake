@@ -19,8 +19,6 @@
 
 package org.maxgamer.quickshop;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import de.leonhard.storage.LightningBuilder;
 import de.leonhard.storage.Yaml;
@@ -277,7 +275,6 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
      */
     protected QuickShop(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
-        System.getProperties().setProperty("org.maxgamer.quickshop.util.envcheck.skip.SIGNATURE_VERIFY", "true");
     }
 
     @NotNull
@@ -1315,7 +1312,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("lockette.displayname", null);
             getConfig().set("float", null);
             getConfig().set("lockette.enable", true);
-            getConfig().set("shop.blacklist-world", Lists.newArrayList("disabled_world_name"));
+            getConfig().set("shop.blacklist-world", new ArrayList<>(Collections.singleton("disabled_world_name")));
             getConfig().set("config-version", 24);
             selectedVersion = 24;
         }
@@ -1526,7 +1523,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             selectedVersion = 68;
         }
         if (selectedVersion == 68) {
-            getConfig().set("shop.blacklist-lores", Lists.newArrayList("SoulBound"));
+            getConfig().set("shop.blacklist-lores", new ArrayList<>(Collections.singleton("SoulBound")));
             getConfig().set("config-version", 69);
             selectedVersion = 69;
         }
@@ -1950,7 +1947,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("config-version", ++selectedVersion);
         }
         if (selectedVersion == 131) {
-            getConfig().set("custom-commands", ImmutableList.of("shop", "chestshop", "cshop"));
+            getConfig().set("custom-commands", Arrays.asList("shop", "chestshop", "cshop"));
             getConfig().set("unlimited-shop-owner-change", false);
             getConfig().set("unlimited-shop-owner-change-account", "quickshop");
             getConfig().set("config-version", ++selectedVersion);
@@ -2072,6 +2069,32 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("purge.at-server-startup", true);
             getConfig().set("purge.backup", true);
             getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 151) {
+            getConfig().set("shop.protection-checking-handler", null);
+            getConfig().set("config-version", ++selectedVersion);
+
+        }
+        if (selectedVersion == 152) {
+            getConfig().set("shop.shop.use-effect-for-potion-item", false);
+            getConfig().set("config-version", ++selectedVersion);
+
+        }
+        if (selectedVersion == 153) {
+            getConfig().set("shop.use-effect-for-potion-item", getConfig().getBoolean("shop.shop.use-effect-for-potion-item", false));
+            getConfig().set("shop.shop.use-effect-for-potion-item", null);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 154) {
+            getConfig().set("integration.fabledskyblock.create", Arrays.asList("MEMBER", "OWNER", "OPERATOR"));
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 155) {
+            getConfig().set("shop.cost-goto-tax-account", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (getConfig().isSet("shop.shop")) {
+            getConfig().set("shop.shop", null);
         }
         if (getConfig().getInt("matcher.work-type") != 0 && GameVersion.get(ReflectFactory.getServerVersion()).name().contains("1_16")) {
             getLogger().warning("You are not using QS Matcher, it may meeting item comparing issue mentioned there: https://hub.spigotmc.org/jira/browse/SPIGOT-5063");

@@ -13,6 +13,7 @@
   "integrations-check-failed-create": "&cIntegrace {0} zamítla vytvoření obchodu",
   "integrations-check-failed-trade": "&cIntegrace {0} zamítla obchod",
   "3rd-plugin-build-check-failed": "Plugin &c3 strany &l{0}&r&c odmítl kontrolu oprávnění, máte správně nastavená oprávnění?",
+  "3rd-plugin-build-check-failed-admin": "&7(AdminOnly) &d{0} &8denied the permission checks, If this not excepted, try add &d{1} &7to listener blacklist. &7Configure Guide: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/wiki/Use-protection-listener-filter",
   "no-creative-break": "&cNemůžete rozbít obchody ostatních hráčů v kreativním režimu, přepněte do režimu přežití nebo zkuste použít super tool {0}.",
   "trading-in-creative-mode-is-disabled": "&cV kreativním módu nemůžeš obchodovat.",
   "supertool-is-disabled": "&cSupertool je zakázán. Nelze zničit žádné obchody.",
@@ -149,6 +150,7 @@
     "now-nolonger-debuging": "&7Úspěšně zakázán vývojářský režim. Reloaduji QuickShop...",
     "wrong-args": "&cNeplatné argumenty. Použij &l/qs help &cpro zobrazení seznamu příkazů.",
     "description": {
+      "alwayscounting": "&eSet if shop always counting container even is unlimited",
       "title": "&bNápověda pro QuickShop",
       "unlimited": "&fDá obchodu neomezený sklad.",
       "setowner": "&fZmění vlastnictví obchodu.",
@@ -358,5 +360,6 @@
   "purchase-out-of-stock": "&cTumuto obchodu došli zásoby, kontaktujte majitele obchodu pro doplňování zásob.",
   "purchase-out-of-space": "&cTomuto obchodu došlo místo, Kontaktuj jeho majitele aby ho vyprázdnil.",
   "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
-  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors.",
+  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
 }

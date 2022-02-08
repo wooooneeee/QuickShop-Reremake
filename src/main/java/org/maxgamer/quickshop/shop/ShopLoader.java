@@ -160,6 +160,7 @@ public class ShopLoader {
                     if (!Util.canBeShop(shopLocation.getBlock())) {
                         Util.debugLog("Target block can't be a shop, removing it from the memory...");
                         // shop.delete();
+                        valid--;
                         plugin.getShopManager().removeShop(shop); // Remove from Mem
                         //TODO: Only remove from memory, so if it actually is a bug, user won't lost all shops.
                         //TODO: Old shop will be deleted when in same location creating new shop.
@@ -175,8 +176,8 @@ public class ShopLoader {
                 for (Shop shop : pendingLoading) {
                     try {
                         shop.onLoad();
-                    } catch (IllegalStateException exception) {
-                        exceptionHandler(exception, shop.getLocation());
+                    } catch (Throwable throwable) {
+                        exceptionHandler(throwable, shop.getLocation());
                     }
                     shop.update();
                 }
@@ -255,7 +256,7 @@ public class ShopLoader {
         return yamlConfiguration;
     }
 
-    private void exceptionHandler(@NotNull Exception ex, @Nullable Location shopLocation) {
+    private void exceptionHandler(@NotNull Throwable ex, @Nullable Location shopLocation) {
         errors++;
         Logger logger = plugin.getLogger();
         logger.warning("##########FAILED TO LOAD SHOP##########");
