@@ -2086,7 +2086,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("shop.use-effect-for-potion-item", getConfig().getBoolean("shop.shop.use-effect-for-potion-item", false));
             getConfig().set("shop.shop.use-effect-for-potion-item", null);
             getConfig().set("config-version", ++selectedVersion);
-
+        }
+        if(selectedVersion == 154){
+            getConfig().set("integration.fabledskyblock.create", ImmutableList.of("MEMBER","OWNER","OPERATOR"));
+            getConfig().set("config-version", ++selectedVersion);
         }
         if (getConfig().isSet("shop.shop")) {
             getConfig().set("shop.shop", null);
