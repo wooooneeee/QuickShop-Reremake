@@ -17,6 +17,7 @@
   "no-creative-break": "&cNemůžete rozbít obchody ostatních hráčů v kreativním režimu, přepněte do režimu přežití nebo zkuste použít super tool {0}.",
   "trading-in-creative-mode-is-disabled": "&cV kreativním módu nemůžeš obchodovat.",
   "supertool-is-disabled": "&cSupertool je zakázán. Nelze zničit žádné obchody.",
+  "disabled-in-this-world": "&cQuickShop is disabled in this world",
   "no-double-chests": "&cNemůžeš vytvářet DoubleChest obchod.",
   "not-managed-shop": "&cNejsi vlastník nebo moderátor obchodu",
   "shop-already-owned": "&cTato truhla je již obchodem.",
@@ -360,6 +361,5 @@
   "purchase-out-of-stock": "&cTumuto obchodu došli zásoby, kontaktujte majitele obchodu pro doplňování zásob.",
   "purchase-out-of-space": "&cTomuto obchodu došlo místo, Kontaktuj jeho majitele aby ho vyprázdnil.",
   "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
-  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors.",
-  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
 }
