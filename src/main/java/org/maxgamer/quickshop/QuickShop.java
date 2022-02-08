@@ -19,8 +19,6 @@
 
 package org.maxgamer.quickshop;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import de.leonhard.storage.LightningBuilder;
 import de.leonhard.storage.Yaml;
@@ -1314,7 +1312,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("lockette.displayname", null);
             getConfig().set("float", null);
             getConfig().set("lockette.enable", true);
-            getConfig().set("shop.blacklist-world", Lists.newArrayList("disabled_world_name"));
+            getConfig().set("shop.blacklist-world", new ArrayList<>(Collections.singleton("disabled_world_name")));
             getConfig().set("config-version", 24);
             selectedVersion = 24;
         }
@@ -1525,7 +1523,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             selectedVersion = 68;
         }
         if (selectedVersion == 68) {
-            getConfig().set("shop.blacklist-lores", Lists.newArrayList("SoulBound"));
+            getConfig().set("shop.blacklist-lores", new ArrayList<>(Collections.singleton("SoulBound")));
             getConfig().set("config-version", 69);
             selectedVersion = 69;
         }
@@ -1949,7 +1947,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("config-version", ++selectedVersion);
         }
         if (selectedVersion == 131) {
-            getConfig().set("custom-commands", ImmutableList.of("shop", "chestshop", "cshop"));
+            getConfig().set("custom-commands", Arrays.asList("shop", "chestshop", "cshop"));
             getConfig().set("unlimited-shop-owner-change", false);
             getConfig().set("unlimited-shop-owner-change-account", "quickshop");
             getConfig().set("config-version", ++selectedVersion);
@@ -2087,8 +2085,8 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("shop.shop.use-effect-for-potion-item", null);
             getConfig().set("config-version", ++selectedVersion);
         }
-        if(selectedVersion == 154){
-            getConfig().set("integration.fabledskyblock.create", ImmutableList.of("MEMBER","OWNER","OPERATOR"));
+        if (selectedVersion == 154) {
+            getConfig().set("integration.fabledskyblock.create", Arrays.asList("MEMBER", "OWNER", "OPERATOR"));
             getConfig().set("config-version", ++selectedVersion);
         }
         if (selectedVersion == 155) {
