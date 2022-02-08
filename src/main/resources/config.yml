@@ -1,7 +1,7 @@
 # QuickShop-Reremake Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 155
+config-version: 156
 
 #Set the default language code the plugin should use, it will apply to:
 #Item Name
@@ -189,6 +189,9 @@ shop-blocks:
 shop:
   #The cost to make a shop.
   cost: 10
+  #Should the cost go to the tax-account above?
+  #Beware: This may cause could not create shop when tax-account could not be deposited
+  cost-goto-tax-account: false
   #Should QS refund the player when their shops are deleted/removed/broken?
   refund: false
   #Should QS send stock messages to staffs?

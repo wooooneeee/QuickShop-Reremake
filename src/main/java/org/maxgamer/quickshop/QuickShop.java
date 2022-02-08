@@ -2091,6 +2091,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("integration.fabledskyblock.create", ImmutableList.of("MEMBER","OWNER","OPERATOR"));
             getConfig().set("config-version", ++selectedVersion);
         }
+        if (selectedVersion == 155) {
+            getConfig().set("shop.cost-goto-tax-account", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
         if (getConfig().isSet("shop.shop")) {
             getConfig().set("shop.shop", null);
         }

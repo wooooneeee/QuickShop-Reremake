@@ -969,17 +969,30 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             createCost = 0;
         }
         if (createCost > 0) {
-            EconomyTransaction economyTransaction =
-                    EconomyTransaction.builder()
-                            .taxAccount(cacheTaxAccount)
-                            .taxModifier(0.0)
-                            .core(plugin.getEconomy())
-                            .from(p.getUniqueId())
-                            .to(null)
-                            .amount(createCost)
-                            .currency(plugin.getCurrency())
-                            .world(shop.getLocation().getWorld())
-                            .build();
+            EconomyTransaction economyTransaction;
+            if (plugin.getConfig().getBoolean("shop.cost-goto-tax-account")) {
+                economyTransaction = EconomyTransaction.builder()
+                        .taxAccount(cacheTaxAccount)
+                        .taxModifier(0.0)
+                        .core(plugin.getEconomy())
+                        .from(p.getUniqueId())
+                        .to(cacheTaxAccount == null ? null : cacheTaxAccount.getUniqueId())
+                        .amount(createCost)
+                        .currency(plugin.getCurrency())
+                        .world(shop.getLocation().getWorld())
+                        .build();
+            } else {
+                economyTransaction = EconomyTransaction.builder()
+                        .taxAccount(cacheTaxAccount)
+                        .taxModifier(0.0)
+                        .core(plugin.getEconomy())
+                        .from(p.getUniqueId())
+                        .to(null)
+                        .amount(createCost)
+                        .currency(plugin.getCurrency())
+                        .world(shop.getLocation().getWorld())
+                        .build();
+            }
             if (!economyTransaction.failSafeCommit()) {
                 if (economyTransaction.getSteps() == EconomyTransaction.TransactionSteps.CHECK) {
                     plugin.text().of(p, "you-cant-afford-a-new-shop",
