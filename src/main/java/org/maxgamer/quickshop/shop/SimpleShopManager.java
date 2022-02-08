@@ -748,7 +748,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
 
 
         shop.buy(buyer, buyerInventory, player != null ? player.getLocation() : shop.getLocation(), amount);
-        sendSellSuccess(buyer, shop, amount);
+        sendSellSuccess(buyer, shop, amount, total);
         ShopSuccessPurchaseEvent se = new ShopSuccessPurchaseEvent(shop, buyer, buyerInventory, amount, total, taxModifier);
         plugin.getServer().getPluginManager().callEvent(se);
         shop.setSignText(); // Update the signs count
@@ -1144,7 +1144,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
 
 
         shop.sell(seller, sellerInventory, player != null ? player.getLocation() : shop.getLocation(), amount);
-        sendPurchaseSuccess(seller, shop, amount);
+        sendPurchaseSuccess(seller, shop, amount, total);
         ShopSuccessPurchaseEvent se = new ShopSuccessPurchaseEvent(shop, seller, sellerInventory, amount, total, taxModifier);
         plugin.getServer().getPluginManager().callEvent(se);
     }
@@ -1157,7 +1157,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
      * @param amount    Trading item amounts.
      */
     @Override
-    public void sendPurchaseSuccess(@NotNull UUID purchaser, @NotNull Shop shop, int amount) {
+    public void sendPurchaseSuccess(@NotNull UUID purchaser, @NotNull Shop shop, int amount, double total) {
         Player sender = Bukkit.getPlayer(purchaser);
         if (sender == null) {
             return;
@@ -1165,7 +1165,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(sender);
         chatSheetPrinter.printHeader();
         chatSheetPrinter.printLine(plugin.text().of(sender, "menu.successful-purchase").forLocale());
-        chatSheetPrinter.printLine(plugin.text().of(sender, "menu.item-name-and-price", Integer.toString(amount * shop.getItem().getAmount()), MsgUtil.getTranslateText(shop.getItem()), format(amount * shop.getPrice(), shop)).forLocale());
+        chatSheetPrinter.printLine(plugin.text().of(sender, "menu.item-name-and-price", Integer.toString(amount * shop.getItem().getAmount()), MsgUtil.getTranslateText(shop.getItem()), format(total, shop)).forLocale());
         MsgUtil.printEnchantment(sender, shop, chatSheetPrinter);
         chatSheetPrinter.printFooter();
     }
@@ -1178,7 +1178,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
      * @param amount Trading item amounts.
      */
     @Override
-    public void sendSellSuccess(@NotNull UUID seller, @NotNull Shop shop, int amount) {
+    public void sendSellSuccess(@NotNull UUID seller, @NotNull Shop shop, int amount, double total) {
         Player sender = Bukkit.getPlayer(seller);
         if (sender == null) {
             return;
@@ -1191,10 +1191,9 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                         "menu.item-name-and-price",
                         Integer.toString(amount),
                         MsgUtil.getTranslateText(shop.getItem()),
-                        format(amount * shop.getPrice(), shop)).forLocale());
+                        format(total, shop)).forLocale());
         if (plugin.getConfig().getBoolean("show-tax")) {
             double tax = plugin.getConfig().getDouble("tax");
-            double total = amount * shop.getPrice();
             if (tax != 0) {
                 if (!seller.equals(shop.getOwner())) {
                     chatSheetPrinter.printLine(
