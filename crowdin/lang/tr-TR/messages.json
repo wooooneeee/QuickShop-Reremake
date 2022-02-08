@@ -17,6 +17,7 @@
   "no-creative-break": "&sYaratıcı modda diğer oyuncuların marketlerini kıramazsın, hayatta kalma moduna geçin veya yerine {0} supertool aletini kullanın.",
   "trading-in-creative-mode-is-disabled": "&cYaratıcı modda iken bu marketle ticaret yapamazsın.",
   "supertool-is-disabled": "&sSupertool devre dışı. Hiçbir marketi kıramazsın.",
+  "disabled-in-this-world": "&cQuickShop is disabled in this world",
   "no-double-chests": "&cÇifte sandık ile market oluşturamazsınız.",
   "not-managed-shop": "&cBu marketin sahibi veya moderatörü değilsin",
   "shop-already-owned": "&cBu zaten bir market.",
@@ -360,6 +361,5 @@
   "purchase-out-of-stock": "&cBu marketin stoğu tükendi, stoğu yeniden doldurmaları için mağaza sahibi ya da personelleri ile iletişime geç.",
   "purchase-out-of-space": "&cBu markette yer kalmadı, marketi boşaltmaları için mağaza sahibi ya da personelleri ile iletişime geç.",
   "safe-mode": "&cQuickShop şimdi güvenli modda, bu mağaza kapsayıcısını açamazsınız, hataları düzeltmek için lütfen sunucu yöneticisi ile iletişime geçin.",
-  "safe-mode-admin": "&c&lUYARI: &cBu sunucudaki QuickShop artık güvenli modda çalışıyor, hiçbir özellik çalışmayacak, hataları kontrol etmek için lütfen &e/qs &c komutunu yazın.",
-  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
+  "safe-mode-admin": "&c&lUYARI: &cBu sunucudaki QuickShop artık güvenli modda çalışıyor, hiçbir özellik çalışmayacak, hataları kontrol etmek için lütfen &e/qs &c komutunu yazın."
 }
