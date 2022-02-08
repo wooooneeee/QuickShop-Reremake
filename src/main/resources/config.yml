@@ -363,7 +363,7 @@ shop:
   #in the sign instead of "Potion".
   #NOTE: Only one effect is shown and is randomly chosen.
   use-effect-for-potion-item: false
-  #The list of worlds in which creating new shops is disabled.
+  #The list of worlds in which quickShop is disabled.
   blacklist-world:
     - disabled_world_name
 

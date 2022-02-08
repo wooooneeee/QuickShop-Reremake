@@ -17,6 +17,7 @@
   "no-creative-break": "&cYou cannot break other players shops in creative mode, switch to survival mode or try to use the supertool {0} instead.",
   "trading-in-creative-mode-is-disabled": "&cYou cannot trade with this shop while being in creative mode.",
   "supertool-is-disabled": "&cSupertool is disabled. Cannot break any shops.",
+  "disabled-in-this-world": "&cQuickShop is disabled in this world",
   "no-double-chests": "&cYou cannot create the double chest shop.",
   "not-managed-shop": "&cYou are not the owner or moderator of this Shop",
   "shop-already-owned": "&cThis is already a shop.",

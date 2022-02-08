@@ -834,6 +834,10 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             plugin.text().of(p, "shop-already-owned").send();
             return;
         }
+        if (Util.isBlacklistWorld(Objects.requireNonNull(info.getLocation().getWorld()))) {
+            plugin.text().of(p, "disabled-in-this-world").send();
+            return;
+        }
         if (Util.isDoubleChest(info.getLocation().getBlock().getBlockData())
                 && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
             plugin.text().of(p, "no-double-chests").send();
