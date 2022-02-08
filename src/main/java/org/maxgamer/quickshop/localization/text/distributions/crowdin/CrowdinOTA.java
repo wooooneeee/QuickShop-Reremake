@@ -25,7 +25,6 @@ import com.google.gson.JsonPrimitive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -176,7 +175,9 @@ public class CrowdinOTA implements Distribution {
         String data = HttpUtil.createGet(url, forceFlush);
         if (data == null) {
             // Failed to grab data
-            throw new OTAException("Failed to grab data");
+            plugin.getLogger().warning("Translation " + crowdinLocale + " update failed, fallback to built-in translation...");
+            // Use Local File
+            return "{}";
         }
         // Successfully grab the data from the remote server
         otaCacheControl.writeObjectCache(postProcessingPath, data.getBytes(StandardCharsets.UTF_8), manifestTimestamp);
@@ -226,13 +227,6 @@ public class CrowdinOTA implements Distribution {
 //        }
     }
 
-    @EqualsAndHashCode(callSuper = true)
-    @Data
-    public static class OTAException extends RuntimeException {
-        public OTAException(String message) {
-            super(message);
-        }
-    }
 
     @AllArgsConstructor
     @Builder
