@@ -27,7 +27,6 @@ import de.leonhard.storage.Yaml;
 import de.leonhard.storage.internal.settings.ConfigSettings;
 import de.leonhard.storage.internal.settings.ReloadSettings;
 import de.tr7zw.nbtapi.plugin.NBTAPI;
-import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import lombok.Setter;
 import me.minebuilders.clearlag.Clearlag;
@@ -74,9 +73,6 @@ import org.maxgamer.quickshop.listener.*;
 import org.maxgamer.quickshop.listener.worldedit.WorldEditAdapter;
 import org.maxgamer.quickshop.localization.text.SimpleTextManager;
 import org.maxgamer.quickshop.nonquickshopstuff.com.rylinaux.plugman.util.PluginUtil;
-import org.maxgamer.quickshop.nonquickshopstuff.net.ess3.essentialsx.PaperServerStateProvider;
-import org.maxgamer.quickshop.nonquickshopstuff.net.ess3.essentialsx.ReflServerStateProvider;
-import org.maxgamer.quickshop.nonquickshopstuff.net.ess3.essentialsx.ServerStateProvider;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopPurger;
@@ -146,7 +142,6 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     private SimpleShopManager shopManager;
     private SimpleTextManager textManager;
     private boolean priceChangeRequiresFee = false;
-    private ServerStateProvider serverStateProvider;
     /**
      * The BootError, if it not NULL, plugin will stop loading and show setted errors when use /qs
      */
@@ -632,26 +627,12 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         this.integrationHelper.callIntegrationsLoad(IntegrateStage.onLoadAfter);
-        if (PaperLib.isPaper()) {
-            this.serverStateProvider = new PaperServerStateProvider();
-        } else {
-            this.serverStateProvider = new ReflServerStateProvider();
-        }
         getLogger().info("QuickShop " + getFork() + " - Early boot step - Complete");
     }
 
     @Override
     public final void onDisable() {
         getLogger().info("QuickShop is finishing remaining work, this may need a while...");
-        final boolean stopping = this.serverStateProvider.isStopping();
-        if (!stopping) {
-            getLogger().warning("QuickShop has been unloaded while server running, please note that this may cause unexpected behavior.");
-            getLogger().warning("If you need reload QuickShop configuration, use /qs reload command instead.");
-            if (sentryErrorReporter != null)
-                sentryErrorReporter.ignoreThrow();
-            // Record the stacktrace because some other plugin will unload quickshop while running.
-            getLogger().log(Level.WARNING, "Hot unload QuickShop while server running may cause unexpected behavior, don't do that!", new Exception("Hot unloading"));
-        }
         if (sentryErrorReporter != null) {
             sentryErrorReporter.unregister();
         }
