@@ -534,7 +534,13 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         // That chunk data hasn't been created yet - Create it!
         // Put it in the world
         // Put the shop in its location in the chunk list.
-        inChunk.put(shop.getLocation(), shop);
+        Shop duplicatedShop = inChunk.put(shop.getLocation(), shop);
+        if (duplicatedShop != null) {
+            if (duplicatedShop.isLoaded()) {
+                duplicatedShop.onUnload();
+            }
+            plugin.getLogger().warning("Found duplicated shop in " + shop.getLocation() + ", it shouldn't happened!");
+        }
         // shop.onLoad();
 
     }
