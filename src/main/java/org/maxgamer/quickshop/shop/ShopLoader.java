@@ -176,8 +176,8 @@ public class ShopLoader {
                 for (Shop shop : pendingLoading) {
                     try {
                         shop.onLoad();
-                    } catch (IllegalStateException exception) {
-                        exceptionHandler(exception, shop.getLocation());
+                    } catch (Throwable throwable) {
+                        exceptionHandler(throwable, shop.getLocation());
                     }
                     shop.update();
                 }
@@ -256,7 +256,7 @@ public class ShopLoader {
         return yamlConfiguration;
     }
 
-    private void exceptionHandler(@NotNull Exception ex, @Nullable Location shopLocation) {
+    private void exceptionHandler(@NotNull Throwable ex, @Nullable Location shopLocation) {
         errors++;
         Logger logger = plugin.getLogger();
         logger.warning("##########FAILED TO LOAD SHOP##########");
