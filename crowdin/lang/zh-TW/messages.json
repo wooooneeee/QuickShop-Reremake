@@ -17,7 +17,7 @@
   "no-creative-break": "&c你不能在創造模式中破壞其他玩家的商店，請使用生存模式或使用超級工具「{0}」來破壞。",
   "trading-in-creative-mode-is-disabled": "&c你不能在創造模式中使用商店交易。",
   "supertool-is-disabled": "&c超級工具已被停用，現在不能破壞任何商店。",
-  "disabled-in-this-world": "&cQuickShop is disabled in this world",
+  "disabled-in-this-world": "&c該世界已停用 QuickShop",
   "no-double-chests": "&c你沒有建立大型儲物箱商店的權限。",
   "not-managed-shop": "你沒有管理此商店的權限",
   "shop-already-owned": "&c這已是一個商店了。",
