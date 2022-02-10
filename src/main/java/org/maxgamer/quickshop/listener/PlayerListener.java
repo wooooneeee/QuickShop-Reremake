@@ -364,7 +364,8 @@ public class PlayerListener extends AbstractQSListener {
         Util.debugLog("Player " + e.getPlayer().getName() + " using locale " + e.getPlayer().getLocale() + ": " + plugin.text().of(e.getPlayer(), "file-test").forLocale());
         // Notify the player any messages they were sent
         if (plugin.getConfig().getBoolean("shop.auto-fetch-shop-messages")) {
-            MsgUtil.flush(e.getPlayer());
+            //Run Task later to make sure locale is correct
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> MsgUtil.flush(e.getPlayer()), 5);
         }
     }
 
