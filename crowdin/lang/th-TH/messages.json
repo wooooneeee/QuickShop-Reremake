@@ -17,6 +17,7 @@
   "no-creative-break": "&cYou cannot break other players shops in creative mode, switch to survival mode or try to use the supertool {0} instead.",
   "trading-in-creative-mode-is-disabled": "&cคุณไม่สามารถแลกเปลี่ยนกับร้านค้านี้ได้ในขณะที่อยู่ในโหมดสร้างสรรค์",
   "supertool-is-disabled": "&cSupertool is disabled. Cannot break any shops.",
+  "disabled-in-this-world": "&cQuickShop is disabled in this world",
   "no-double-chests": "&cYou cannot create the double chest shop.",
   "not-managed-shop": "&cYou are not the owner or moderator of this Shop",
   "shop-already-owned": "&cThis is already a shop.",
@@ -360,6 +361,5 @@
   "purchase-out-of-stock": "&cThis shop run out of the stock, Contact shop owner or staffs to refill the stock.",
   "purchase-out-of-space": "&cThis shop run out of the space, Contact shop owner or staffs to empty the shop.",
   "safe-mode": "&cQuickShop now in safe-mode, you cannot open this shop container, please contact with server administrator to fix the errors.",
-  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors.",
-  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
+  "safe-mode-admin": "&c&lWARNING: &cThe QuickShop on this server now running under safe-mode, no features will working, please type &e/qs &c command to check any errors."
 }

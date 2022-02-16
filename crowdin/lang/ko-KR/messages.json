@@ -17,6 +17,7 @@
   "no-creative-break": "&c크리에이티브 모드 상태론 다른 플레이어의 상점을 파괴할 수 없습니다, 서바이벌 모드로 전환하거나 슈퍼툴 {0} 을(를) 사용해주세요.",
   "trading-in-creative-mode-is-disabled": "&c크리에이티브 모드 상태에서는 상점에서 거래할 수 없습니다.",
   "supertool-is-disabled": "&c슈퍼툴이 비활성화 되어있습니다. 어느 상점도 부술 수 없습니다.",
+  "disabled-in-this-world": "&cQuickShop is disabled in this world",
   "no-double-chests": "&c당신은 큰상자(일반 상자를 두개붙인)를 이용한 상점을 만들 수 없습니다. (권한 부족입니다.)",
   "not-managed-shop": "&c당신은 상점의 주인이나 관리자가 아닙니다",
   "shop-already-owned": "&c이것은 이미 상점입니다.",
@@ -360,6 +361,5 @@
   "purchase-out-of-stock": "&c이 상점은 재고가 다 떨어졌으니 주인에게 문의하여 재고보충을 요구해주세요.",
   "purchase-out-of-space": "&c이 상점은 공간이 부족하니 주인에게 문의하여 상자를 비우라고 요청해주세요.",
   "safe-mode": "이 서버의 QuickShop은 현재 안전 모드로 실행 중이므로 기능이 작동하지 않습니다. 오류를 확인하려면 관리자에게 연락하세요",
-  "safe-mode-admin": "&c&l경고: &c이 서버의 QuickShop은 현재 안전 모드로 실행 중이므로 기능이 작동하지 않습니다. 오류를 확인하려면 &e/qs &c 명령을 입력하십시오.",
-  "internal-error": "&cAn internal error has occurred, the details has been logged in Console. Please try again and contact the server administrator if still exists."
+  "safe-mode-admin": "&c&l경고: &c이 서버의 QuickShop은 현재 안전 모드로 실행 중이므로 기능이 작동하지 않습니다. 오류를 확인하려면 &e/qs &c 명령을 입력하십시오."
 }

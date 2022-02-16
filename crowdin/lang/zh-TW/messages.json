@@ -17,6 +17,7 @@
   "no-creative-break": "&c你不能在創造模式中破壞其他玩家的商店，請使用生存模式或使用超級工具「{0}」來破壞。",
   "trading-in-creative-mode-is-disabled": "&c你不能在創造模式中使用商店交易。",
   "supertool-is-disabled": "&c超級工具已被停用，現在不能破壞任何商店。",
+  "disabled-in-this-world": "&c該世界已停用 QuickShop",
   "no-double-chests": "&c你沒有建立大型儲物箱商店的權限。",
   "not-managed-shop": "你沒有管理此商店的權限",
   "shop-already-owned": "&c這已是一個商店了。",
@@ -360,6 +361,5 @@
   "purchase-out-of-stock": "&c該商店已缺貨，請聯繫商店店主或商店員工補充庫存。",
   "purchase-out-of-space": "&c該商店空間不足，請聯繫商店商店店主或商店員工清空商店。",
   "safe-mode": "&cQuickShop 現在處於安全模式，你無法打開該商店，請與伺服器管理員聯繫以修復錯誤！",
-  "safe-mode-admin": "&c&l警告：&c該伺服器上的 QuickShop 現在在安全模式下運行，所以沒有任何功能可供使用，請輸入 &e/qs &c 指令以檢查錯誤！",
-  "internal-error": "&c發生內部錯誤，詳細資訊已記錄到控制台。請稍後再試，如果問題仍然存在，請聯繫伺服器管理員。"
+  "safe-mode-admin": "&c&l警告：&c該伺服器上的 QuickShop 現在在安全模式下運行，所以沒有任何功能可供使用，請輸入 &e/qs &c 指令以檢查錯誤！"
 }
