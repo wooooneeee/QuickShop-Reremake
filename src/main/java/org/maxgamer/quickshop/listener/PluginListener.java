@@ -25,8 +25,8 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.compatibility.CompatibilityManager;
-import org.maxgamer.quickshop.api.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.api.integration.IntegrationManager;
+import org.maxgamer.quickshop.integration.SimpleIntegrationManager;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.compatibility.SimpleCompatibilityManager;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
@@ -54,14 +54,11 @@ public class PluginListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPluginDisabled(PluginDisableEvent event) {
         String pluginName = event.getPlugin().getName();
-        if (integrationHelper.isRegistered(pluginName) && plugin.getConfig().getBoolean("integration." + pluginName.toLowerCase() + ".enable")) {
-            IntegratedPlugin integratedPlugin = integrationHelper.getIntegrationMap().get(pluginName);
-            if (integratedPlugin != null) {
-                Util.debugLog("[Hot Load] Calling for unloading " + integratedPlugin.getName());
-                integratedPlugin.unload();
-                integrationHelper.unregister(integratedPlugin);
-            }
+        if (integrationHelper.isRegistered(pluginName)) {
+            Util.debugLog("[Hot Unload] Calling for unloading " + pluginName);
+            integrationHelper.unregister(pluginName);
         }
+
         if (COMPATIBILITY_MODULE_LIST.contains(pluginName)) {
             compatibilityManager.unregister(pluginName);
         }
@@ -70,13 +67,9 @@ public class PluginListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPluginEnabled(PluginEnableEvent event) {
         String pluginName = event.getPlugin().getName();
-        if (integrationHelper.isRegistered(pluginName) && plugin.getConfig().getBoolean("integration." + pluginName.toLowerCase() + ".enable")) {
+        if (SimpleIntegrationManager.getBuiltInIntegrationMapping().containsKey(pluginName) && plugin.getConfig().getBoolean("integration." + pluginName.toLowerCase() + ".enable")) {
             integrationHelper.register(pluginName);
-            IntegratedPlugin integratedPlugin = integrationHelper.getIntegrationMap().get(pluginName);
-            if (integratedPlugin != null) {
-                Util.debugLog("[Hot Load] Calling for loading " + integratedPlugin.getName());
-                integratedPlugin.load();
-            }
+            Util.debugLog("[Hot Load] Calling for loading " + pluginName);
         }
         if (COMPATIBILITY_MODULE_LIST.contains(pluginName)) {
             ((SimpleCompatibilityManager) compatibilityManager).register(pluginName);
