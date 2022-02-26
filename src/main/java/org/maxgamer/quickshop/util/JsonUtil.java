@@ -20,6 +20,8 @@
 package org.maxgamer.quickshop.util;
 
 import com.google.gson.*;
+import com.google.gson.internal.Streams;
+import com.google.gson.stream.JsonReader;
 import me.lucko.helper.datatree.DataTree;
 import me.lucko.helper.gson.typeadapters.BukkitSerializableAdapterFactory;
 import me.lucko.helper.gson.typeadapters.GsonSerializableAdapterFactory;
@@ -28,6 +30,7 @@ import me.lucko.helper.text3.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.Objects;
 
 
@@ -87,6 +90,19 @@ public final class JsonUtil {
     @NotNull
     public static JsonObject readObject(@NotNull Reader reader) {
         return PARSER.parse(reader).getAsJsonObject();
+    }
+
+    @NotNull
+    public static JsonElement readElement(@NotNull String s) {
+        try {
+            return Streams.parse(new JsonReader(new StringReader(s)));
+        } catch (NoSuchMethodError | NoClassDefFoundError e1) {
+            try {
+                return JsonParser.parseString(s);
+            } catch (NoSuchMethodError e2) {
+                return PARSER.parse(s);
+            }
+        }
     }
 
     @NotNull

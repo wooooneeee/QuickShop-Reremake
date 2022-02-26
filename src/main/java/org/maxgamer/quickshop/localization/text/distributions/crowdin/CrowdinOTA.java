@@ -20,7 +20,6 @@
 package org.maxgamer.quickshop.localization.text.distributions.crowdin;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -88,7 +87,7 @@ public class CrowdinOTA implements Distribution {
      */
     public Map<String, String> genLanguageMapping() {
         Map<String, String> mapping = new HashMap<>();
-        JsonElement element = JsonParser.parseString(getManifestJson());
+        JsonElement element = JsonUtil.readElement(getManifestJson());
         for (Map.Entry<String, JsonElement> set : element.getAsJsonObject().getAsJsonObject("language_mapping").entrySet()) {
             if (!set.getValue().isJsonObject()) {
                 continue;
