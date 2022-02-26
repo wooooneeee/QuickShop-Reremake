@@ -933,9 +933,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         ConfigurationSection limitCfg = yamlConfiguration.getConfigurationSection("limits");
         if (limitCfg != null) {
             this.limit = limitCfg.getBoolean("use", false);
-            limitCfg = limitCfg.getConfigurationSection("ranks");
-            for (String key : Objects.requireNonNull(limitCfg).getKeys(true)) {
-                limits.put(key, limitCfg.getInt(key));
+            ConfigurationSection ranks = limitCfg.getConfigurationSection("ranks");
+            if (ranks != null) {
+                for (String key : ranks.getKeys(true)) {
+                    limits.put(key, limitCfg.getInt(key));
+                }
             }
         }
         // Limit end
