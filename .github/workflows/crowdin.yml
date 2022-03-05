@@ -25,6 +25,7 @@ jobs:
         pull_request_body: 'New Crowdin pull request with translations'
         pull_request_labels: 'enhancement'
         config: 'crowdin.yml'
+        crowdin_branch_name: master
         download_translations_args: '--all'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
