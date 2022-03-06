@@ -513,7 +513,12 @@ public class Util {
         if (itemStack.hasItemMeta()
                 && Objects.requireNonNull(itemStack.getItemMeta()).hasDisplayName()
                 && !QuickShop.getInstance().getConfig().getBoolean("shop.force-use-item-original-name")) {
-            return itemStack.getItemMeta().getDisplayName();
+            String displayName = itemStack.getItemMeta().getDisplayName();
+            if (displayName == null || displayName.isEmpty()) {
+                return null;
+            } else {
+                return displayName;
+            }
         }
         return null;
     }
