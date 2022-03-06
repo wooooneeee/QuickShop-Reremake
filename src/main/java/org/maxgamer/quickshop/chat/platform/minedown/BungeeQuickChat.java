@@ -339,21 +339,30 @@ public class BungeeQuickChat implements QuickChat {
 
     @Override
     public void sendExecutableChat(@NotNull CommandSender receiver, @NotNull String message, @NotNull String hoverText, @NotNull String command) {
-        TextComponent component =
-                new TextComponent(ChatColor.DARK_PURPLE + plugin.text().of(receiver, "tableformat.left_begin").forLocale() + message);
-        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-        component.setHoverEvent(
-                new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create())); //FIXME: Update this when drop 1.15 supports
-        receiver.spigot().sendMessage(component);
+        BaseComponent[] components =
+                fromLegacyText(ChatColor.DARK_PURPLE + plugin.text().of(receiver, "tableformat.left_begin").forLocale() + message);
+        ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, command);
+        //FIXME: Update this when drop 1.15 supports
+        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, fromLegacyText(hoverText));
+        for (BaseComponent component : components) {
+            component.setClickEvent(clickEvent);
+            component.setHoverEvent(
+                    hoverEvent); //FIXME: Update this when drop 1.15 supports
+        }
+        receiver.spigot().sendMessage(components);
     }
 
     @Override
     public void sendSuggestedChat(@NotNull CommandSender receiver, @NotNull String message, @NotNull String hoverText, @NotNull String command) {
-        TextComponent component =
-                new TextComponent(ChatColor.DARK_PURPLE + plugin.text().of(receiver, "tableformat.left_begin").forLocale() + message);
-        component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
-        component.setHoverEvent(
-                new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create())); //FIXME: Update this when drop 1.15 supports
-        receiver.spigot().sendMessage(component);
+        BaseComponent[] components =
+                fromLegacyText(ChatColor.DARK_PURPLE + plugin.text().of(receiver, "tableformat.left_begin").forLocale() + message);
+        ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command);
+        //FIXME: Update this when drop 1.15 supports
+        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, fromLegacyText(hoverText));
+        for (BaseComponent component : components) {
+            component.setClickEvent(clickEvent);
+            component.setHoverEvent(hoverEvent);
+        }
+        receiver.spigot().sendMessage(components);
     }
 }
