@@ -46,7 +46,6 @@ import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.util.GameVersion;
 import org.maxgamer.quickshop.util.Util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -155,7 +154,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
     private void sendPacket(@NotNull Player player, @NotNull PacketContainer packet) {
         try {
             PROTOCOL_MANAGER.sendServerPacket(player, packet);
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             throw new RuntimeException("An error occurred when sending a packet", e);
         }
     }
