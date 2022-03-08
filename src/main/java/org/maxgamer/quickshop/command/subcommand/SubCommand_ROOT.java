@@ -52,9 +52,9 @@ public class SubCommand_ROOT implements CommandHandler<CommandSender> {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] strings) {
         final List<String> candidate = new ArrayList<>();
 
+        String firstArg = strings.length > 0 ? strings[0] : "";
         for (CommandContainer container : plugin.getCommandManager().getRegisteredCommands()) {
-            if (!container.getPrefix().startsWith(strings[0])
-                    && !container.getPrefix().equals(strings[0])) {
+            if (!container.getPrefix().startsWith(firstArg)) {
                 continue;
             }
 

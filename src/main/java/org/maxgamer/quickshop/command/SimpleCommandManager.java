@@ -514,9 +514,10 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
             ((Player) sender).playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.0F, 1.0F);
         }
         if (cmdArg.length <= 1) {
+            //If no args or one args passed, return the sub command list matching
             return getRootContainer().getExecutor().onTabComplete(capture(sender), commandLabel, cmdArg);
         } else {
-            // Tab-complete subcommand args
+            // If two args passed, tab-completing the subcommand args
             String[] passThroughArgs = new String[cmdArg.length - 1];
             System.arraycopy(cmdArg, 1, passThroughArgs, 0, passThroughArgs.length);
             for (CommandContainer container : cmds) {
