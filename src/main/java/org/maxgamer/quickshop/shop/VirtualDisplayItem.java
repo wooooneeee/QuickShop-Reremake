@@ -25,7 +25,6 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.injector.server.TemporaryPlayer;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.utility.MinecraftVersion;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
@@ -53,6 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 public class VirtualDisplayItem extends AbstractDisplayItem {
     private static final AtomicInteger COUNTER = new AtomicInteger(Integer.MAX_VALUE);
@@ -269,45 +269,67 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
             }
             Util.debugLog("Loading VirtualDisplayItem chunks mapping manager...");
             if (packetAdapter == null) {
-                packetAdapter = new PacketAdapter(PLUGIN, ListenerPriority.HIGH, PacketType.Play.Server.MAP_CHUNK) {
-                    @Override
-                    public void onPacketSending(@NotNull PacketEvent event) {
-                        //is really full chunk data
-                        //In 1.17, this value was removed, so read safely
-                        Boolean boxedIsFull = event.getPacket().getBooleans().readSafely(0);
-                        boolean isFull = boxedIsFull == null || boxedIsFull;
-                        if (!isFull) {
-                            return;
-                        }
-                        Player player = event.getPlayer();
-                        if (player instanceof TemporaryPlayer) {
-                            return;
-                        }
-                        if (player == null || !player.isOnline()) {
-                            return;
-                        }
-                        StructureModifier<Integer> integerStructureModifier = event.getPacket().getIntegers();
-                        //chunk x
-                        int x = integerStructureModifier.read(0);
-                        //chunk z
-                        int z = integerStructureModifier.read(1);
-
-                        CHUNKS_MAPPING.computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLocation, targetList) -> {
-                            for (VirtualDisplayItem target : targetList) {
-                                if (!target.shop.isLoaded() || !target.isDisplay || target.shop.isLeftShop()) {
-                                    continue;
-                                }
-                                target.packetSenders.add(player.getUniqueId());
-                                target.sendFakeItem(player);
-                            }
-                            return targetList;
-                        });
-                    }
-                };
+                packetAdapter = new ChunkPacketAdapter();
                 Util.debugLog("Registering the packet listener...");
                 PROTOCOL_MANAGER.addPacketListener(packetAdapter);
                 LOADED.set(true);
             }
+        }
+
+        private static class ChunkPacketAdapter extends PacketAdapter {
+
+            private final Class<?> temporaryPlayerClass;
+
+            public ChunkPacketAdapter() {
+                super(PLUGIN, ListenerPriority.HIGH, PacketType.Play.Server.MAP_CHUNK);
+                Class<?> localTemporaryPlayerClass;
+                try {
+                    localTemporaryPlayerClass = Class.forName("com.comphenix.protocol.injector.temporary.TemporaryPlayer");
+                } catch (ClassNotFoundException unused1) {
+                    try {
+                        localTemporaryPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
+                    } catch (ClassNotFoundException unused2) {
+                        plugin.getLogger().log(Level.WARNING, "Failed to find temporaryPlayer class! Please contact QuickShop author!");
+                        localTemporaryPlayerClass = this.getClass();
+                    }
+                }
+                this.temporaryPlayerClass = localTemporaryPlayerClass;
+            }
+
+            @Override
+            public void onPacketSending(@NotNull PacketEvent event) {
+                //is really full chunk data
+                //In 1.17, this value was removed, so read safely
+                Boolean boxedIsFull = event.getPacket().getBooleans().readSafely(0);
+                boolean isFull = boxedIsFull == null || boxedIsFull;
+                if (!isFull) {
+                    return;
+                }
+                Player player = event.getPlayer();
+                if (temporaryPlayerClass.isInstance(player)) {
+                    return;
+                }
+                if (player == null || !player.isOnline()) {
+                    return;
+                }
+                StructureModifier<Integer> integerStructureModifier = event.getPacket().getIntegers();
+                //chunk x
+                int x = integerStructureModifier.read(0);
+                //chunk z
+                int z = integerStructureModifier.read(1);
+
+                CHUNKS_MAPPING.computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLocation, targetList) -> {
+                    for (VirtualDisplayItem target : targetList) {
+                        if (!target.shop.isLoaded() || !target.isDisplay || target.shop.isLeftShop()) {
+                            continue;
+                        }
+                        target.packetSenders.add(player.getUniqueId());
+                        target.sendFakeItem(player);
+                    }
+                    return targetList;
+                });
+            }
+
         }
 
         public static void unload() {
