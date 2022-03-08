@@ -936,7 +936,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             ConfigurationSection ranks = limitCfg.getConfigurationSection("ranks");
             if (ranks != null) {
                 for (String key : ranks.getKeys(true)) {
-                    limits.put(key, limitCfg.getInt(key));
+                    limits.put(key, ranks.getInt(key));
                 }
             }
         }
