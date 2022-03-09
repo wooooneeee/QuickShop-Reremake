@@ -59,7 +59,7 @@ import java.util.logging.Level;
 public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements GameLanguage {
     private final QuickShop plugin;
     private final String languageCode;
-    private final AtomicReference<Optional<JsonObject>> lang = new AtomicReference<>();
+    private final AtomicReference<Optional<JsonObject>> lang = new AtomicReference<>(Optional.empty());
     private MojangApiMirror mirror;
 
     @SneakyThrows
