@@ -476,8 +476,9 @@ plugin:
     only: false
   #If you have WorldEdit, QuickShop will try migrating shops in EditSession. [BETA]
   WorldEdit: true
-  #Allow us use NBTAPI to direct modify the blockstate data
-  NBTAPI: true
+  #If we use NBTAPI, it could show the multi-language item name in the sign according to your client language
+  #Disable this if your shop sign turn blank
+  NBTAPI: false
 effect:
   sound:
     ontabcomplete: true
