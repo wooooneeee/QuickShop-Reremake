@@ -107,7 +107,7 @@ public final class JsonUtil {
 
     @NotNull
     public static JsonObject readObject(@NotNull String s) {
-        return PARSER.parse(s).getAsJsonObject();
+        return readElement(s).getAsJsonObject();
     }
 
     public static void writeObject(@NotNull Appendable writer, @NotNull JsonObject object) {

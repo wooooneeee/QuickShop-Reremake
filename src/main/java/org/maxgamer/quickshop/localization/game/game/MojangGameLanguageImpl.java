@@ -21,7 +21,6 @@ package org.maxgamer.quickshop.localization.game.game;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -299,7 +298,7 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
 
                 //Download language json
 
-                JsonElement indexJson = new JsonParser().parse(assetsFileData.get().getContent());
+                JsonElement indexJson = JsonUtil.readObject(assetsFileData.get().getContent());
                 if (!indexJson.isJsonObject()) {
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server because the json structure seems invalid, please try again later.");
                     return Optional.empty();
