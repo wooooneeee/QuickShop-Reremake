@@ -33,8 +33,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.ReflectFactory;
 import org.maxgamer.quickshop.util.Util;
@@ -47,10 +47,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 /**
@@ -59,12 +57,9 @@ import java.util.logging.Level;
  * @author Ghost_chu and sandtechnology
  */
 public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements GameLanguage {
-    private final static Lock LOCK = new ReentrantLock();
-    private static final Condition DOWNLOAD_CONDITION = LOCK.newCondition();
     private final QuickShop plugin;
     private final String languageCode;
-    @Nullable
-    private volatile JsonObject lang = null;
+    private final AtomicReference<Optional<JsonObject>> lang = new AtomicReference<>();
     private MojangApiMirror mirror;
 
     @SneakyThrows
@@ -99,20 +94,16 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
     }
 
     public void load() {
-        LOCK.lock();
+        FutureTask<Optional<JsonObject>> futureTask = new FutureTask<>(new GameLanguageLoadTask(plugin, languageCode, mirror));
         try {
-            final GameLanguageLoadThread loadThread = new GameLanguageLoadThread(plugin, languageCode, mirror);
-            loadThread.start();
-            boolean timeout = !DOWNLOAD_CONDITION.await(20, TimeUnit.SECONDS);
-            if (timeout) {
-                Util.debugLog("No longer waiting file downloading because it now timed out, now downloading in background.");
-                plugin.getLogger().info("No longer waiting file downloading because it now timed out, now downloading in background, please reset itemi18n.yml, potioni18n.yml and enchi18n.yml after download completed.");
-            }
-            this.lang = loadThread.getLang(); // Get the Lang whatever thread running or died.
+            this.lang.set(futureTask.get(20, TimeUnit.SECONDS));
         } catch (InterruptedException exception) {
-            plugin.getLogger().warning("Failed to wait game language thread loading");
-        } finally {
-            LOCK.unlock();
+            plugin.getLogger().log(Level.WARNING, "Failed to wait game language thread loading", exception);
+        } catch (ExecutionException e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to get game language file!", e);
+        } catch (TimeoutException e) {
+            Util.debugLog("No longer waiting file downloading because it now timed out, now downloading in background.");
+            plugin.getLogger().info("No longer waiting file downloading because it now timed out, now downloading in background, please reset itemi18n.yml, potioni18n.yml and enchi18n.yml after download completed.");
         }
     }
 
@@ -133,10 +124,11 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
 
     @Override
     public @NotNull String getItem(@NotNull Material material) {
-        if (lang == null) {
+        Optional<JsonObject> lang = this.lang.get();
+        if (!lang.isPresent()) {
             return super.getItem(material);
         }
-        JsonElement element = lang.get("item.minecraft." + material.name().toLowerCase());
+        JsonElement element = lang.get().get("item.minecraft." + material.name().toLowerCase());
         if (element == null) {
             return getBlock(material);
         } else {
@@ -152,11 +144,12 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
      */
     @NotNull
     public String getBlock(@NotNull Material material) {
-        if (lang == null) {
+        Optional<JsonObject> lang = this.lang.get();
+        if (!lang.isPresent()) {
             return super.getItem(material);
         }
 
-        JsonElement jsonElement = lang.get("block.minecraft." + material.name().toLowerCase());
+        JsonElement jsonElement = lang.get().get("block.minecraft." + material.name().toLowerCase());
         if (jsonElement == null) {
             return super.getItem(material);
         }
@@ -166,14 +159,15 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
     private static final boolean isPotionSupportMinecraftKey = Util.isMethodAvailable("org.bukkit.potion.PotionEffectType", "getKey");
     @Override
     public @NotNull String getPotion(@NotNull PotionEffectType potionEffectType) {
-        if (lang == null) {
+        Optional<JsonObject> lang = this.lang.get();
+        if (!lang.isPresent()) {
             return super.getPotion(potionEffectType);
         }
         JsonElement jsonElement;
         if (isPotionSupportMinecraftKey) {
-            jsonElement = lang.get("effect.minecraft." + potionEffectType.getKey().getKey().toLowerCase());
+            jsonElement = lang.get().get("effect.minecraft." + potionEffectType.getKey().getKey().toLowerCase());
         } else {
-            jsonElement = lang.get("effect.minecraft." + potionEffectType.getName().toLowerCase());
+            jsonElement = lang.get().get("effect.minecraft." + potionEffectType.getName().toLowerCase());
         }
         if (jsonElement == null) {
             return super.getPotion(potionEffectType);
@@ -183,10 +177,11 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
 
     @Override
     public @NotNull String getEnchantment(@NotNull Enchantment enchantment) {
-        if (lang == null) {
+        Optional<JsonObject> lang = this.lang.get();
+        if (!lang.isPresent()) {
             return super.getEnchantment(enchantment);
         }
-        JsonElement jsonElement = lang.get("enchantment.minecraft." + enchantment.getKey().getKey().toLowerCase());
+        JsonElement jsonElement = lang.get().get("enchantment.minecraft." + enchantment.getKey().getKey().toLowerCase());
         if (jsonElement == null) {
             return super.getEnchantment(enchantment);
         }
@@ -196,10 +191,11 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
 
     @Override
     public @NotNull String getEntity(@NotNull EntityType entityType) {
-        if (lang == null) {
+        Optional<JsonObject> lang = this.lang.get();
+        if (!lang.isPresent()) {
             return super.getEntity(entityType);
         }
-        JsonElement jsonElement = lang.get("entity.minecraft." + entityType.name().toLowerCase());
+        JsonElement jsonElement = lang.get().get("entity.minecraft." + entityType.name().toLowerCase());
         if (jsonElement == null) {
             return super.getEntity(entityType);
         }
@@ -207,33 +203,22 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
     }
 
     @Getter
-    static class GameLanguageLoadThread extends Thread {
+    static class GameLanguageLoadTask implements Callable<Optional<JsonObject>> {
         private final String languageCode;
         private final QuickShop plugin;
         private final MojangApiMirror mirror;
-        private JsonObject lang;
         private boolean isLatest = false; //Does assets is latest?
         private boolean isUpdated = false; //Did we tried update assets?
 
-        public GameLanguageLoadThread(@NotNull QuickShop plugin, @NotNull String languageCode, @NotNull MojangApiMirror mirror) {
+        public GameLanguageLoadTask(@NotNull QuickShop plugin, @NotNull String languageCode, @NotNull MojangApiMirror mirror) {
             this.plugin = plugin;
             this.languageCode = languageCode;
             this.mirror = mirror;
+
         }
 
         @Override
-        public void run() {
-            LOCK.lock();
-            try {
-                execute();
-                DOWNLOAD_CONDITION.signalAll();
-            } finally {
-                LOCK.unlock();
-            }
-
-        }
-
-        public void execute() {
+        public Optional<JsonObject> call() throws Exception {
             try {
                 File cacheFile = new File(Util.getCacheFolder(), "mojanglang.cache"); // Load cache file
                 if (!cacheFile.exists()) {
@@ -249,7 +234,7 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                 /* If language name is default, use computer language */
                 if ("en_us".equalsIgnoreCase(languageCode)) {
                     isLatest = true;
-                    return; //Ignore english language
+                    return Optional.empty(); //Ignore english language
                 }
                 File cachedFile = new File(Util.getCacheFolder(), cacheSha1);
                 if (languageCode.equals(cacheCode)) { //Language same
@@ -260,8 +245,7 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                                 if (cacheVersion.equals(ReflectFactory.getServerVersion())) {
                                     isLatest = true;
                                     try (FileReader reader = new FileReader(cachedFile)) {
-                                        lang = new JsonParser().parse(reader).getAsJsonObject();
-                                        return; //We doesn't need to update it
+                                        return Optional.of(JsonUtil.readObject(reader)); //We doesn't need to update it
                                     } catch (Exception e) {
                                         //Keep it empty so continue to update files
                                     }
@@ -282,14 +266,14 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                 if (!assetsAPI.isAvailable()) { //This version no meta can be found, bug?
                     Util.debugLog("AssetsAPI returns not available, This may caused by Mojang servers down or connection issue.");
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server, This may caused by Mojang servers down, connection issue or invalid language code.");
-                    return;
+                    return Optional.empty();
                 }
                 //Download AssetsIndex
                 Optional<MojangAPI.AssetsFileData> assetsFileData = assetsAPI.getGameAssetsFile();
                 if (!assetsFileData.isPresent()) {
                     Util.debugLog("AssetsAPI returns nothing about required game asset file, This may caused by Mojang servers down or connection issue.");
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server, This may caused by Mojang servers down, connection issue or invalid language code.");
-                    return;
+                    return Optional.empty();
                 }
                 Util.debugLog(MsgUtil.fillArgs("Assets file loaded! id:[{0}], sha1:[{1}], Content Length:[{2}]",
                         assetsFileData.get().getId(),
@@ -304,7 +288,7 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                             assetsFileData.get().getSha1(),
                             indexSha1Hex));
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server because the file seems invalid, please try again later.");
-                    return;
+                    return Optional.empty();
                 }
 
                 try {
@@ -318,23 +302,23 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                 JsonElement indexJson = new JsonParser().parse(assetsFileData.get().getContent());
                 if (!indexJson.isJsonObject()) {
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server because the json structure seems invalid, please try again later.");
-                    return;
+                    return Optional.empty();
                 }
                 if (!indexJson.getAsJsonObject().get("objects").isJsonObject()) {
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server because the json structure about objects seems invalid, please try again later.");
-                    return;
+                    return Optional.empty();
                 }
                 JsonElement langElement = indexJson.getAsJsonObject().get("objects").getAsJsonObject().get("minecraft/lang/" + languageCode + ".json");
                 if (langElement == null) {
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server because the language code " + languageCode + " not supported by Minecraft.");
-                    return;
+                    return Optional.empty();
                 }
 
                 String langHash = langElement.getAsJsonObject().get("hash").getAsString();
                 Optional<String> langContent = mojangAPI.getResourcesAPI().get(langHash);
                 if (!langContent.isPresent()) {
                     plugin.getLogger().warning("Failed to update game assets from MojangAPI server because network connection issue.");
-                    return;
+                    return Optional.empty();
                 }
 
                 try {
@@ -344,7 +328,6 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                 }
 
                 //Save the caches
-                lang = new JsonParser().parse(langContent.get()).getAsJsonObject();
                 yamlConfiguration.set("ver", ReflectFactory.getServerVersion());
                 yamlConfiguration.set("sha1", langHash);
                 yamlConfiguration.set("lang", languageCode);
@@ -353,14 +336,12 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
                 Util.debugLog("Successfully update game assets.");
                 plugin.getLogger().info("Success! The game assets now up-to-date :)");
                 plugin.getLogger().info("Now you can execute [/qs reset lang] command to regenerate files with localized.");
+                return Optional.of(JsonUtil.readObject(langContent.get()));
             } catch (Exception e) {
                 plugin.getSentryErrorReporter().ignoreThrow();
                 plugin.getLogger().log(Level.WARNING, "Something going wrong when loading game translation assets", e);
             }
-        }
-
-        public boolean isLatest() {
-            return isLatest;
+            return Optional.empty();
         }
     }
 }
