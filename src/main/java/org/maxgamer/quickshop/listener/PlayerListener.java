@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerListener extends AbstractQSListener {
     private final CooldownMap<Player> cooldownMap = CooldownMap.create(Cooldown.of(1, TimeUnit.SECONDS));
-    private final boolean swapBehavior;
+    private boolean swapBehavior;
 
     public PlayerListener(QuickShop plugin) {
         super(plugin);
@@ -461,6 +461,7 @@ public class PlayerListener extends AbstractQSListener {
      */
     @Override
     public ReloadResult reloadModule() {
+        swapBehavior = plugin.getConfig().getBoolean("shop.interact.swap-click-behavior");
         return ReloadResult.builder().status(ReloadStatus.SUCCESS).build();
     }
 }
