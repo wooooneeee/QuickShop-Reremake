@@ -379,14 +379,18 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         if (getConfig().getBoolean("plugin.NBTAPI")) {
-            this.nbtapi = (NBTAPI) Bukkit.getPluginManager().getPlugin("NBTAPI");
-            if (this.nbtapi != null) {
-                if (!this.nbtapi.isCompatible()) {
-                    getLogger().warning("NBTAPI plugin failed to loading, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue. (" + nbtapi.getDescription().getVersion() + ")");
-                    this.nbtapi = null;
-                } else {
-                    getLogger().info("Successfully loaded NBTAPI support!");
+            if (Util.isClassAvailable("de.tr7zw.nbtapi.plugin.NBTAPI")) {
+                this.nbtapi = (NBTAPI) Bukkit.getPluginManager().getPlugin("NBTAPI");
+                if (this.nbtapi != null) {
+                    if (!this.nbtapi.isCompatible()) {
+                        getLogger().warning("NBTAPI plugin failed to loading, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue. (" + nbtapi.getDescription().getVersion() + ")");
+                        this.nbtapi = null;
+                    } else {
+                        getLogger().info("Successfully loaded NBTAPI support!");
+                    }
                 }
+            } else {
+                getLogger().warning("NBTAPI plugin is invalid, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue.");
             }
         }
         Bukkit.getPluginManager().registerEvents(this.compatibilityTool, this);
@@ -933,9 +937,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         ConfigurationSection limitCfg = yamlConfiguration.getConfigurationSection("limits");
         if (limitCfg != null) {
             this.limit = limitCfg.getBoolean("use", false);
-            limitCfg = limitCfg.getConfigurationSection("ranks");
-            for (String key : Objects.requireNonNull(limitCfg).getKeys(true)) {
-                limits.put(key, limitCfg.getInt(key));
+            ConfigurationSection ranks = limitCfg.getConfigurationSection("ranks");
+            if (ranks != null) {
+                for (String key : ranks.getKeys(true)) {
+                    limits.put(key, ranks.getInt(key));
+                }
             }
         }
         // Limit end

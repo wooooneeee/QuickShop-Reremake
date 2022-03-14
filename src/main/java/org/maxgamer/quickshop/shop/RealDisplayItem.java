@@ -254,7 +254,7 @@ public class RealDisplayItem extends AbstractDisplayItem {
         }
         this.guardedIstack = AbstractDisplayItem.createGuardItemStack(this.originalItemStack, this.shop);
         this.item = this.shop.getLocation().getWorld().dropItem(getDisplayLocation(), this.guardedIstack);
-        //this.item.setItemStack(this.guardedIstack);
+        this.item.setItemStack(this.guardedIstack);
         safeGuard(this.item);
     }
 

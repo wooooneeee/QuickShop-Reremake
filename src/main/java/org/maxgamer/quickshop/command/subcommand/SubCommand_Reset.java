@@ -69,10 +69,9 @@ public class SubCommand_Reset implements CommandHandler<CommandSender> {
             case "config":
                 File config = new File(plugin.getDataFolder(), "config.yml");
                 config.delete();
-                plugin.saveDefaultConfig();
+                plugin.saveResource("config.yml", true);
                 plugin.reloadConfiguration();
-                plugin.getServer().getPluginManager().disablePlugin(plugin);
-                plugin.getServer().getPluginManager().enablePlugin(plugin);
+                plugin.getReloadManager().reload();
                 plugin.text().of(sender, "complete").send();
                 break;
             case "messages":

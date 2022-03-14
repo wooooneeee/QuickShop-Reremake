@@ -26,17 +26,22 @@ import org.maxgamer.quickshop.util.reload.Reloadable;
 
 public abstract class AbstractQSListener implements Listener, Reloadable {
     protected final QuickShop plugin;
-
+    private volatile boolean isRegistered = false;
     public AbstractQSListener(QuickShop plugin) {
         this.plugin = plugin;
         plugin.getReloadManager().register(this);
     }
 
     public void register() {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        if (!isRegistered) {
+            plugin.getServer().getPluginManager().registerEvents(this, plugin);
+            isRegistered = true;
+        }
     }
 
     public void unregister() {
-        HandlerList.unregisterAll(this);
+        if (isRegistered) {
+            HandlerList.unregisterAll(this);
+        }
     }
 }

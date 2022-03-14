@@ -1529,7 +1529,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
     }
 
     @Override
-    public PriceLimiter getPriceLimiter() {
+    public @NotNull PriceLimiter getPriceLimiter() {
         return this.priceLimiter;
     }
 

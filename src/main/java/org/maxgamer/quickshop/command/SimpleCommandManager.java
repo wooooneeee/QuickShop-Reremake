@@ -514,9 +514,30 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
             ((Player) sender).playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.0F, 1.0F);
         }
         if (cmdArg.length <= 1) {
-            return getRootContainer().getExecutor().onTabComplete(capture(sender), commandLabel, cmdArg);
+            //If no args or one args passed, return the sub command list matching
+            final List<String> candidate = new ArrayList<>();
+
+            String firstArg = cmdArg.length > 0 ? cmdArg[0] : "";
+            for (CommandContainer container : cmds) {
+                if (!container.getPrefix().startsWith(firstArg)) {
+                    continue;
+                }
+
+                final List<String> requirePermissions = container.getPermissions();
+                final List<String> selectivePermissions = container.getSelectivePermissions();
+                if (!checkPermissions(sender, commandLabel, EMPTY_ARGS, requirePermissions, SimpleCommandManager.PermissionType.REQUIRE, SimpleCommandManager.Action.TAB_COMPLETE)) {
+                    continue;
+                }
+                if (!checkPermissions(sender, commandLabel, EMPTY_ARGS, selectivePermissions, SimpleCommandManager.PermissionType.SELECTIVE, SimpleCommandManager.Action.TAB_COMPLETE)) {
+                    continue;
+                }
+                if (!container.isHidden() && !(container.isDisabled() || (container.getDisabledSupplier() != null && container.getDisabledSupplier().get()))) {
+                    candidate.add(container.getPrefix());
+                }
+            }
+            return candidate;
         } else {
-            // Tab-complete subcommand args
+            // If two args passed, tab-completing the subcommand args
             String[] passThroughArgs = new String[cmdArg.length - 1];
             System.arraycopy(cmdArg, 1, passThroughArgs, 0, passThroughArgs.length);
             for (CommandContainer container : cmds) {
@@ -556,7 +577,7 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
         }
     }
 
-    private enum PermissionType {
+    enum PermissionType {
         REQUIRE,
         SELECTIVE
     }

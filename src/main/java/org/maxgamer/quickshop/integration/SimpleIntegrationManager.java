@@ -61,7 +61,11 @@ public class SimpleIntegrationManager extends QuickShopInstanceHolder implements
         INTEGRATION_MAPPING.put("AdvancedRegionMarket", AdvancedShopRegionMarketIntegration.class);
     }
 
-    private final Map<String, IntegratedPlugin> integrations = new HashMap<>(7);
+    private final Map<String, IntegratedPlugin> integrations = new HashMap<>(11);
+
+    public static Map<String, Class<? extends IntegratedPlugin>> getBuiltInIntegrationMapping() {
+        return INTEGRATION_MAPPING;
+    }
 
     public SimpleIntegrationManager(QuickShop plugin) {
         super(plugin);
@@ -185,7 +189,7 @@ public class SimpleIntegrationManager extends QuickShopInstanceHolder implements
 
     @Override
     public boolean isRegistered(@NotNull String integrationName) {
-        return false;
+        return integrations.containsKey(integrationName);
     }
 
     public void callIntegrationsLoad(@NotNull IntegrateStage stage) {

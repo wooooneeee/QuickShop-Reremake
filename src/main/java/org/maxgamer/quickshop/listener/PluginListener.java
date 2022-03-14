@@ -27,12 +27,16 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.compatibility.CompatibilityManager;
 import org.maxgamer.quickshop.api.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.api.integration.IntegrationManager;
+import org.maxgamer.quickshop.api.integration.InvalidIntegratedPluginClassException;
+import org.maxgamer.quickshop.integration.SimpleIntegrationManager;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.compatibility.SimpleCompatibilityManager;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class PluginListener extends AbstractQSListener {
 
@@ -54,14 +58,13 @@ public class PluginListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPluginDisabled(PluginDisableEvent event) {
         String pluginName = event.getPlugin().getName();
-        if (integrationHelper.isRegistered(pluginName) && plugin.getConfig().getBoolean("integration." + pluginName.toLowerCase() + ".enable")) {
-            IntegratedPlugin integratedPlugin = integrationHelper.getIntegrationMap().get(pluginName);
-            if (integratedPlugin != null) {
-                Util.debugLog("[Hot Load] Calling for unloading " + integratedPlugin.getName());
-                integratedPlugin.unload();
-                integrationHelper.unregister(integratedPlugin);
-            }
+        IntegratedPlugin plugin = integrationHelper.getIntegrationMap().get(pluginName);
+        if (plugin != null) {
+            Util.debugLog("[Hot Unload] Calling for unloading " + pluginName);
+            plugin.unload();
+            integrationHelper.unregister(plugin);
         }
+
         if (COMPATIBILITY_MODULE_LIST.contains(pluginName)) {
             compatibilityManager.unregister(pluginName);
         }
@@ -70,12 +73,15 @@ public class PluginListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPluginEnabled(PluginEnableEvent event) {
         String pluginName = event.getPlugin().getName();
-        if (integrationHelper.isRegistered(pluginName) && plugin.getConfig().getBoolean("integration." + pluginName.toLowerCase() + ".enable")) {
-            integrationHelper.register(pluginName);
-            IntegratedPlugin integratedPlugin = integrationHelper.getIntegrationMap().get(pluginName);
-            if (integratedPlugin != null) {
-                Util.debugLog("[Hot Load] Calling for loading " + integratedPlugin.getName());
+        Class<? extends IntegratedPlugin> pluginClass = SimpleIntegrationManager.getBuiltInIntegrationMapping().get(pluginName);
+        if (pluginClass != null && plugin.getConfig().getBoolean("integration." + pluginName.toLowerCase() + ".enable")) {
+            try {
+                IntegratedPlugin integratedPlugin = pluginClass.getConstructor(plugin.getClass()).newInstance(plugin);
                 integratedPlugin.load();
+                integrationHelper.register(integratedPlugin);
+                Util.debugLog("[Hot Load] Calling for loading " + pluginName);
+            } catch (NullPointerException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                plugin.getLogger().log(Level.WARNING, "Hot load integration failed", new InvalidIntegratedPluginClassException("Invalid Integration module class: " + pluginClass, e));
             }
         }
         if (COMPATIBILITY_MODULE_LIST.contains(pluginName)) {

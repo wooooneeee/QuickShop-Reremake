@@ -261,6 +261,10 @@ public class SimpleTextManager implements TextManager, Reloadable {
                         JsonConfiguration override = getOverrideConfiguration(crowdinFile, minecraftCode);
                         applyOverrideConfiguration(configuration, override);
                         // Deploy distribution to mapper
+                        // Handle broken case like /[xxx] /
+                        if (crowdinFile.startsWith("/[")) {
+                            crowdinFile = "/" + StringUtils.substringAfter(crowdinFile, "] ");
+                        }
                         languageFilesManager.deploy(crowdinFile, minecraftCode, configuration, defaultFile);
                         Util.debugLog("Locale " + crowdinFile.replace("%locale%", crowdinCode) + " has been successfully loaded");
                     } // Key founds in available locales but not in custom mapping on crowdin platform

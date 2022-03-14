@@ -769,7 +769,7 @@ public class MsgUtil {
 
     public static boolean isJson(String str) {
         try {
-            JsonUtil.parser().parse(str);
+            JsonUtil.readObject(str);
             return true;
         } catch (JsonParseException exception) {
             return false;

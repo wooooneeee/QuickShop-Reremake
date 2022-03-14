@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerListener extends AbstractQSListener {
     private final CooldownMap<Player> cooldownMap = CooldownMap.create(Cooldown.of(1, TimeUnit.SECONDS));
-    private final boolean swapBehavior;
+    private boolean swapBehavior;
 
     public PlayerListener(QuickShop plugin) {
         super(plugin);
@@ -364,13 +364,17 @@ public class PlayerListener extends AbstractQSListener {
         Util.debugLog("Player " + e.getPlayer().getName() + " using locale " + e.getPlayer().getLocale() + ": " + plugin.text().of(e.getPlayer(), "file-test").forLocale());
         // Notify the player any messages they were sent
         if (plugin.getConfig().getBoolean("shop.auto-fetch-shop-messages")) {
-            MsgUtil.flush(e.getPlayer());
+            //Run Task later to make sure locale is correct
+            plugin.getServer().getScheduler().runTaskLater(plugin, () ->
+                            MsgUtil.flush(plugin.getServer().getOfflinePlayer(e.getPlayer().getUniqueId()))
+                    , 50);
         }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onJoin(PlayerLocaleChangeEvent e) {
         Util.debugLog("Player " + e.getPlayer().getName() + " using new locale " + e.getLocale() + ": " + plugin.text().of(e.getPlayer(), "file-test").forLocale(e.getLocale()));
+
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -457,6 +461,7 @@ public class PlayerListener extends AbstractQSListener {
      */
     @Override
     public ReloadResult reloadModule() {
+        swapBehavior = plugin.getConfig().getBoolean("shop.interact.swap-click-behavior");
         return ReloadResult.builder().status(ReloadStatus.SUCCESS).build();
     }
 }

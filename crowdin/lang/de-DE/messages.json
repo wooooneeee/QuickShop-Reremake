@@ -17,6 +17,7 @@
   "no-creative-break": "&cDu kannst Shops anderere Spieler nicht im Kreativmodus zerstören. Wechsle zum Überlebensmodus oder verwende das Supertool {0}.",
   "trading-in-creative-mode-is-disabled": "&cDu kannst mit dem Shop nicht handeln während du im Kreativmodus bist.",
   "supertool-is-disabled": "&cSupertool ist deaktiviert. Kann keine Shops zersören.",
+  "disabled-in-this-world": "&cQuickShop ist in dieser Welt deaktiviert",
   "no-double-chests": "&cDu kannst keinen Doppeltruhen-Shop erstellen.",
   "not-managed-shop": "&cDu bist nicht der Besitzer oder ein Moderator dieses Shops",
   "shop-already-owned": "&cDies ist bereits ein Shop.",
@@ -24,7 +25,7 @@
   "price-too-cheap": "&cPreis muss höher als &e${0}&c sein",
   "no-price-change": "&cDies würde in keinen Preisunterschied enden!",
   "you-cant-afford-a-new-shop": "&cEs kostet {0} um einen neuen Shop zu erstellen.",
-  "player-bought-from-your-store-tax": "&c{0} hat {1} {2} von deinem Shop gekauft und du hast {3} ({4} Steuern) verdient.",
+  "player-bought-from-your-store-tax": "&c{0} hat {1} {2} &r&cvon deine Shop gekauft und du hast {3} daran verdient ({4} an Steuern).",
   "you-cant-afford-to-change-price": "Es kostet {0} um den Preis deines Shops zu ändern.",
   "success-created-shop": "&aShop erstellt.",
   "success-removed-shop": "&aShop entfernt.",
@@ -37,7 +38,7 @@
   "not-a-number": "&cDu kannst nur eine Zahl eingeben, Deine Eingabe war {0}.",
   "exceeded-maximum": "&cDer Wert hat den Maximalwert in Java überschritten.",
   "not-a-integer": "&cDu kannst nur eine Zahl eingeben, Deine Eingabe war {0}.",
-  "player-bought-from-your-store": "&c{0} hat {1} {2} von deinem Shop gekauft und du hast {3} ( Steuern) verdient.",
+  "player-bought-from-your-store": "&c{0} hat {1} {2} &r&cvon deine Shop gekauft und du hast {3} daran verdient.",
   "shop-out-of-stock": "&5Dein Shop bei den Koordinaten {0}, {1}, {2}, verfügt über keine {3} mehr!",
   "shop-has-no-space": "&cDer Shop hat nur noch Platz für {0} weitere {1}.",
   "you-dont-have-that-many-items": "&cDu hast nur {0} {1}.",
@@ -360,6 +361,5 @@
   "purchase-out-of-stock": "&cDieser Shop hat keine Items mehr. Kontaktiere den Shopeigentümer oder Shop-Mitarbeiter um den Bestand wieder aufzufüllen.",
   "purchase-out-of-space": "&cDieser Shop hat keinen Platz mehr. Kontaktiere den Shopeigentümer oder Shop-Mitarbeiter damit er geleert wird.",
   "safe-mode": "&cQuickShop ist nun im sicheren Modus, du kannst diesen Shop-Container nicht öffnen. Bitte kontaktiere den Server Administrator um diesen Fehler zu beheben.",
-  "safe-mode-admin": "&c&lWARNUNG: &cQuickShop ist nun im sicheren Modus auf diesem Server und keiner seiner funktionen wird funktionieren. Bitte schreib den &e/qs &cBefehl um nach Fehlern zu schauen.",
-  "internal-error": "&cEin interner Fehler ist aufgetreten. Die details wurden in der Konsole vermerkt. Bitte versuch es erneut und kontaktiere den Server-Administrator wenn dieser Fehler bestehen bleibt."
+  "safe-mode-admin": "&c&lWARNUNG: &cQuickShop ist nun im sicheren Modus auf diesem Server und keiner seiner funktionen wird funktionieren. Bitte schreib den &e/qs &cBefehl um nach Fehlern zu schauen."
 }

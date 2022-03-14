@@ -23,7 +23,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -205,7 +204,7 @@ public class MojangAPI {
                 return Optional.empty();
             }
             try {
-                JsonElement index = new JsonParser().parse(result);
+                JsonElement index = JsonUtil.readObject(result);
                 if (!index.isJsonObject()) {
                     return Optional.empty();
                 }

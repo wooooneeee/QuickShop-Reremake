@@ -1316,7 +1316,7 @@ public class ContainerShop implements Shop {
     public @Nullable Inventory getInventory() {
         Util.ensureThread(false);
         BlockState state = PaperLib.getBlockState(location.getBlock(), false).getState();
-        Inventory inv = null;
+        Inventory inv;
         try {
             if (state.getType() == Material.ENDER_CHEST
                     && plugin.getOpenInvPlugin() != null) { //FIXME: Need better impl

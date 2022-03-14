@@ -20,7 +20,6 @@
 package org.maxgamer.quickshop.localization.text.distributions.crowdin;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -77,7 +76,7 @@ public class CrowdinOTA implements Distribution {
     @NotNull
     public String getManifestJson() {
         String url = CROWDIN_OTA_HOST + "manifest.json";
-        return HttpUtil.createGet(url, "{\"files\":[\"\\/master\\/crowdin\\/lang\\/%locale%\\/messages.json\"],\"languages\":[\"af\",\"ar\",\"ca\",\"zh-CN\",\"zh-TW\",\"zh-HK\",\"cs\",\"da\",\"nl\",\"en\",\"fi\",\"fr\",\"de\",\"el\",\"he\",\"hu\",\"it\",\"ja\",\"ko\",\"no\",\"pl\",\"pt-PT\",\"pt-BR\",\"ro\",\"ru\",\"sr\",\"es-ES\",\"sv-SE\",\"tr\",\"uk\",\"vi\"],\"language_mapping\":{\"ro\":{\"locale\":\"ro-RO\"},\"fr\":{\"locale\":\"fr-FR\"},\"es-ES\":{\"locale\":\"es-ES\"},\"af\":{\"locale\":\"af-ZA\"},\"ar\":{\"locale\":\"ar-SA\"},\"ca\":{\"locale\":\"ca-ES\"},\"cs\":{\"locale\":\"cs-CZ\"},\"da\":{\"locale\":\"da-DK\"},\"de\":{\"locale\":\"de-DE\"},\"el\":{\"locale\":\"el-GR\"},\"fi\":{\"locale\":\"fi-FI\"},\"he\":{\"locale\":\"he-IL\"},\"hu\":{\"locale\":\"hu-HU\"},\"it\":{\"locale\":\"it-IT\"},\"ja\":{\"locale\":\"ja-JP\"},\"ko\":{\"locale\":\"ko-KR\"},\"nl\":{\"locale\":\"nl-NL\"},\"no\":{\"locale\":\"no-NO\"},\"pl\":{\"locale\":\"pl-PL\"},\"pt-PT\":{\"locale\":\"pt-PT\"},\"ru\":{\"locale\":\"ru-RU\"},\"sr\":{\"locale\":\"sr-SP\"},\"sv-SE\":{\"locale\":\"sv-SE\"},\"tr\":{\"locale\":\"tr-TR\"},\"uk\":{\"locale\":\"uk-UA\"},\"zh-CN\":{\"locale\":\"zh-CN\"},\"zh-TW\":{\"locale\":\"zh-TW\"},\"en\":{\"locale\":\"en-US\"},\"vi\":{\"locale\":\"vi-VN\"},\"pt-BR\":{\"locale\":\"pt-BR\"},\"zh-HK\":{\"locale\":\"zh-HK\"}},\"custom_languages\":[],\"timestamp\":1639272930,\"local\":true}");
+        return HttpUtil.createGet(url, "{\"files\":[\"\\/master\\/crowdin\\/lang\\/%locale%\\/messages.json\"],\"languages\":[\"af\",\"ar\",\"bg\",\"ca\",\"zh-CN\",\"zh-TW\",\"zh-HK\",\"cs\",\"da\",\"nl\",\"en\",\"fi\",\"fr\",\"de\",\"el\",\"he\",\"hu\",\"it\",\"ja\",\"ko\",\"lt\",\"no\",\"pl\",\"pt-PT\",\"pt-BR\",\"ro\",\"ru\",\"sr\",\"es-ES\",\"sv-SE\",\"th\",\"tr\",\"uk\",\"vi\"],\"language_mapping\":{\"ro\":{\"locale\":\"ro-RO\"},\"fr\":{\"locale\":\"fr-FR\"},\"es-ES\":{\"locale\":\"es-ES\"},\"af\":{\"locale\":\"af-ZA\"},\"ar\":{\"locale\":\"ar-SA\"},\"bg\":{\"locale\":\"bg-BG\"},\"ca\":{\"locale\":\"ca-ES\"},\"cs\":{\"locale\":\"cs-CZ\"},\"da\":{\"locale\":\"da-DK\"},\"de\":{\"locale\":\"de-DE\"},\"el\":{\"locale\":\"el-GR\"},\"fi\":{\"locale\":\"fi-FI\"},\"he\":{\"locale\":\"he-IL\"},\"hu\":{\"locale\":\"hu-HU\"},\"it\":{\"locale\":\"it-IT\"},\"ja\":{\"locale\":\"ja-JP\"},\"ko\":{\"locale\":\"ko-KR\"},\"lt\":{\"locale\":\"lt-LT\"},\"nl\":{\"locale\":\"nl-NL\"},\"no\":{\"locale\":\"no-NO\"},\"pl\":{\"locale\":\"pl-PL\"},\"pt-PT\":{\"locale\":\"pt-PT\"},\"ru\":{\"locale\":\"ru-RU\"},\"sr\":{\"locale\":\"sr-SP\"},\"sv-SE\":{\"locale\":\"sv-SE\"},\"tr\":{\"locale\":\"tr-TR\"},\"uk\":{\"locale\":\"uk-UA\"},\"zh-CN\":{\"locale\":\"zh-CN\"},\"zh-TW\":{\"locale\":\"zh-TW\"},\"en\":{\"locale\":\"en-US\"},\"vi\":{\"locale\":\"vi-VN\"},\"pt-BR\":{\"locale\":\"pt-BR\"},\"th\":{\"locale\":\"th-TH\"},\"zh-HK\":{\"locale\":\"zh-HK\"}},\"custom_languages\":[],\"timestamp\":1645011494,\"local\":true}");
     }
 
     /**
@@ -88,8 +87,8 @@ public class CrowdinOTA implements Distribution {
      */
     public Map<String, String> genLanguageMapping() {
         Map<String, String> mapping = new HashMap<>();
-        JsonElement parser = new JsonParser().parse(getManifestJson());
-        for (Map.Entry<String, JsonElement> set : parser.getAsJsonObject().getAsJsonObject("language_mapping").entrySet()) {
+        JsonElement element = JsonUtil.readElement(getManifestJson());
+        for (Map.Entry<String, JsonElement> set : element.getAsJsonObject().getAsJsonObject("language_mapping").entrySet()) {
             if (!set.getValue().isJsonObject()) {
                 continue;
             }

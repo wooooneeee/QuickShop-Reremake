@@ -2,8 +2,8 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e33e2fafe3ac4d4eb9048d154bbd874e)](https://www.codacy.com/gh/PotatoCraft-Studio/QuickShop-Reremake/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PotatoCraft-Studio/QuickShop-Reremake&amp;utm_campaign=Badge_Grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/potatocraft-studio/quickshop-reremake/badge)](https://www.codefactor.io/repository/github/potatocraft-studio/quickshop-reremake)
-![BuildStatus](https://ci.codemc.io/job/Ghost-chu/job/QuickShop-Reremake/21/badge/icon)
-![TestsPassed](https://img.shields.io/jenkins/tests?compact_message&jobUrl=https://ci.codemc.io/job/Ghost-chu/job/QuickShop-Reremake)
+![BuildStatus](https://ci.codemc.io/job/PotatoCraft-Studio/job/QuickShop-Reremake/21/badge/icon)
+![TestsPassed](https://img.shields.io/jenkins/tests?compact_message&jobUrl=https://ci.codemc.io/job/PotatoCraft-Studio/job/QuickShop-Reremake)
 ![Contributors](https://img.shields.io/github/contributors/potatocraft-studio/QuickShop-Reremake)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FPotatoCraft-Studio%2FQuickShop-Reremake.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FPotatoCraft-Studio%2FQuickShop-Reremake?ref=badge_shield)
 ---
@@ -48,7 +48,7 @@ from [KaiKikuchi's QuickShop upstream repository](https://github.com/KaiKikuchi/
 
 ## Downloads
 
-| <a href="https://www.spigotmc.org/resources/62575/"><img src="/.github/icons/Spigot.png" width="100" height="90" /></a> | <a href="https://dev.bukkit.org/projects/quickshop-reremake"><img src="/.github/icons/Bukkit.png" width="100" height="100" /></a></a> | <a href="http://www.mcbbs.net/thread-809496-1-1.html"><img src="/.github/icons/MCBBS.png" width="100" height="100" /></a> | <a href="https://ci.codemc.io/job/Ghost-chu/job/QuickShop-Reremake-SNAPSHOT/"><img src="/.github/icons/Jenkins.svg" width="85" height="100" /></a>
+| <a href="https://www.spigotmc.org/resources/62575/"><img src="/.github/icons/Spigot.png" width="100" height="90" /></a> | <a href="https://dev.bukkit.org/projects/quickshop-reremake"><img src="/.github/icons/Bukkit.png" width="100" height="100" /></a></a> | <a href="http://www.mcbbs.net/thread-809496-1-1.html"><img src="/.github/icons/MCBBS.png" width="100" height="100" /></a> | <a href="https://ci.codemc.io/job/PotatoCraft-Studio/job/QuickShop-Reremake-SNAPSHOT/"><img src="/.github/icons/Jenkins.svg" width="85" height="100" /></a>
  | :---: | :---: | :---: | :---: |
 | **Spigot** | **BukkitDev** | **MCBBS** | **Jenkins** |
 
