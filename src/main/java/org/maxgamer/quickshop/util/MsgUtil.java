@@ -20,7 +20,6 @@
 package org.maxgamer.quickshop.util;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonParseException;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -771,7 +770,7 @@ public class MsgUtil {
         try {
             JsonUtil.readObject(str);
             return true;
-        } catch (JsonParseException exception) {
+        } catch (Exception exception) {
             return false;
         }
     }
