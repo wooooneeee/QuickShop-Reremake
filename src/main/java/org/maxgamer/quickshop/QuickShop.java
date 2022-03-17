@@ -86,6 +86,8 @@ import org.maxgamer.quickshop.util.envcheck.*;
 import org.maxgamer.quickshop.util.matcher.item.BukkitItemMatcherImpl;
 import org.maxgamer.quickshop.util.matcher.item.QuickShopItemMatcherImpl;
 import org.maxgamer.quickshop.util.reload.ReloadManager;
+import org.maxgamer.quickshop.util.reporter.error.EmptyErrorReporter;
+import org.maxgamer.quickshop.util.reporter.error.IErrorReporter;
 import org.maxgamer.quickshop.util.reporter.error.RollbarErrorReporter;
 import org.maxgamer.quickshop.watcher.*;
 
@@ -201,7 +203,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
      * The error reporter to help devs report errors to Sentry.io
      */
     @Getter
-    private RollbarErrorReporter sentryErrorReporter;
+    private IErrorReporter sentryErrorReporter = new EmptyErrorReporter();
     /**
      * The server UniqueID, use to the ErrorReporter
      */
