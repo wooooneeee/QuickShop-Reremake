@@ -569,9 +569,9 @@ integration:
     #Should we prevent the creation of a shop or trade with a shop outside of WorldGuard regions?
     whitelist-mode: false
     #Add the world you want to enable whitelist-mode here
-    # * means all worlds, to add specific world please remove that before adding
+    # "*" means all worlds, to add specific world please remove that before adding
     whitelist-worlds:
-      - *
+      - "*"
     #Allow players to create a shop if the player is the owner of in this location or ANY region.
     any-owner: true
     #Should we respect the global region flag?
