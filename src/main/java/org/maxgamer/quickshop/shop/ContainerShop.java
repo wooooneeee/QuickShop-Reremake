@@ -510,8 +510,7 @@ public class ContainerShop implements Shop {
                         }
                     }
                 }
-                economyCore.deposit(this.getOwner(), plugin.getConfig().getDouble("shop.cost"),
-                        Objects.requireNonNull(getLocation().getWorld()), getCurrency());
+                economyCore.deposit(this.getOwner(), cost, world, currency);
             }
             plugin.getShopManager().removeShop(this);
             plugin.getDatabaseHelper().removeShop(this);
