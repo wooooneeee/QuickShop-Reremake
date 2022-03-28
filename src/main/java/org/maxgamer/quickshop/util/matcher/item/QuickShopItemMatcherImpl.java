@@ -177,6 +177,11 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
             return true;
         }
 
+        //Check if both have item meta
+        if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
+            return false;
+        }
+
         if (requireStack.hasItemMeta()) {
             return itemMetaMatcher.matches(requireStack, givenStack);
         }
