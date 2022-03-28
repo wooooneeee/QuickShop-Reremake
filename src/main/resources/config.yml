@@ -1,7 +1,7 @@
 # QuickShop-Reremake Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 157
+config-version: 158
 
 #Set the default language code the plugin should use, it will apply to:
 #Item Name
@@ -194,6 +194,9 @@ shop:
   cost-goto-tax-account: false
   #Should QS refund the player when their shops are deleted/removed/broken?
   refund: false
+  #When refunding, should QS taking the money of refund from tax account as much as possible?
+  #If this failed it won't affect refunding but the balance of tax account
+  refund-from-tax-account-as-much-as-possible: false
   #Should QS send stock messages to staffs?
   sending-stock-message-to-staffs: false
   #Should QS disable trading in creative mode?
