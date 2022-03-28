@@ -496,14 +496,14 @@ public class ContainerShop implements Shop {
                 if (plugin.getConfig().getBoolean("shop.refund-from-tax-account-as-much-as-possible")) {
                     double balanceShouldTake;
                     if (taxAccount != null) {
-                        balanceShouldTake = Math.min(0, Math.min(cost, economyCore.getBalance(taxAccount, world, currency)));
+                        balanceShouldTake = Math.max(0, Math.min(cost, economyCore.getBalance(taxAccount, world, currency)));
                         if (balanceShouldTake != 0) {
                             economyCore.withdraw(taxAccount, balanceShouldTake, world, currency);
                         }
                     } else {
                         Trader taxDefaultTrader = ((SimpleShopManager) plugin.getShopManager()).getCacheTaxAccount();
                         if (taxDefaultTrader != null) {
-                            balanceShouldTake = Math.min(0, Math.min(cost, economyCore.getBalance(taxDefaultTrader, world, currency)));
+                            balanceShouldTake = Math.max(0, Math.min(cost, economyCore.getBalance(taxDefaultTrader, world, currency)));
                             if (balanceShouldTake != 0) {
                                 economyCore.withdraw(taxDefaultTrader, balanceShouldTake, world, currency);
                             }
