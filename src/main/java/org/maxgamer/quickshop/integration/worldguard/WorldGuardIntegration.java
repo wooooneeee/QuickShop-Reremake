@@ -34,6 +34,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
@@ -44,14 +45,17 @@ import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("DuplicatedCode")
 @IntegrationStage(loadStage = IntegrateStage.onLoadAfter)
 public class WorldGuardIntegration extends AbstractQSIntegratedPlugin {
     private final StateFlag createFlag = createOrGet("quickshop-create", false);
     private final StateFlag tradeFlag = createOrGet("quickshop-trade", true);
+    private final List<String> whiteListWorldList = new ArrayList<>();
     private List<WorldGuardFlags> createFlags;
     private List<WorldGuardFlags> tradeFlags;
     private boolean anyOwner;
@@ -62,6 +66,16 @@ public class WorldGuardIntegration extends AbstractQSIntegratedPlugin {
     public WorldGuardIntegration(QuickShop plugin) {
         super(plugin);
         plugin.getReloadManager().register(this);
+    }
+
+    private boolean checkWhitelist(Location location) {
+        World world = location.getWorld();
+        if (world != null) {
+            if (!whiteListWorldList.contains("*") && !whiteListWorldList.contains(world.getName().toLowerCase())) {
+                return false;
+            }
+        }
+        return whiteList;
     }
 
     private StateFlag createOrGet(String key, boolean def) {
@@ -99,6 +113,8 @@ public class WorldGuardIntegration extends AbstractQSIntegratedPlugin {
         tradeFlags =
                 WorldGuardFlags.deserialize(
                         plugin.getConfig().getStringList("integration.worldguard.trade"));
+        whiteListWorldList.clear();
+        whiteListWorldList.addAll(plugin.getConfig().getStringList("integration.worldguard.whitelist-worlds").stream().map(String::toLowerCase).collect(Collectors.toList()));
     }
 
     @Override
@@ -141,13 +157,13 @@ public class WorldGuardIntegration extends AbstractQSIntegratedPlugin {
         //Regions not included global one
         if (applicableRegionSet.getRegions().isEmpty()) {
             if (!respectGlobalRegion) {
-                return !whiteList;
+                return !checkWhitelist(location);
             } else {
                 //So check it manually
                 RegionManager worldManger = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()));
                 if (worldManger != null && !worldManger.hasRegion("__global__")) {
                     //If not have, just check whitelist
-                    return !whiteList;
+                    return !checkWhitelist(location);
                 }
             }
         }
@@ -214,13 +230,13 @@ public class WorldGuardIntegration extends AbstractQSIntegratedPlugin {
         //Regions not included global one
         if (applicableRegionSet.getRegions().isEmpty()) {
             if (!respectGlobalRegion) {
-                return !whiteList;
+                return !checkWhitelist(location);
             } else {
                 //So check it manually
                 RegionManager worldManger = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()));
                 if (worldManger != null && !worldManger.hasRegion("__global__")) {
                     //If not have, just check whitelist
-                    return !whiteList;
+                    return !checkWhitelist(location);
                 }
             }
         }

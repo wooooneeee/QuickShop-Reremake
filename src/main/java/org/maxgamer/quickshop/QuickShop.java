@@ -86,6 +86,8 @@ import org.maxgamer.quickshop.util.envcheck.*;
 import org.maxgamer.quickshop.util.matcher.item.BukkitItemMatcherImpl;
 import org.maxgamer.quickshop.util.matcher.item.QuickShopItemMatcherImpl;
 import org.maxgamer.quickshop.util.reload.ReloadManager;
+import org.maxgamer.quickshop.util.reporter.error.EmptyErrorReporter;
+import org.maxgamer.quickshop.util.reporter.error.IErrorReporter;
 import org.maxgamer.quickshop.util.reporter.error.RollbarErrorReporter;
 import org.maxgamer.quickshop.watcher.*;
 
@@ -201,7 +203,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
      * The error reporter to help devs report errors to Sentry.io
      */
     @Getter
-    private RollbarErrorReporter sentryErrorReporter;
+    private IErrorReporter sentryErrorReporter = new EmptyErrorReporter();
     /**
      * The server UniqueID, use to the ErrorReporter
      */
@@ -2097,6 +2099,14 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
         if (selectedVersion == 155) {
             getConfig().set("shop.cost-goto-tax-account", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 156) {
+            getConfig().set("integration.worldguard.whitelist-worlds", Collections.singletonList("*"));
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 157) {
+            getConfig().set("shop.refund-from-tax-account-as-much-as-possible", false);
             getConfig().set("config-version", ++selectedVersion);
         }
         if (getConfig().isSet("shop.shop")) {

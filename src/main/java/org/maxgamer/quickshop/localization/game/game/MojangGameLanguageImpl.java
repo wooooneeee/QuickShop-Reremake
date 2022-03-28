@@ -47,6 +47,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -60,6 +61,7 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
     private final String languageCode;
     private final AtomicReference<Optional<JsonObject>> lang = new AtomicReference<>(Optional.empty());
     private MojangApiMirror mirror;
+    private static final AtomicBoolean isTaskRunning = new AtomicBoolean(false);
 
     @SneakyThrows
     public MojangGameLanguageImpl(@NotNull QuickShop plugin, @NotNull String languageCode) {
@@ -93,8 +95,13 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
     }
 
     public void load() {
+        if (isTaskRunning.get()) {
+            plugin.getLogger().info("There are already have a i18n task downloading in background, please reset itemi18n.yml, potioni18n.yml and enchi18n.yml after download completed.");
+            return;
+        }
         FutureTask<Optional<JsonObject>> futureTask = new FutureTask<>(new GameLanguageLoadTask(plugin, languageCode, mirror));
         try {
+            new Thread(futureTask, "QuickShop I18n file update task").start();
             this.lang.set(futureTask.get(20, TimeUnit.SECONDS));
         } catch (InterruptedException exception) {
             plugin.getLogger().log(Level.WARNING, "Failed to wait game language thread loading", exception);
@@ -218,6 +225,7 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
 
         @Override
         public Optional<JsonObject> call() throws Exception {
+            isTaskRunning.set(true);
             try {
                 File cacheFile = new File(Util.getCacheFolder(), "mojanglang.cache"); // Load cache file
                 if (!cacheFile.exists()) {
@@ -339,6 +347,8 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
             } catch (Exception e) {
                 plugin.getSentryErrorReporter().ignoreThrow();
                 plugin.getLogger().log(Level.WARNING, "Something going wrong when loading game translation assets", e);
+            } finally {
+                isTaskRunning.set(false);
             }
             return Optional.empty();
         }

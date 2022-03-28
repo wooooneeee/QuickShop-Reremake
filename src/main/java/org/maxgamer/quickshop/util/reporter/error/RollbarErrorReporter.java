@@ -41,7 +41,7 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-public class RollbarErrorReporter {
+public class RollbarErrorReporter implements IErrorReporter {
     //private volatile static String bootPaste = null;
     private final Rollbar rollbar;
     private final List<String> reported = new ArrayList<>(5);
@@ -82,6 +82,7 @@ public class RollbarErrorReporter {
         enabled = true;
     }
 
+    @Override
     public void unregister() {
         enabled = false;
         plugin.getLogger().setFilter(quickShopExceptionFilter.preFilter);
@@ -175,6 +176,7 @@ public class RollbarErrorReporter {
      * @param throwable Throws
      * @param context   BreadCrumb
      */
+    @Override
     public void sendError(@NotNull Throwable throwable, @NotNull String... context) {
         if (Bukkit.isPrimaryThread()) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> sendError0(throwable, context));
@@ -190,6 +192,7 @@ public class RollbarErrorReporter {
      * @param throwable Throws
      * @return dupecated
      */
+    @Override
     public boolean canReport(@NotNull Throwable throwable) {
         if (!enabled) {
             return false;
@@ -239,55 +242,9 @@ public class RollbarErrorReporter {
     }
 
     /**
-     * Check a throw is cause by QS
-     *
-     * @param throwable Throws
-     * @return Cause or not
-     */
-    public PossiblyLevel checkWasCauseByQS(@Nullable Throwable throwable) {
-        if (throwable == null) {
-            return PossiblyLevel.IMPOSSIBLE;
-        }
-        if (throwable.getMessage() == null) {
-            return PossiblyLevel.IMPOSSIBLE;
-        }
-        if (throwable.getMessage().contains("Could not pass event")) {
-            if (throwable.getMessage().contains("QuickShop")) {
-                return PossiblyLevel.CONFIRM;
-            } else {
-                return PossiblyLevel.IMPOSSIBLE;
-            }
-        }
-        while (throwable.getCause() != null) {
-            throwable = throwable.getCause();
-        }
-
-        StackTraceElement[] stackTraceElements = throwable.getStackTrace();
-
-        if (stackTraceElements.length == 0) {
-            return PossiblyLevel.IMPOSSIBLE;
-        }
-
-        if (stackTraceElements[0].getClassName().contains("org.maxgamer.quickshop") && stackTraceElements[1].getClassName().contains("org.maxgamer.quickshop")) {
-            return PossiblyLevel.CONFIRM;
-        }
-
-        long errorCount = Arrays.stream(stackTraceElements)
-                .limit(3)
-                .filter(stackTraceElement -> stackTraceElement.getClassName().contains("org.maxgamer.quickshop"))
-                .count();
-
-        if (errorCount > 0) {
-            return PossiblyLevel.MAYBE;
-        } else if (throwable.getCause() != null) {
-            return checkWasCauseByQS(throwable.getCause());
-        }
-        return PossiblyLevel.IMPOSSIBLE;
-    }
-
-    /**
      * Set ignore throw. It will unlocked after accept a throw
      */
+    @Override
     public void ignoreThrow() {
         tempDisable = true;
     }
@@ -295,6 +252,7 @@ public class RollbarErrorReporter {
     /**
      * Set ignore throws. It will unlocked after called method resetIgnores.
      */
+    @Override
     public void ignoreThrows() {
         disable = true;
     }
@@ -302,6 +260,7 @@ public class RollbarErrorReporter {
     /**
      * Reset ignore throw(s).
      */
+    @Override
     public void resetIgnores() {
         tempDisable = false;
         disable = false;

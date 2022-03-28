@@ -25,7 +25,7 @@
     <artifactId>QuickShop</artifactId>
 
     <properties>
-        <pluginver>5.1.0.5</pluginver>
+        <pluginver>5.1.0.6</pluginver>
         <package>org.maxgamer.quickshop</package>
         <developer>Ghost-chu</developer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -381,14 +381,6 @@
             <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
         <repository>
-            <id>intellectualsites releases</id>
-            <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>intellectualsites snapshots</id>
-            <url>https://mvn.intellectualsites.com/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -529,7 +521,7 @@
         <dependency>
             <groupId>com.github.jikoo.OpenInv</groupId>
             <artifactId>openinvapi</artifactId>
-            <version>4.1.9</version>
+            <version>4.1.10</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -600,7 +592,7 @@
         <dependency>
             <groupId>com.github.seeseemelk</groupId>
             <artifactId>MockBukkit-v1.18</artifactId>
-            <version>1.18.1</version>
+            <version>1.24.1</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -790,7 +782,7 @@
         <dependency>
             <groupId>com.songoda</groupId>
             <artifactId>SongodaCore</artifactId>
-            <version>2.6.11</version>
+            <version>2.6.12</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
@@ -822,7 +814,7 @@
         <dependency>
             <groupId>com.bgsoftware</groupId>
             <artifactId>SuperiorSkyblockAPI</artifactId>
-            <version>1.8.4</version>
+            <version>1.9.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

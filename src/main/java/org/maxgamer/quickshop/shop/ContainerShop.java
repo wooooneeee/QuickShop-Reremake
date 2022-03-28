@@ -25,10 +25,7 @@ import io.papermc.lib.PaperLib;
 import lombok.EqualsAndHashCode;
 import me.lucko.helper.serialize.BlockPosition;
 import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -48,9 +45,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.chat.ComponentPackage;
+import org.maxgamer.quickshop.api.economy.EconomyCore;
 import org.maxgamer.quickshop.api.event.*;
 import org.maxgamer.quickshop.api.shop.*;
 import org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat;
+import org.maxgamer.quickshop.economy.Trader;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.logging.container.ShopRemoveLog;
@@ -490,8 +489,28 @@ public class ContainerShop implements Shop {
             // Delete it from the database
             // Refund if necessary
             if (plugin.getConfig().getBoolean("shop.refund")) {
-                plugin.getEconomy().deposit(this.getOwner(), plugin.getConfig().getDouble("shop.cost"),
-                        Objects.requireNonNull(getLocation().getWorld()), getCurrency());
+                final EconomyCore economyCore = plugin.getEconomy();
+                final double cost = plugin.getConfig().getDouble("shop.cost");
+                final World world = Objects.requireNonNull(getLocation().getWorld());
+                final String currency = getCurrency();
+                if (plugin.getConfig().getBoolean("shop.refund-from-tax-account-as-much-as-possible")) {
+                    double balanceShouldTake;
+                    if (taxAccount != null) {
+                        balanceShouldTake = Math.max(0, Math.min(cost, economyCore.getBalance(taxAccount, world, currency)));
+                        if (balanceShouldTake != 0) {
+                            economyCore.withdraw(taxAccount, balanceShouldTake, world, currency);
+                        }
+                    } else {
+                        Trader taxDefaultTrader = ((SimpleShopManager) plugin.getShopManager()).getCacheTaxAccount();
+                        if (taxDefaultTrader != null) {
+                            balanceShouldTake = Math.max(0, Math.min(cost, economyCore.getBalance(taxDefaultTrader, world, currency)));
+                            if (balanceShouldTake != 0) {
+                                economyCore.withdraw(taxDefaultTrader, balanceShouldTake, world, currency);
+                            }
+                        }
+                    }
+                }
+                economyCore.deposit(this.getOwner(), cost, world, currency);
             }
             plugin.getShopManager().removeShop(this);
             plugin.getDatabaseHelper().removeShop(this);
@@ -1496,7 +1515,7 @@ public class ContainerShop implements Shop {
         if (!Util.canBeShop(this.getLocation().getBlock())) {
             Util.debugLog("Shop at " + this.getLocation() + "@" + this.getLocation().getBlock()
                     + " container was missing, deleting...");
-            plugin.getDatabaseHelper().insertHistoryRecord(new ShopRemoveLog(Util.getNilUniqueId(), "Container invalid", saveToInfoStorage()));
+            plugin.logEvent(new ShopRemoveLog(Util.getNilUniqueId(), "Container invalid", saveToInfoStorage()));
             this.onUnload();
             this.delete(false);
         }
