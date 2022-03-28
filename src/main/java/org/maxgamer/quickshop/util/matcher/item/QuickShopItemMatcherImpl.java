@@ -176,10 +176,7 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
         if (requireStack.isSimilar(givenStack)) {
             return true;
         }
-        /* If they are the same type, they should also have item meta
-        if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
-            return false;
-        }*/
+
         if (requireStack.hasItemMeta()) {
             return itemMetaMatcher.matches(requireStack, givenStack);
         }
@@ -543,10 +540,10 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
         }
 
         boolean matches(ItemStack requireStack, ItemStack givenStack) {
-            /* If they are the same type, they should also have item meta
+            //Check if both have item meta
             if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
                 return false;
-            }*/
+            }
             if (!requireStack.hasItemMeta()) {
                 return true; // Passed check. no meta need to check.
             }
