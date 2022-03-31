@@ -1,7 +1,7 @@
 # QuickShop-Reremake Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 158
+config-version: 159
 
 #Set the default language code the plugin should use, it will apply to:
 #Item Name
@@ -620,8 +620,12 @@ integration:
     whitelist-mode: false
     #If QS should ignore disabled worlds.
     ignore-disabled-worlds: true
-    #Should we delete the shop in a land when the shop owner loses the permission for this land?
+    #Should we delete the shop in the land when the shop owner loses the permission for this land?
     delete-on-lose-permission: false
+    #Should we delete all the shop of land members and owner in the land which deleted?
+    delete-on-land-deleted: false
+    #Should we delete all the shop of land members and owner in the land which expired?
+    delete-on-land-expired: false
   #FabledSkyblock Integration
   fabledskyblock:
     # If a player wants to create a shop, the player must have the quickshop-create flag.
