@@ -366,7 +366,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                 }
             }
         }
-        if (getConfig().getBoolean("plugin.BlockHub")) {
+        if (getConfig().getBoolean("plugin.BlockHub.enable")) {
             this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
             if (this.blockHubPlugin != null && blockHubPlugin.isEnabled()) {
                 if (Util.verifyClassLoader(blockHubPlugin) && Util.loadClassAndCheckName(blockHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
