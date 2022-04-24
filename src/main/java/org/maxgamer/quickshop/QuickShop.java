@@ -346,7 +346,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                 try {
                     if (Util.verifyClassLoader(openInvPlugin) &&
                             //To avoid class conflict, we load the class from its class loader
-                            openInvPlugin.getClass().isAssignableFrom(openInvPlugin.getClass().getClassLoader().loadClass("com.lishid.openinv.IOpenInv"))) {
+                            openInvPlugin.getClass().getClassLoader().loadClass("com.lishid.openinv.IOpenInv").isInstance(openInvPlugin)) {
                         getLogger().info("Successfully loaded OpenInv support!");
                     } else {
                         getLogger().info("Failed to load OpenInv support, this version is unsupported!");
@@ -359,7 +359,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         if (getConfig().getBoolean("plugin.PlaceHolderAPI")) {
             this.placeHolderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
             if (this.placeHolderAPI != null && placeHolderAPI.isEnabled()) {
-                if (Util.verifyClassLoader(placeHolderAPI) && Util.loadClassAndCheckName(placeHolderAPI, "me.clip.placeholderapi.PlaceholderAPI")) {
+                if (Util.verifyClassLoader(placeHolderAPI) && Util.loadClassAndCheckName(placeHolderAPI, "me.clip.placeholderapi.PlaceholderAPIPlugin")) {
                     getLogger().info("Successfully loaded PlaceHolderAPI support!");
                 } else {
                     getLogger().info("Failed to load PlaceHolderAPI support, this version is unsupported!");
@@ -367,7 +367,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         if (getConfig().getBoolean("plugin.BlockHub")) {
-            this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlockHub");
+            this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
             if (this.blockHubPlugin != null && blockHubPlugin.isEnabled()) {
                 if (Util.verifyClassLoader(blockHubPlugin) && Util.loadClassAndCheckName(blockHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
                     getLogger().info("Successfully loaded BlockHub support!");
@@ -393,7 +393,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         if (getConfig().getBoolean("plugin.LWC")) {
             this.lwcPlugin = Bukkit.getPluginManager().getPlugin("LWC");
             if (this.lwcPlugin != null && lwcPlugin.isEnabled()) {
-                if (Util.verifyClassLoader(lwcPlugin) && Util.loadClassAndCheckName(lwcPlugin, "com.griefcraft.lwc.LWCPlugin") && Util.isMethodAvailable(lwcPlugin.getClass(), "findProtection", org.bukkit.Location.class)) {
+                if (Util.verifyClassLoader(lwcPlugin) && Util.loadClassAndCheckName(lwcPlugin, "com.griefcraft.lwc.LWCPlugin") && Util.isMethodAvailable("com.griefcraft.lwc.LWC", "findProtection", org.bukkit.Location.class)) {
                     getLogger().info("Successfully loaded LWC support!");
                 } else {
                     getLogger().warning("Unsupported LWC version, please make sure you are using the modern version of LWC!");
