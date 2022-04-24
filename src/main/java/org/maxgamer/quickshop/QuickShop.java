@@ -27,7 +27,6 @@ import de.leonhard.storage.internal.settings.ReloadSettings;
 import de.tr7zw.nbtapi.plugin.NBTAPI;
 import lombok.Getter;
 import lombok.Setter;
-import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -403,10 +402,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         if (getConfig().getBoolean("plugin.NBTAPI")) {
-            this.nbtapi = (NBTAPI) Bukkit.getPluginManager().getPlugin("NBTAPI");
-            if (this.nbtapi != null) {
+            Plugin nbtapi = Bukkit.getPluginManager().getPlugin("NBTAPI");
+            if (nbtapi != null && nbtapi.isEnabled()) {
                 if (Util.verifyClassLoader(nbtapi) && Util.loadClassAndCheckName(nbtapi, "de.tr7zw.nbtapi.plugin.NBTAPI") &&
                         Util.isMethodAvailable(nbtapi.getClass(), "isCompatible")) {
+                    this.nbtapi = (NBTAPI) nbtapi;
                     if (!this.nbtapi.isCompatible()) {
 
                         getLogger().warning("NBTAPI plugin failed to loading, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue. (" + nbtapi.getDescription().getVersion() + ")");
