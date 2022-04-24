@@ -343,7 +343,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         // https://github.com/KaiKikuchi/QuickShop/issues/139
         if (getConfig().getBoolean("plugin.OpenInv")) {
             this.openInvPlugin = Bukkit.getPluginManager().getPlugin("OpenInv");
-            if (this.openInvPlugin != null) {
+            if (this.openInvPlugin != null && openInvPlugin.isEnabled()) {
                 try {
                     if (Util.verifyClassLoader(openInvPlugin) &&
                             //To avoid class conflict, we load the class from its class loader
@@ -359,7 +359,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
         if (getConfig().getBoolean("plugin.PlaceHolderAPI")) {
             this.placeHolderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
-            if (this.placeHolderAPI != null) {
+            if (this.placeHolderAPI != null && placeHolderAPI.isEnabled()) {
                 if (Util.verifyClassLoader(placeHolderAPI) && Util.loadClassAndCheckName(placeHolderAPI, "me.clip.placeholderapi.PlaceholderAPI")) {
                     getLogger().info("Successfully loaded PlaceHolderAPI support!");
                 } else {
@@ -369,7 +369,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
         if (getConfig().getBoolean("plugin.BlockHub")) {
             this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlockHub");
-            if (this.blockHubPlugin != null) {
+            if (this.blockHubPlugin != null && blockHubPlugin.isEnabled()) {
                 if (Util.verifyClassLoader(blockHubPlugin) && Util.loadClassAndCheckName(blockHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
                     getLogger().info("Successfully loaded BlockHub support!");
                 } else {
@@ -380,7 +380,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         if (getConfig().getBoolean("plugin.WorldEdit")) {
             //  GameVersion gameVersion = GameVersion.get(nmsVersion);
             this.worldEditPlugin = Bukkit.getPluginManager().getPlugin("WorldEdit");
-            if (this.worldEditPlugin != null) {
+            if (this.worldEditPlugin != null && worldEditPlugin.isEnabled()) {
                 if (Util.verifyClassLoader(worldEditPlugin) && Util.loadClassAndCheckName(worldEditPlugin, "com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
                     this.worldEditAdapter = new WorldEditAdapter(this, (WorldEditPlugin) this.worldEditPlugin);
                     this.worldEditAdapter.register();
@@ -393,7 +393,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
 
         if (getConfig().getBoolean("plugin.LWC")) {
             this.lwcPlugin = Bukkit.getPluginManager().getPlugin("LWC");
-            if (this.lwcPlugin != null) {
+            if (this.lwcPlugin != null && lwcPlugin.isEnabled()) {
                 if (Util.verifyClassLoader(lwcPlugin) && Util.loadClassAndCheckName(lwcPlugin, "com.griefcraft.lwc.LWCPlugin") && Util.isMethodAvailable(lwcPlugin.getClass(), "findProtection", org.bukkit.Location.class)) {
                     getLogger().info("Successfully loaded LWC support!");
                 } else {
@@ -426,7 +426,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             if (AbstractDisplayItem.getNowUsing() == DisplayType.VIRTUALITEM) {
                 getLogger().info("Using Virtual Item display, loading ProtocolLib support...");
                 Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-                if (protocolLibPlugin != null && protocolLibPlugin.isEnabled()) {
+                if (protocolLibPlugin != null && Util.verifyClassLoader(protocolLibPlugin) && protocolLibPlugin.isEnabled()) {
                     getLogger().info("Successfully loaded ProtocolLib support!");
                 } else {
                     getLogger().warning("Failed to load ProtocolLib support, fallback to real item display");
@@ -436,11 +436,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
             if (AbstractDisplayItem.getNowUsing() == DisplayType.REALITEM) {
                 getLogger().warning("You're using Real Display system and that may cause your server lagg, switch to Virtual Display system if you can!");
-                if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
+                Plugin clearLagPlugin = Bukkit.getPluginManager().getPlugin("ClearLag");
+                if (clearLagPlugin != null && Util.verifyClassLoader(clearLagPlugin)) {
                     try {
-                        Clearlag clearlag = (Clearlag) Bukkit.getPluginManager().getPlugin("ClearLag");
                         for (RegisteredListener clearLagListener : ItemSpawnEvent.getHandlerList().getRegisteredListeners()) {
-                            if (!clearLagListener.getPlugin().equals(clearlag)) {
+                            if (!clearLagListener.getPlugin().equals(clearLagPlugin)) {
                                 continue;
                             }
                             if (clearLagListener.getListener().getClass().equals(ItemMergeListener.class)) {

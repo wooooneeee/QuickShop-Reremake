@@ -854,10 +854,9 @@ public class Util {
     }
 
     /**
-     * Check if there are class conflict
+     * Check if there are class conflicting
      *
      * @param obj the class obj
-     * @return if this name matched
      */
     public static boolean verifyClassLoader(@NotNull Object obj) {
         String name = obj.getClass().getName();
@@ -866,14 +865,14 @@ public class Util {
             ClassLoader inThereClassLoader = obj.getClass().getClassLoader().loadClass(name).getClassLoader();
             ClassLoader fromHereLoader = plugin.getClass().getClassLoader().loadClass(name).getClassLoader();
             if (!inThereClassLoader.equals(fromHereLoader)) {
-                plugin.getLogger().log(Level.SEVERE, "Found class conflict for " + name + "! Load from different classloader: " + inThereClassLoader + " and " + fromHereLoader + "! This will cause ClassCastError, for avoid this, QS will denied this 3rd loading!");
-                plugin.getLogger().log(Level.SEVERE, "It usually caused by plugin developer not relocating or shade the plugin jar depended, To fix it, please contact " + fromHereLoader + " plugin authors!");
+                plugin.getLogger().log(Level.SEVERE, "Found class conflict for " + name + "! Load from different classloader: \nClassLoader1:" + inThereClassLoader + " \nClassLoader2:" + fromHereLoader + "\nThis will cause ClassCastError, to avoid this error, the loading of this 3rd plugin support will be skipped!");
+                plugin.getLogger().log(Level.SEVERE, "It usually caused by plugin developer not relocating or shading the plugin jar depended WRONGLY, To fix it, please contact the plugin author of this loader: \n" + fromHereLoader);
                 return false;
             } else {
                 return true;
             }
         } catch (ClassNotFoundException e) {
-            //It means no more conflict here
+            //It means no more conflicts here
             return true;
         }
     }
