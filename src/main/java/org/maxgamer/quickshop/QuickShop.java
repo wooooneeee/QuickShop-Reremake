@@ -344,35 +344,57 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         if (getConfig().getBoolean("plugin.OpenInv")) {
             this.openInvPlugin = Bukkit.getPluginManager().getPlugin("OpenInv");
             if (this.openInvPlugin != null) {
-                getLogger().info("Successfully loaded OpenInv support!");
+                try {
+                    if (Util.verifyClassLoader(openInvPlugin) &&
+                            //To avoid class conflict, we load the class from its class loader
+                            openInvPlugin.getClass().isAssignableFrom(openInvPlugin.getClass().getClassLoader().loadClass("com.lishid.openinv.IOpenInv"))) {
+                        getLogger().info("Successfully loaded OpenInv support!");
+                    } else {
+                        getLogger().info("Failed to load OpenInv support, this version is unsupported!");
+                    }
+                } catch (ClassNotFoundException e) {
+                    getLogger().info("Failed to find IOpenInv interface, this version is unsupported!");
+                }
             }
         }
         if (getConfig().getBoolean("plugin.PlaceHolderAPI")) {
             this.placeHolderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
             if (this.placeHolderAPI != null) {
-                getLogger().info("Successfully loaded PlaceHolderAPI support!");
+                if (Util.verifyClassLoader(placeHolderAPI) && Util.loadClassAndCheckName(placeHolderAPI, "me.clip.placeholderapi.PlaceholderAPI")) {
+                    getLogger().info("Successfully loaded PlaceHolderAPI support!");
+                } else {
+                    getLogger().info("Failed to load PlaceHolderAPI support, this version is unsupported!");
+                }
             }
         }
         if (getConfig().getBoolean("plugin.BlockHub")) {
             this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlockHub");
             if (this.blockHubPlugin != null) {
-                getLogger().info("Successfully loaded BlockHub support!");
+                if (Util.verifyClassLoader(blockHubPlugin) && Util.loadClassAndCheckName(blockHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
+                    getLogger().info("Successfully loaded BlockHub support!");
+                } else {
+                    getLogger().info("Failed to load BlockHub support, this version is unsupported!");
+                }
             }
         }
         if (getConfig().getBoolean("plugin.WorldEdit")) {
             //  GameVersion gameVersion = GameVersion.get(nmsVersion);
             this.worldEditPlugin = Bukkit.getPluginManager().getPlugin("WorldEdit");
             if (this.worldEditPlugin != null) {
-                this.worldEditAdapter = new WorldEditAdapter(this, (WorldEditPlugin) this.worldEditPlugin);
-                this.worldEditAdapter.register();
-                getLogger().info("Successfully loaded WorldEdit support!");
+                if (Util.verifyClassLoader(worldEditPlugin) && Util.loadClassAndCheckName(worldEditPlugin, "com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
+                    this.worldEditAdapter = new WorldEditAdapter(this, (WorldEditPlugin) this.worldEditPlugin);
+                    this.worldEditAdapter.register();
+                    getLogger().info("Successfully loaded WorldEdit support!");
+                } else {
+                    getLogger().info("Failed to load WorldEdit support, this version is unsupported!");
+                }
             }
         }
 
         if (getConfig().getBoolean("plugin.LWC")) {
             this.lwcPlugin = Bukkit.getPluginManager().getPlugin("LWC");
             if (this.lwcPlugin != null) {
-                if (Util.isMethodAvailable("com.griefcraft.lwc.LWC", "findProtection", org.bukkit.Location.class)) {
+                if (Util.verifyClassLoader(lwcPlugin) && Util.loadClassAndCheckName(lwcPlugin, "com.griefcraft.lwc.LWCPlugin") && Util.isMethodAvailable(lwcPlugin.getClass(), "findProtection", org.bukkit.Location.class)) {
                     getLogger().info("Successfully loaded LWC support!");
                 } else {
                     getLogger().warning("Unsupported LWC version, please make sure you are using the modern version of LWC!");
@@ -381,18 +403,20 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         if (getConfig().getBoolean("plugin.NBTAPI")) {
-            if (Util.isClassAvailable("de.tr7zw.nbtapi.plugin.NBTAPI")) {
-                this.nbtapi = (NBTAPI) Bukkit.getPluginManager().getPlugin("NBTAPI");
-                if (this.nbtapi != null) {
+            this.nbtapi = (NBTAPI) Bukkit.getPluginManager().getPlugin("NBTAPI");
+            if (this.nbtapi != null) {
+                if (Util.verifyClassLoader(nbtapi) && Util.loadClassAndCheckName(nbtapi, "de.tr7zw.nbtapi.plugin.NBTAPI") &&
+                        Util.isMethodAvailable(nbtapi.getClass(), "isCompatible")) {
                     if (!this.nbtapi.isCompatible()) {
+
                         getLogger().warning("NBTAPI plugin failed to loading, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue. (" + nbtapi.getDescription().getVersion() + ")");
                         this.nbtapi = null;
                     } else {
                         getLogger().info("Successfully loaded NBTAPI support!");
                     }
+                } else {
+                    getLogger().warning("NBTAPI plugin is invalid, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue.");
                 }
-            } else {
-                getLogger().warning("NBTAPI plugin is invalid, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue.");
             }
         }
         Bukkit.getPluginManager().registerEvents(this.compatibilityTool, this);

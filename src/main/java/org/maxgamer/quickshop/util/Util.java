@@ -853,6 +853,63 @@ public class Util {
         }
     }
 
+    /**
+     * Check if there are class conflict
+     *
+     * @param obj the class obj
+     * @return if this name matched
+     */
+    public static boolean verifyClassLoader(@NotNull Object obj) {
+        String name = obj.getClass().getName();
+
+        try {
+            ClassLoader inThereClassLoader = obj.getClass().getClassLoader().loadClass(name).getClassLoader();
+            ClassLoader fromHereLoader = plugin.getClass().getClassLoader().loadClass(name).getClassLoader();
+            if (!inThereClassLoader.equals(fromHereLoader)) {
+                plugin.getLogger().log(Level.SEVERE, "Found class conflict for " + name + "! Load from different classloader: " + inThereClassLoader + " and " + fromHereLoader + "! This will cause ClassCastError, for avoid this, QS will denied this 3rd loading!");
+                plugin.getLogger().log(Level.SEVERE, "It usually caused by plugin developer not relocating or shade the plugin jar depended, To fix it, please contact " + fromHereLoader + " plugin authors!");
+                return false;
+            } else {
+                return true;
+            }
+        } catch (ClassNotFoundException e) {
+            //It means no more conflict here
+            return true;
+        }
+    }
+
+    /**
+     * Let classloader load this class and check name (For solving class conflict issue)
+     *
+     * @param obj  the class obj
+     * @param name the full name for check
+     * @return if this name matched
+     */
+    public static boolean loadClassAndCheckName(@NotNull Object obj, String name) {
+        return obj.getClass().getName().equals(name);
+    }
+
+    /**
+     * Get this method available or not
+     *
+     * @param clazz  the class
+     * @param method the name of method
+     * @param args   the arg of method
+     * @return boolean Available
+     */
+    public static boolean isMethodAvailable(@NotNull Class<?> clazz, String method, Class<?>... args) {// nosemgrep
+        try {
+            try {
+                clazz.getDeclaredMethod(method, args);
+            } catch (NoSuchMethodException e) {
+                clazz.getMethod(method, args);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static boolean isDisplayAllowBlock(@NotNull Material mat) {
         return mat.isTransparent() || isWallSign(mat);
     }
