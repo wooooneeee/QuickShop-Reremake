@@ -43,6 +43,7 @@ import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Timer;
 import org.maxgamer.quickshop.util.Util;
+import org.maxgamer.quickshop.util.logging.container.ShopStackingStatusChangeLog;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -131,10 +132,19 @@ public class ShopLoader {
                 }
                 Shop shop;
                 try {
+                    double price = data.getPrice();
+                    if (!plugin.isAllowStack() && data.item.getAmount() > 1) {
+                        //Shop stack changed, logging for backup
+                        plugin.logEvent(new ShopStackingStatusChangeLog(origin));
+                        //Update the actual price
+                        price = price / data.item.getAmount();
+                        //Setting item amount
+                        data.item.setAmount(1);
+                    }
                     shop =
                             new ContainerShop(plugin,
                                     data.getLocation(),
-                                    data.getPrice(),
+                                    price,
                                     data.getItem(),
                                     data.getModerators(),
                                     data.isUnlimited(),
@@ -381,7 +391,6 @@ public class ShopLoader {
         private boolean disableDisplay;
 
         private String taxAccount;
-
         ShopRawDatabaseInfo(ResultSet rs) throws SQLException {
             this.x = rs.getInt("x");
             this.y = rs.getInt("y");
@@ -461,7 +470,6 @@ public class ShopLoader {
                 exceptionHandler(ex, this.location);
             }
         }
-
         private @Nullable ItemStack deserializeItem(@NotNull String itemConfig) throws RuntimeException {
             try {
                 return Util.deserialize(itemConfig);
