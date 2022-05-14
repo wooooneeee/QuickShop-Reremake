@@ -77,7 +77,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
                 if (allowLoan || plugin.getEconomy().getBalance(shopOwner, Objects.requireNonNull(world), shop.getCurrency()) >= cost) {
                     Trader taxAccount;
                     if (shop.getTaxAccount() != null) {
-                        taxAccount = new Trader(shop.getTaxAccount().toString(), Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+                        taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
                     } else {
                         taxAccount = ((SimpleShopManager) plugin.getShopManager()).getCacheTaxAccount();
                     }

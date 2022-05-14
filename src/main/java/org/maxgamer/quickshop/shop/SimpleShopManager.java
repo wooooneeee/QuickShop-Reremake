@@ -685,7 +685,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         }
         Trader taxAccount;
         if (shop.getTaxAccount() != null) {
-            taxAccount = new Trader(shop.getTaxAccount().toString(), Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+            taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
         } else {
             taxAccount = this.cacheTaxAccount;
         }
@@ -1086,7 +1086,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         EconomyTransaction transaction;
         Trader taxAccount;
         if (shop.getTaxAccount() != null) {
-            taxAccount = new Trader(shop.getTaxAccount().toString(), Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+            taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
         } else {
             taxAccount = this.cacheTaxAccount;
         }
