@@ -1,7 +1,7 @@
 # QuickShop-Reremake Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 159
+config-version: 160
 
 #Set the default language code the plugin should use, it will apply to:
 #Item Name
@@ -745,10 +745,17 @@ integration:
   #Superior Skyblock Integration
   superiorskyblock:
     enable: false
+    #Should we prevent the creation of a shop or trade with a shop outside the superior-skyblock area?
+    whitelist-mode: true
     #Is only the island owner allowed to create shops?
     owner-create-only: false
     #Delete shops when the shop owner got kicked/quited from the island.
     delete-shop-on-member-leave: true
+    #The privilege needs when creating shop
+    create-privilege-needs-list:
+      - chest_access
+    #The privilege needs when trading with a shop
+    trade-privilege-needs-list: [ ]
   #AdvanvedRegionMarket shop deletion Integration
   advancedregionmarket:
     enable: true

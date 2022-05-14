@@ -2138,6 +2138,12 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("integration.lands.delete-on-land-expired", false);
             getConfig().set("config-version", ++selectedVersion);
         }
+        if (selectedVersion == 159) {
+            getConfig().set("integration.superiorskyblock.whitelist-mode", true);
+            getConfig().set("integration.superiorskyblock.create-privilege-needs-list", new ArrayList<>());
+            getConfig().set("integration.superiorskyblock.trade-privilege-needs-list", new ArrayList<>());
+            getConfig().set("config-version", ++selectedVersion);
+        }
         if (getConfig().isSet("shop.shop")) {
             getConfig().set("shop.shop", null);
         }
