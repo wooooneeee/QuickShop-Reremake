@@ -115,6 +115,22 @@ public class EconomyTransactionTest extends TestBukkitBase {
     }
 
     @Test
+    public void testRollback() {
+
+        UUID from = UUID.randomUUID();
+        UUID to = UUID.randomUUID();
+        economy.deposit(from, 99, null, null);
+        assertEquals(99, economy.getBalance(from, null, null));
+        assertEquals(0, economy.getBalance(to, null, null));
+        EconomyTransaction.builder().core(economy).from(from).to(to).amount(100).core(economy).taxAccount(taxAccount).taxModifier(0.0).build().failSafeCommit();
+        assertEquals(99, economy.getBalance(from, null, null));
+        assertEquals(0, economy.getBalance(to, null, null));
+        EconomyTransaction.builder().core(economy).from(from).to(to).amount(100).core(economy).taxAccount(taxAccount).taxModifier(0.2).build().failSafeCommit();
+        assertEquals(99, economy.getBalance(from, null, null));
+        assertEquals(0, economy.getBalance(to, null, null));
+    }
+
+    @Test
     public void testNull() {
         try {
             EconomyTransaction.builder().core(economy).from(null).to(null).amount(100).core(economy).taxAccount(taxAccount).taxModifier(0.0).build().failSafeCommit();

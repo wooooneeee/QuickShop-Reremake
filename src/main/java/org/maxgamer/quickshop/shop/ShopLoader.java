@@ -43,6 +43,7 @@ import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Timer;
 import org.maxgamer.quickshop.util.Util;
+import org.maxgamer.quickshop.util.logging.container.ShopStackingStatusChangeLog;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -114,35 +115,50 @@ public class ShopLoader {
                     exceptionHandler(e, null);
                     continue;
                 }
-                //World unloaded and not found
-                if (data.getWorld() == null) {
-                    ++loadAfterWorldLoaded;
-                    continue;
-                }
-                Shop shop =
-                        new ContainerShop(plugin,
-                                data.getLocation(),
-                                data.getPrice(),
-                                data.getItem(),
-                                data.getModerators(),
-                                data.isUnlimited(),
-                                data.getType(),
-                                data.getExtra(),
-                                data.getCurrency(),
-                                data.isDisableDisplay(),
-                                data.getTaxAccount());
-                if (data.needUpdate.get()) {
-                    shop.setDirty();
-                }
-                if (shopNullCheck(shop)) {
+                if (shopNullCheck(data)) {
                     if (deleteCorruptShops) {
-                        plugin.getLogger().warning("Deleting shop " + shop + " caused by corrupted.");
+                        plugin.getLogger().warning("Deleting shop " + data + " caused by corrupted.");
                         plugin.getDatabaseHelper().removeShop(origin.getWorld(), origin.getX(), origin.getY(), origin.getZ());
                     } else {
                         Util.debugLog("Trouble database loading debug: " + data);
                         Util.debugLog("Somethings gone wrong, skipping the loading...");
                     }
                     continue;
+                }
+                //World unloaded and not found
+                if (data.getWorld() == null) {
+                    ++loadAfterWorldLoaded;
+                    continue;
+                }
+                Shop shop;
+                try {
+                    double price = data.getPrice();
+                    if (!plugin.isAllowStack() && data.item.getAmount() > 1) {
+                        //Shop stack changed, logging for backup
+                        plugin.logEvent(new ShopStackingStatusChangeLog(origin));
+                        //Update the actual price
+                        price = price / data.item.getAmount();
+                        //Setting item amount
+                        data.item.setAmount(1);
+                    }
+                    shop =
+                            new ContainerShop(plugin,
+                                    data.getLocation(),
+                                    price,
+                                    data.getItem(),
+                                    data.getModerators(),
+                                    data.isUnlimited(),
+                                    data.getType(),
+                                    data.getExtra(),
+                                    data.getCurrency(),
+                                    data.isDisableDisplay(),
+                                    data.getTaxAccount());
+                } catch (Exception e) {
+                    exceptionHandler(e, data.location);
+                    continue;
+                }
+                if (data.needUpdate.get()) {
+                    shop.setDirty();
                 }
                 ++valid;
 
@@ -195,28 +211,28 @@ public class ShopLoader {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private boolean shopNullCheck(@Nullable Shop shop) {
-        if (shop == null) {
+    private boolean shopNullCheck(@Nullable ShopDatabaseInfo databaseInfo) {
+        if (databaseInfo == null) {
             Util.debugLog("Shop object is null");
             return true;
         }
-        if (shop.getItem() == null) {
+        if (databaseInfo.getItem() == null) {
             Util.debugLog("Shop itemStack is null");
             return true;
         }
-        if (shop.getItem().getType() == Material.AIR) {
+        if (databaseInfo.getItem().getType() == Material.AIR) {
             Util.debugLog("Shop itemStack type can't be AIR");
             return true;
         }
-        if (shop.getLocation() == null) {
+        if (databaseInfo.getLocation() == null) {
             Util.debugLog("Shop location is null");
             return true;
         }
-        if (shop.getOwner() == null) {
+        if (databaseInfo.moderators == null || databaseInfo.moderators.getOwner() == null) {
             Util.debugLog("Shop owner is null");
             return true;
         }
-        if (plugin.getServer().getOfflinePlayer(shop.getOwner()).getName() == null) {
+        if (PlayerFinder.findOfflinePlayerByUUID(databaseInfo.moderators.getOwner()) == null) {
             Util.debugLog("Shop owner not exist on this server, did you have reset the playerdata?");
         }
         return false;
@@ -299,19 +315,24 @@ public class ShopLoader {
             plugin.getLogger().info("Loading recovered shops...");
             for (ShopRawDatabaseInfo rawDatabaseInfo : list) {
                 ShopDatabaseInfo data = new ShopDatabaseInfo(rawDatabaseInfo);
-                Shop shop =
-                        new ContainerShop(plugin,
-                                data.getLocation(),
-                                data.getPrice(),
-                                data.getItem(),
-                                data.getModerators(),
-                                data.isUnlimited(),
-                                data.getType(),
-                                data.getExtra(),
-                                data.getCurrency(),
-                                data.isDisableDisplay(),
-                                data.getTaxAccount());
-                if (shopNullCheck(shop)) {
+                if (shopNullCheck(data)) {
+                    continue;
+                }
+                Shop shop;
+                try {
+                    shop = new ContainerShop(plugin,
+                            data.getLocation(),
+                            data.getPrice(),
+                            data.getItem(),
+                            data.getModerators(),
+                            data.isUnlimited(),
+                            data.getType(),
+                            data.getExtra(),
+                            data.getCurrency(),
+                            data.isDisableDisplay(),
+                            data.getTaxAccount());
+                } catch (Exception exception) {
+                    exceptionHandler(exception, data.location);
                     continue;
                 }
                 plugin.getDatabaseHelper().createShop(shop, null, null);
@@ -370,7 +391,6 @@ public class ShopLoader {
         private boolean disableDisplay;
 
         private String taxAccount;
-
         ShopRawDatabaseInfo(ResultSet rs) throws SQLException {
             this.x = rs.getInt("x");
             this.y = rs.getInt("y");
@@ -450,14 +470,13 @@ public class ShopLoader {
                 exceptionHandler(ex, this.location);
             }
         }
-
-        private @Nullable ItemStack deserializeItem(@NotNull String itemConfig) {
+        private @Nullable ItemStack deserializeItem(@NotNull String itemConfig) throws RuntimeException {
             try {
                 return Util.deserialize(itemConfig);
             } catch (InvalidConfigurationException e) {
                 plugin.getLogger().log(Level.WARNING, "Failed load shop data, because target config can't deserialize the ItemStack", e);
                 Util.debugLog("Failed to load data to the ItemStack: " + itemConfig);
-                return null;
+                throw new RuntimeException("Failed load shop data, because target config can't deserialize the ItemStack", e);
             }
         }
 

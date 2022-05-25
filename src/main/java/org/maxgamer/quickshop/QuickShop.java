@@ -27,7 +27,6 @@ import de.leonhard.storage.internal.settings.ReloadSettings;
 import de.tr7zw.nbtapi.plugin.NBTAPI;
 import lombok.Getter;
 import lombok.Setter;
-import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -343,36 +342,58 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         // https://github.com/KaiKikuchi/QuickShop/issues/139
         if (getConfig().getBoolean("plugin.OpenInv")) {
             this.openInvPlugin = Bukkit.getPluginManager().getPlugin("OpenInv");
-            if (this.openInvPlugin != null) {
-                getLogger().info("Successfully loaded OpenInv support!");
+            if (this.openInvPlugin != null && openInvPlugin.isEnabled()) {
+                try {
+                    if (Util.verifyClassLoader(openInvPlugin) &&
+                            //To avoid class conflict, we load the class from its class loader
+                            openInvPlugin.getClass().getClassLoader().loadClass("com.lishid.openinv.IOpenInv").isInstance(openInvPlugin)) {
+                        getLogger().info("Successfully loaded OpenInv support!");
+                    } else {
+                        getLogger().info("Failed to load OpenInv support, this version is unsupported!");
+                    }
+                } catch (ClassNotFoundException e) {
+                    getLogger().info("Failed to find IOpenInv interface, this version is unsupported!");
+                }
             }
         }
         if (getConfig().getBoolean("plugin.PlaceHolderAPI")) {
             this.placeHolderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
-            if (this.placeHolderAPI != null) {
-                getLogger().info("Successfully loaded PlaceHolderAPI support!");
+            if (this.placeHolderAPI != null && placeHolderAPI.isEnabled()) {
+                if (Util.verifyClassLoader(placeHolderAPI) && Util.loadClassAndCheckName(placeHolderAPI, "me.clip.placeholderapi.PlaceholderAPIPlugin")) {
+                    getLogger().info("Successfully loaded PlaceHolderAPI support!");
+                } else {
+                    getLogger().info("Failed to load PlaceHolderAPI support, this version is unsupported!");
+                }
             }
         }
-        if (getConfig().getBoolean("plugin.BlockHub")) {
-            this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlockHub");
-            if (this.blockHubPlugin != null) {
-                getLogger().info("Successfully loaded BlockHub support!");
+        if (getConfig().getBoolean("plugin.BlockHub.enable")) {
+            this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
+            if (this.blockHubPlugin != null && blockHubPlugin.isEnabled()) {
+                if (Util.verifyClassLoader(blockHubPlugin) && Util.loadClassAndCheckName(blockHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
+                    getLogger().info("Successfully loaded BlockHub support!");
+                } else {
+                    getLogger().info("Failed to load BlockHub support, this version is unsupported!");
+                }
             }
         }
         if (getConfig().getBoolean("plugin.WorldEdit")) {
             //  GameVersion gameVersion = GameVersion.get(nmsVersion);
             this.worldEditPlugin = Bukkit.getPluginManager().getPlugin("WorldEdit");
-            if (this.worldEditPlugin != null) {
-                this.worldEditAdapter = new WorldEditAdapter(this, (WorldEditPlugin) this.worldEditPlugin);
-                this.worldEditAdapter.register();
-                getLogger().info("Successfully loaded WorldEdit support!");
+            if (this.worldEditPlugin != null && worldEditPlugin.isEnabled()) {
+                if (Util.verifyClassLoader(worldEditPlugin) && Util.loadClassAndCheckName(worldEditPlugin, "com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
+                    this.worldEditAdapter = new WorldEditAdapter(this, (WorldEditPlugin) this.worldEditPlugin);
+                    this.worldEditAdapter.register();
+                    getLogger().info("Successfully loaded WorldEdit support!");
+                } else {
+                    getLogger().info("Failed to load WorldEdit support, this version is unsupported!");
+                }
             }
         }
 
         if (getConfig().getBoolean("plugin.LWC")) {
             this.lwcPlugin = Bukkit.getPluginManager().getPlugin("LWC");
-            if (this.lwcPlugin != null) {
-                if (Util.isMethodAvailable("com.griefcraft.lwc.LWC", "findProtection", org.bukkit.Location.class)) {
+            if (this.lwcPlugin != null && lwcPlugin.isEnabled()) {
+                if (Util.verifyClassLoader(lwcPlugin) && Util.loadClassAndCheckName(lwcPlugin, "com.griefcraft.lwc.LWCPlugin") && Util.isMethodAvailable("com.griefcraft.lwc.LWC", "findProtection", org.bukkit.Location.class)) {
                     getLogger().info("Successfully loaded LWC support!");
                 } else {
                     getLogger().warning("Unsupported LWC version, please make sure you are using the modern version of LWC!");
@@ -381,18 +402,21 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         if (getConfig().getBoolean("plugin.NBTAPI")) {
-            if (Util.isClassAvailable("de.tr7zw.nbtapi.plugin.NBTAPI")) {
-                this.nbtapi = (NBTAPI) Bukkit.getPluginManager().getPlugin("NBTAPI");
-                if (this.nbtapi != null) {
+            Plugin nbtapi = Bukkit.getPluginManager().getPlugin("NBTAPI");
+            if (nbtapi != null && nbtapi.isEnabled()) {
+                if (Util.verifyClassLoader(nbtapi) && Util.loadClassAndCheckName(nbtapi, "de.tr7zw.nbtapi.plugin.NBTAPI") &&
+                        Util.isMethodAvailable(nbtapi.getClass(), "isCompatible")) {
+                    this.nbtapi = (NBTAPI) nbtapi;
                     if (!this.nbtapi.isCompatible()) {
+
                         getLogger().warning("NBTAPI plugin failed to loading, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue. (" + nbtapi.getDescription().getVersion() + ")");
                         this.nbtapi = null;
                     } else {
                         getLogger().info("Successfully loaded NBTAPI support!");
                     }
+                } else {
+                    getLogger().warning("NBTAPI plugin is invalid, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue.");
                 }
-            } else {
-                getLogger().warning("NBTAPI plugin is invalid, QuickShop NBTAPI support module has been disabled. Try update NBTAPI version to resolve the issue.");
             }
         }
         Bukkit.getPluginManager().registerEvents(this.compatibilityTool, this);
@@ -402,7 +426,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             if (AbstractDisplayItem.getNowUsing() == DisplayType.VIRTUALITEM) {
                 getLogger().info("Using Virtual Item display, loading ProtocolLib support...");
                 Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-                if (protocolLibPlugin != null && protocolLibPlugin.isEnabled()) {
+                if (protocolLibPlugin != null && Util.verifyClassLoader(protocolLibPlugin) && protocolLibPlugin.isEnabled()) {
                     getLogger().info("Successfully loaded ProtocolLib support!");
                 } else {
                     getLogger().warning("Failed to load ProtocolLib support, fallback to real item display");
@@ -412,11 +436,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
             if (AbstractDisplayItem.getNowUsing() == DisplayType.REALITEM) {
                 getLogger().warning("You're using Real Display system and that may cause your server lagg, switch to Virtual Display system if you can!");
-                if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
+                Plugin clearLagPlugin = Bukkit.getPluginManager().getPlugin("ClearLag");
+                if (clearLagPlugin != null && Util.verifyClassLoader(clearLagPlugin)) {
                     try {
-                        Clearlag clearlag = (Clearlag) Bukkit.getPluginManager().getPlugin("ClearLag");
                         for (RegisteredListener clearLagListener : ItemSpawnEvent.getHandlerList().getRegisteredListeners()) {
-                            if (!clearLagListener.getPlugin().equals(clearlag)) {
+                            if (!clearLagListener.getPlugin().equals(clearLagPlugin)) {
                                 continue;
                             }
                             if (clearLagListener.getListener().getClass().equals(ItemMergeListener.class)) {
@@ -2107,6 +2131,17 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
         if (selectedVersion == 157) {
             getConfig().set("shop.refund-from-tax-account-as-much-as-possible", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 158) {
+            getConfig().set("integration.lands.delete-on-land-deleted", false);
+            getConfig().set("integration.lands.delete-on-land-expired", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 159) {
+            getConfig().set("integration.superiorskyblock.whitelist-mode", true);
+            getConfig().set("integration.superiorskyblock.create-privilege-needs-list", new ArrayList<>());
+            getConfig().set("integration.superiorskyblock.trade-privilege-needs-list", new ArrayList<>());
             getConfig().set("config-version", ++selectedVersion);
         }
         if (getConfig().isSet("shop.shop")) {

@@ -58,7 +58,7 @@ softdepend:
   - Factions
   - ProtocolLib
   - LWC
-  - BlockHub
+  - BlocksHub
   - Lands
   - GriefPrevention
   - JulySafe

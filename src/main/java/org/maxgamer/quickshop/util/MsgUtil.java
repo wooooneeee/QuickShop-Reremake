@@ -244,17 +244,16 @@ public class MsgUtil {
     public static void loadEnchi18n() {
         plugin.getLogger().info("Loading enchantments translations...");
         File enchi18nFile = new File(plugin.getDataFolder(), "enchi18n.yml");
+        YamlConfiguration defaultYaml = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(Objects.requireNonNull(plugin.getResource("enchi18n.yml")), StandardCharsets.UTF_8));
         if (!enchi18nFile.exists()) {
             plugin.getLogger().info("Creating enchi18n.yml");
-            plugin.saveResource("enchi18n.yml", false);
+            plugin.saveResource("enchi18n.yml", true);
         }
-        // Store it
         enchi18n = YamlConfiguration.loadConfiguration(enchi18nFile);
         enchi18n.options().copyDefaults(false);
-        YamlConfiguration enchi18nYAML =
-                YamlConfiguration.loadConfiguration(
-                        new InputStreamReader(Objects.requireNonNull(plugin.getResource("enchi18n.yml")), StandardCharsets.UTF_8));
-        enchi18n.setDefaults(enchi18nYAML);
+        enchi18n.setDefaults(defaultYaml);
+        // Store it
         Util.parseColours(enchi18n);
         Enchantment[] enchsi18n = Enchantment.values();
         for (Enchantment ench : enchsi18n) {
@@ -281,17 +280,17 @@ public class MsgUtil {
     public static void loadItemi18n() {
         plugin.getLogger().info("Loading items translations...");
         File itemi18nFile = new File(plugin.getDataFolder(), "itemi18n.yml");
+        YamlConfiguration defaultYaml = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(Objects.requireNonNull(plugin.getResource("itemi18n.yml")), StandardCharsets.UTF_8));
         if (!itemi18nFile.exists()) {
             plugin.getLogger().info("Creating itemi18n.yml");
-            plugin.saveResource("itemi18n.yml", false);
+            plugin.saveResource("itemi18n.yml", true);
         }
-        // Store it
         itemi18n = YamlConfiguration.loadConfiguration(itemi18nFile);
         itemi18n.options().copyDefaults(false);
-        YamlConfiguration itemi18nYAML =
-                YamlConfiguration.loadConfiguration(
-                        new InputStreamReader(Objects.requireNonNull(plugin.getResource("itemi18n.yml")), StandardCharsets.UTF_8));
-        itemi18n.setDefaults(itemi18nYAML);
+        itemi18n.setDefaults(defaultYaml);
+
+        // Store it
         Util.parseColours(itemi18n);
         Material[] itemsi18n = Material.values();
         for (Material material : itemsi18n) {
@@ -317,17 +316,16 @@ public class MsgUtil {
     public static void loadPotioni18n() {
         plugin.getLogger().info("Loading potions translations...");
         File potioni18nFile = new File(plugin.getDataFolder(), "potioni18n.yml");
+        YamlConfiguration defaultYaml = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(Objects.requireNonNull(plugin.getResource("potioni18n.yml")), StandardCharsets.UTF_8));
         if (!potioni18nFile.exists()) {
             plugin.getLogger().info("Creating potioni18n.yml");
-            plugin.saveResource("potioni18n.yml", false);
+            plugin.saveResource("potioni18n.yml", true);
         }
-        // Store it
         potioni18n = YamlConfiguration.loadConfiguration(potioni18nFile);
         potioni18n.options().copyDefaults(false);
-        YamlConfiguration potioni18nYAML =
-                YamlConfiguration.loadConfiguration(
-                        new InputStreamReader(Objects.requireNonNull(plugin.getResource("potioni18n.yml")), StandardCharsets.UTF_8));
-        potioni18n.setDefaults(potioni18nYAML);
+        potioni18n.setDefaults(defaultYaml);
+        // Store it
         Util.parseColours(potioni18n);
         for (PotionEffectType potion : PotionEffectType.values()) {
             if (potion == null) {

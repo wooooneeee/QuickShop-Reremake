@@ -1564,7 +1564,10 @@ public class ContainerShop implements Shop {
      */
     @Override
     public boolean isStackingShop() {
-        return plugin.isAllowStack() && this.item.getAmount() > 1;
+        //Since isAllowStack will change in the runtime and shop does not handle this change
+        //We just care about the snapshot result (it was already checked when init shop)
+        //return plugin.isAllowStack() && this.item.getAmount() > 1;
+        return this.item.getAmount() > 1;
     }
 
     /**
