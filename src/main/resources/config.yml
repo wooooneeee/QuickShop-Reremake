@@ -330,12 +330,12 @@ shop:
 
   #The minimum price for a shop.
   #The default is 0.01
-  #This will not affect existing shops!
+  #This WILL AFFECT existing shops!
   minimum-price: 0.01
 
   #The maximum price for a shop.
   #Set this to -1 to disable it. (Unlimited maximum shop price)
-  #This will not affect existing shops!
+  #This WILL AFFECT existing shops!
   maximum-price: -1
 
   #Per item price restrictions.
