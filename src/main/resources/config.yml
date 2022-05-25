@@ -390,7 +390,7 @@ shop:
     - disabled_world
 
   #The listener list to skip when protection-checking.
-  #Requires "protection-checking-handler" set to 1.
+  #
   #Examples:
   #- xx.xxx.xxx.xxxxx.BlockBreakListenerClass
   #  This will skip calling the xx.xxx.xxx.xxxxx.BlockBreakListenerClass.
