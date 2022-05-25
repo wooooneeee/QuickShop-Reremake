@@ -103,10 +103,12 @@ auto-report-errors: true
 include-offlineplayer-list: false
 
 #What economy provider should QuickShop use?
+#If you need to use Multi-Currency feature
+#You need to install the eco plugin supported listing there
+#and change to corresponding type
 #0=Vault
 #3=GemsEconomy with Multi-Currency on
 #4=TNE with Multi-Currency on
-#DO NOT TOUCH THIS IF YOU DON'T KNOW WHAT IT DOES. ASK FOR SUPPORT BEFORE TOUCHING THIS!
 economy-type: 0
 
 #Whether to use decimal format to display money.
