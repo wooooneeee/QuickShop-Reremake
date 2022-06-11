@@ -229,7 +229,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     @Deprecated
     private boolean enabledAsyncDisplayDespawn;
     @Getter
-    private Plugin blockHubPlugin;
+    private Plugin blocksHubPlugin;
     @Getter
     private Plugin lwcPlugin;
     @Getter
@@ -367,9 +367,9 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             }
         }
         if (getConfig().getBoolean("plugin.BlockHub.enable")) {
-            this.blockHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
-            if (this.blockHubPlugin != null && blockHubPlugin.isEnabled()) {
-                if (Util.verifyClassLoader(blockHubPlugin) && Util.loadClassAndCheckName(blockHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
+            this.blocksHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
+            if (this.blocksHubPlugin != null && blocksHubPlugin.isEnabled()) {
+                if (Util.verifyClassLoader(blocksHubPlugin) && Util.loadClassAndCheckName(blocksHubPlugin, "org.primesoft.blockshub.BlocksHubBukkit")) {
                     getLogger().info("Successfully loaded BlockHub support!");
                 } else {
                     getLogger().info("Failed to load BlockHub support, this version is unsupported!");

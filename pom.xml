@@ -737,7 +737,7 @@
         </dependency>
         <dependency>
             <groupId>org.primesoft.blockshub</groupId>
-            <artifactId>BlockHub</artifactId>
+            <artifactId>BlocksHub</artifactId>
             <version>3.2.1</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/BlocksHub-3.2.1.jar</systemPath>

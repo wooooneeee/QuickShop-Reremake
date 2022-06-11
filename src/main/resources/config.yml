@@ -474,10 +474,10 @@ plugin:
   PlaceHolderAPI: true
   #If you have LWC/LWCX, QuickShop will check access.
   LWC: true
-  #If you use BlockHub, Should QuickShop use BlockHub to check region access for players?
+  #If you use BlocksHub, Should QuickShop use BlockHub to check region access for players?
   BlockHub:
     enable: true
-    #Should BlockHub only be used for permission checks?
+    #Should BlocksHub only be used for permission checks?
     only: false
   #If you have WorldEdit, QuickShop will try migrating shops in EditSession. [BETA]
   WorldEdit: true
