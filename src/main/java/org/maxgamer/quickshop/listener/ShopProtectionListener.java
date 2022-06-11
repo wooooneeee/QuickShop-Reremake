@@ -49,7 +49,6 @@ import org.maxgamer.quickshop.util.reload.ReloadStatus;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class ShopProtectionListener extends AbstractProtectionListener {
@@ -92,42 +91,101 @@ public class ShopProtectionListener extends AbstractProtectionListener {
             if (plugin.getShopManager().getShopsInWorld(world).isEmpty()) {
                 return;
             }
+            //Checking and changing memory value and file
+            //Value for store results
+            boolean disableHopperMoveEvents;
+            //Reading and changing memory value
             try {
                 Field worldServerF = world.getClass().getDeclaredField("world");
                 worldServerF.setAccessible(true);
                 Object worldServer = worldServerF.get(world);
-                Object paperWorldConfig = worldServer.getClass().getSuperclass().getDeclaredField("paperConfig").get(worldServer);
-                boolean disableHopperMoveEvents = paperWorldConfig.getClass().getDeclaredField("disableHopperMoveEvents").getBoolean(paperWorldConfig);
+                Field paperConfigF = worldServer.getClass().getSuperclass().getDeclaredField("paperConfig");
+                paperConfigF.setAccessible(true);
+                Object paperWorldConfig = paperConfigF.get(worldServer);
+                Field disableHopperMoveEventsF;
+                //Old version
+                try {
+                    disableHopperMoveEventsF = paperWorldConfig.getClass().getDeclaredField("disableHopperMoveEvents");
+                    disableHopperMoveEventsF.setAccessible(true);
+                    disableHopperMoveEvents = disableHopperMoveEventsF.getBoolean(paperWorldConfig);
+                    if (disableHopperMoveEvents) {
+                        disableHopperMoveEventsF.setBoolean(paperWorldConfig, false);
+                    }
+                    // New version
+                } catch (NoSuchFieldException e) {
+                    Field hopperF = paperWorldConfig.getClass().getDeclaredField("hopper");
+                    hopperF.setAccessible(true);
+                    Object hopperConfig = hopperF.get(paperWorldConfig);
+                    disableHopperMoveEventsF = hopperConfig.getClass().getDeclaredField("disableMoveEvent");
+                    disableHopperMoveEventsF.setAccessible(true);
+                    disableHopperMoveEvents = disableHopperMoveEventsF.getBoolean(hopperConfig);
+                    if (disableHopperMoveEvents) {
+                        disableHopperMoveEventsF.setBoolean(hopperConfig, false);
+                    }
+                }
+
+                //Printing warning
                 if (disableHopperMoveEvents) {
-                    plugin.getLogger()
-                            .warning("World " + world.getName()
-                                    + " have shops and Hopper protection is enabled. But we detected" +
-                                    " \"disableHopperMoveEvents\" options in \"paper.yml\" is activated, so QuickShop already automatic disabled it.");
-                    plugin.getLogger()
-                            .warning("If you still want keep enable disableHopperMoveEvents enables " +
-                                    "in this world, please disable Hopper protection or make sure no shops in this world.");
-                    paperWorldConfig.getClass().getDeclaredField("disableHopperMoveEvents").setBoolean(paperWorldConfig, false);
-                    File serverRoot = plugin.getDataFolder().getParentFile().getParentFile();
+                    plugin.getServer().getScheduler().runTask(plugin, () -> {
+                        plugin.getLogger()
+                                .warning("World " + world.getName()
+                                        + " have shops and Hopper protection is enabled. But we detected" +
+                                        " \"disableHopperMoveEvents\" options in \"paper.yml\" is activated, so QuickShop already automatic disabled it.");
+                        plugin.getLogger()
+                                .warning("If you still want keep enable disableHopperMoveEvents enables " +
+                                        "in this world, please disable Hopper protection or make sure no shops in this world.");
+
+                    });
+                }
+                //File related changes
+                if (disableHopperMoveEvents) {
+                    //Current work dir
+                    File serverRoot = new File(".");
                     File paperConfigYaml = new File(serverRoot, "paper.yml");
+                    //Old version
                     if (paperConfigYaml.exists()) {
                         YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(paperConfigYaml);
-                        ConfigurationSection worldsSection =
-                                Objects.requireNonNull(yamlConfiguration.getConfigurationSection("world-settings"));
-                        ConfigurationSection worldSection;
-                        if (Objects.requireNonNull(worldsSection).getConfigurationSection(world.getName()) == null) {
-                            worldSection = worldsSection.getConfigurationSection("default");
-                        } else {
-                            worldSection = worldsSection.getConfigurationSection(world.getName());
+                        ConfigurationSection worldsSection = yamlConfiguration.getConfigurationSection("world-settings");
+                        ConfigurationSection defaultWorldSection;
+                        ConfigurationSection perWorldSection;
+                        if (worldsSection != null) {
+                            perWorldSection = worldsSection.getConfigurationSection(world.getName());
+                            defaultWorldSection = worldsSection.getConfigurationSection("default");
+                            if (checkAndEnableMoveEvent(perWorldSection) || checkAndEnableMoveEvent(defaultWorldSection)) {
+                                yamlConfiguration.save(paperConfigYaml);
+                            }
                         }
-                        Objects.requireNonNull(worldSection).set("hopper.disable-move-event", false);
-                        Objects.requireNonNull(worldSection).set("hopper.disable-move-event-quickshop-tips", "QuickShop automatic disabled this due it will allow other players steal items from shop. This notice only shown when have shops in current world and hopper protection is on and also disable-move-event turned on.");
-                        yamlConfiguration.save(paperConfigYaml);
+                        //New version
+                    } else {
+                        File paperConfigYamlNew = serverRoot.toPath().resolve("config").resolve("paper-world-defaults.yml").toFile();
+                        if (paperConfigYamlNew.exists()) {
+                            YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(paperConfigYamlNew);
+                            if (checkAndEnableMoveEvent(yamlConfiguration)) {
+                                yamlConfiguration.save(paperConfigYamlNew);
+                            }
+                        }
+                        File paperConfigPerWorldYamlNew = serverRoot.toPath().resolve(world.getName()).resolve("paper-world.yml").toFile();
+                        if (paperConfigPerWorldYamlNew.exists()) {
+                            YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(paperConfigPerWorldYamlNew);
+                            if (checkAndEnableMoveEvent(yamlConfiguration)) {
+                                yamlConfiguration.save(paperConfigPerWorldYamlNew);
+                            }
+                        }
                     }
                 }
             } catch (Exception ex) {
                 plugin.getLogger().log(Level.WARNING, "Failed to automatic disable disable-move-event for world [" + world.getName() + "], please disable it by yourself or player can steal items from shops.", ex);
             }
         });
+    }
+
+    private boolean checkAndEnableMoveEvent(ConfigurationSection section) {
+        if (section != null && section.isSet("hopper.disable-move-event") && section.getBoolean("hopper.disable-move-event")) {
+            section.set("hopper.disable-move-event", false);
+            section.set("hopper.disable-move-event-quickshop-tips", "QuickShop automatic disabled this due it will allow other players steal items from shop. This notice only shown when have shops in current world and hopper protection is on and also disable-move-event turned on.");
+            return true;
+        }
+        return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

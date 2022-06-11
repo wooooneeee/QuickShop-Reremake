@@ -126,12 +126,13 @@ public abstract class AbstractDisplayItem implements Reloadable {
      * @return Is target shop's display
      */
     public static boolean checkIsTargetShopDisplay(@NotNull final ItemStack itemStack, @NotNull Shop shop) {
-        if (!PLUGIN.isDisplayEnabled()) {
+        //Is not needed to check current display
+        /*if (!PLUGIN.isDisplayEnabled()) {
             return false;
         }
         if (getNowUsing() == DisplayType.VIRTUALITEM) {
             return false;
-        }
+        }*/
 
         if (!itemStack.hasItemMeta()) {
             return false;

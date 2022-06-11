@@ -196,6 +196,12 @@ public class Trader implements OfflinePlayer {
         offlinePlayer.setStatistic(statistic, entityType, newValue);
     }
 
+    @Nullable
+    @Override
+    public Location getLastDeathLocation() {
+        return offlinePlayer.getLastDeathLocation();
+    }
+
     @Override
     public @NotNull Map<String, Object> serialize() {
         return offlinePlayer.serialize();
