@@ -360,19 +360,21 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
 
             //and add data based on packet class in NMS  (global scope variable)
             //Reference: https://wiki.vg/Protocol#Spawn_Object
-            fakeItemPacket.getIntegers()
+            StructureModifier<Integer> integerStructureModifier = fakeItemPacket.getIntegers();
+            integerStructureModifier
                     //Entity ID
-                    .write(0, entityID)
-                    //Velocity x
-                    .write(1, 0)
-                    //Velocity y
-                    .write(2, 0)
-                    //Velocity z
-                    .write(3, 0)
-                    //Pitch
-                    .write(4, 0)
-                    //Yaw
-                    .write(5, 0);
+                    .write(0, entityID);
+            //Removed since it was changed to byte since 1.19 and init value is zero
+            //Velocity x
+            //.write(1, 0)
+            //Velocity y
+            //.write(2, 0)
+            //Velocity z
+            //.write(3, 0);
+            //Pitch
+            //.write(4, 0)
+            //Yaw
+            //.write(5, 0);
 
             //noinspection SwitchStatementWithTooFewBranches
             switch (VERSION) {
@@ -389,8 +391,10 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                 default:
                     //For 1.14+, we should use EntityType
                     fakeItemPacket.getEntityTypeModifier().write(0, EntityType.DROPPED_ITEM);
-                    //int data to mark
-                    fakeItemPacket.getIntegers().write(6, 1);
+                    if (VERSION != GameVersion.v1_19_R1) {
+                        //int data to marking there have velocity (at last field)
+                        integerStructureModifier.write(integerStructureModifier.getFields().size() - 1, 1);
+                    }
             }
 //        if (version == 13) {
 //            //for 1.13, we should use type id to represent the EntityType
