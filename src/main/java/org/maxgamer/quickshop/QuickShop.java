@@ -985,7 +985,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         shopContainerWatcher = new ShopContainerWatcher();
         if (display && AbstractDisplayItem.getNowUsing() != DisplayType.VIRTUALITEM) {
             displayDupeRemoverWatcher = new DisplayDupeRemoverWatcher();
-            timerTaskList.add(displayDupeRemoverWatcher.runTaskTimerAsynchronously(this, 0, 1));
+            timerTaskList.add(displayDupeRemoverWatcher.runTaskTimer(this, 0, 1));
         }
         /* Load all shops. */
         shopLoader = new ShopLoader(this);
