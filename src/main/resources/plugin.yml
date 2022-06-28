@@ -93,7 +93,6 @@ permissions:
       quickshop.create.changeprice: true
       quickshop.create.double: true
       quickshop.create.cmd: true
-      quickshop.transfer: true
       quickshop.find: true
       quickshop.fetchmessage: true
       quickshop.staff: true

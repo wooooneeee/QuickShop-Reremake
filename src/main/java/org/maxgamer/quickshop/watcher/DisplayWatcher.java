@@ -29,7 +29,6 @@ public class DisplayWatcher {
 
     public DisplayWatcher(QuickShop plugin) {
         this.plugin = plugin;
-        registerTask();
     }
 
 

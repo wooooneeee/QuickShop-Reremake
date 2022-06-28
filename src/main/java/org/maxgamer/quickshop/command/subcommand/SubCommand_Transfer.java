@@ -51,9 +51,11 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
                 targetPlayerName = "null";
             }
             final UUID targetPlayerUUID = targetPlayer.getUniqueId();
-            List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(((Player) sender).getUniqueId());
+            List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(sender.getUniqueId());
             for (Shop shop : shopList) {
-                shop.setOwner(targetPlayerUUID);
+                if (!shop.isBuying()) {
+                    shop.setOwner(targetPlayerUUID);
+                }
             }
             plugin.text().of(sender, "command.transfer-success", Integer.toString(shopList.size()), targetPlayerName).send();
         } else if (cmdArg.length == 2) {
