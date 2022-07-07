@@ -29,6 +29,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionData;
 import org.jetbrains.annotations.NotNull;
@@ -431,21 +432,35 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
                     if (mapMeta1.hasMapView() != mapMeta2.hasMapView()) {
                         return false;
                     }
-                    if (mapMeta1.hasMapView() && mapMeta2.hasMapView() && !Objects.equals(mapMeta1.getMapView(), mapMeta2.getMapView())) {
-                        return false;
+                    if (mapMeta1.hasMapView()) {
+                        MapView mapView1 = mapMeta1.getMapView();
+                        MapView mapView2 = mapMeta2.getMapView();
+                        //Manual matching since there are not equals method for mapView
+                        boolean matched = (mapView1.getCenterX() == mapView2.getCenterX())
+                                && (mapView1.getCenterZ() == mapView2.getCenterZ())
+                                && (mapView1.getId() == mapView2.getId())
+                                && (mapView1.getScale() == mapView2.getScale())
+                                && (mapView1.isUnlimitedTracking() == mapView2.isUnlimitedTracking())
+                                && (mapView1.isVirtual() == mapView2.isVirtual())
+                                && Objects.equals(mapView1.getWorld(), mapView2.getWorld())
+                                && (mapView1.isTrackingPosition() == mapView2.isTrackingPosition())
+                                && mapView1.getRenderers().containsAll(mapView2.getRenderers());
+                        if (!matched) {
+                            return false;
+                        }
                     }
 
                     if (mapMeta1.hasColor() != mapMeta2.hasColor()) {
                         return false;
                     }
-                    if (mapMeta1.hasColor() && mapMeta2.hasColor() && !Objects.equals(mapMeta1.getColor(), mapMeta2.getColor())) {
+                    if (mapMeta1.hasColor() && !Objects.equals(mapMeta1.getColor(), mapMeta2.getColor())) {
                         return false;
                     }
 
                     if (mapMeta1.hasLocationName() != mapMeta2.hasLocationName()) {
                         return false;
                     }
-                    return !mapMeta1.hasLocationName() || !mapMeta2.hasLocationName() || Objects.equals(mapMeta1.getLocationName(), mapMeta2.getLocationName());
+                    return !mapMeta1.hasLocationName() || Objects.equals(mapMeta1.getLocationName(), mapMeta2.getLocationName());
                 }
                 return true;
             });
