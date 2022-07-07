@@ -43,52 +43,56 @@ public class SubCommand_LogConvert implements CommandHandler<CommandSender> {
         try {
             List<String> outList = new ArrayList<>();
             List<String> stringList = Files.readAllLines(path.resolve("qs.log"));
+            Gson gson = JsonUtil.standard();
+            StringBuilder builder = new StringBuilder();
             for (String logline : stringList) {
                 String[] splitedStr = logline.split("\\] ", 2);
-                Gson gson = JsonUtil.standard();
+                builder.setLength(0);
+                builder.append(splitedStr[0]).append("] ");
                 if (splitedStr.length == 2 && splitedStr[1].startsWith("{")) {
                     String[] keys = JsonUtil.readObject(splitedStr[1]).keySet().toArray(new String[0]);
                     if (keys.length >= 2) {
                         switch (keys[1].toLowerCase(Locale.ROOT)) {
                             case "from":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], EconomyTransactionLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], EconomyTransactionLog.class).toReadableLog());
                                 break;
                             case "player":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], PlayerEconomyPreCheckLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], PlayerEconomyPreCheckLog.class).toReadableLog());
                                 break;
                             case "shop":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], ShopCreationLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], ShopCreationLog.class).toReadableLog());
                                 break;
                             case "moderator":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], ShopModeratorChangedLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], ShopModeratorChangedLog.class).toReadableLog());
                                 break;
                             case "oldprice":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], ShopPriceChangedLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], ShopPriceChangedLog.class).toReadableLog());
                                 break;
                             case "type":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], ShopPurchaseLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], ShopPurchaseLog.class).toReadableLog());
                                 break;
                             case "reason":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], ShopRemoveLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], ShopRemoveLog.class).toReadableLog());
                                 break;
                             default:
-                                outList.add(splitedStr[0] + "] " + "Unknown log: " + splitedStr[1]);
+                                builder.append("Unknown log: ").append(splitedStr[1]);
                                 break;
                         }
 
                     } else {
                         switch (keys[0].toLowerCase(Locale.ROOT)) {
                             case "rawdatabaseinfo":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], ShopStackingStatusChangeLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], ShopStackingStatusChangeLog.class).toReadableLog());
                                 break;
                             case "content":
-                                outList.add(splitedStr[0] + "] " + gson.fromJson(splitedStr[1], PluginGlobalAlertLog.class).toReadableLog());
+                                builder.append(gson.fromJson(splitedStr[1], PluginGlobalAlertLog.class).toReadableLog());
                                 break;
                             default:
-                                outList.add(splitedStr[0] + "] " + "Unknown log: " + splitedStr[1]);
+                                builder.append("Unknown log: ").append(splitedStr[1]);
                                 break;
                         }
                     }
+                    outList.add(builder.toString());
                 } else {
                     outList.add(logline);
                 }
