@@ -25,9 +25,14 @@ import org.maxgamer.quickshop.api.shop.ShopInfoStorage;
 
 @AllArgsConstructor
 @Data
-public class ShopPriceChangedLog {
+public class ShopPriceChangedLog implements ReadableLog {
     private static int v = 1;
     private ShopInfoStorage shop;
     private double oldPrice;
     private double newPrice;
+
+    @Override
+    public String toReadableLog() {
+        return "Shop price at " + shop.getPosition() + " was change to " + newPrice + ", from " + oldPrice + ", raw shop data: " + shop.toJson();
+    }
 }

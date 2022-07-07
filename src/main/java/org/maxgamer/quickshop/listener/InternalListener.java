@@ -19,6 +19,7 @@
 
 package org.maxgamer.quickshop.listener;
 
+import me.lucko.helper.serialize.BlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ import org.bukkit.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.event.*;
+import org.maxgamer.quickshop.shop.SimpleShopModerator;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.logging.container.*;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
@@ -70,7 +72,7 @@ public class InternalListener extends AbstractQSListener {
         }
         if (loggingAction) {
             //Player creator = plugin.getServer().getPlayer(event.getCreator());
-            plugin.logEvent(new ShopCreationLog(event.getCreator(), event.getShop().saveToInfoStorage(), event.getShop().getLocation()));
+            plugin.logEvent(new ShopCreationLog(event.getCreator(), event.getShop().saveToInfoStorage(), BlockPosition.of(event.getShop().getLocation())));
 
         }
     }
@@ -85,7 +87,7 @@ public class InternalListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void shopModeratorChanges(ShopModeratorChangedEvent event) {
         if (loggingAction) {
-            plugin.logEvent(new ShopModeratorChangedLog(event.getShop().saveToInfoStorage(), event.getModerator()));
+            plugin.logEvent(new ShopModeratorChangedLog(event.getShop().saveToInfoStorage(), (SimpleShopModerator) event.getModerator()));
         }
     }
 

@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Data
-public class ShopPurchaseLog {
+public class ShopPurchaseLog implements ReadableLog {
     private static int v = 1;
     private ShopInfoStorage shop;
     private ShopType type;
@@ -39,4 +39,8 @@ public class ShopPurchaseLog {
     private double balance;
     private double tax;
 
+    @Override
+    public String toReadableLog() {
+        return trader + " trade with shop at " + shop.getPosition() + " for " + amount + "x " + itemStack + "(" + itemName + ") with balance " + balance + ", tax: " + tax + ", shop data:" + shop.toJson();
+    }
 }
