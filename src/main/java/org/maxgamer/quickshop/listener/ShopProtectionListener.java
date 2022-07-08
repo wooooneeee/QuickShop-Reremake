@@ -64,7 +64,7 @@ public class ShopProtectionListener extends AbstractProtectionListener {
 
     private void init() {
         this.sendProtectionAlert = plugin.getConfig().getBoolean("send-shop-protection-alert", false);
-        useEnhanceProtection = plugin.getConfig().getBoolean("shop.enchance-shop-protect");
+        useEnhanceProtection = plugin.getConfig().getBoolean("shop.enchance-shop-protect", true);
         scanAndFixPaperListener();
     }
 
@@ -342,10 +342,6 @@ public class ShopProtectionListener extends AbstractProtectionListener {
     // Protect Entity pickup shop
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMobChangeBlock(EntityChangeBlockEvent event) {
-        if (!useEnhanceProtection) {
-            return;
-        }
-
         final Shop shop = getShopNature(event.getBlock().getLocation(), true);
 
         if (shop == null) {
