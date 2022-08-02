@@ -106,7 +106,16 @@ public class PlayerListener extends AbstractQSListener {
             return;
         }
         // ----Adventure dupe click workaround end----
-        Block focused = event.getPlayer().getTargetBlock(null, 5);
+        Block focused;
+        try {
+            focused = event.getPlayer().getTargetBlock(null, 5);
+        } catch (IllegalStateException exception) {
+            //Not sure if this is server side bug, but we could ignore it this time
+            //java.lang.IllegalStateException: Start block missed in BlockIterator
+            //Could not pass event PlayerArmSwingEvent to QuickShop v5.1.0.9
+            //https://github.com/PotatoCraft-Studio/QuickShop-Reremake/issues/212
+            return;
+        }
         PlayerInteractEvent interactEvent
                 = new PlayerInteractEvent(event.getPlayer(),
                 focused.getType() == Material.AIR ? Action.LEFT_CLICK_AIR : Action.LEFT_CLICK_BLOCK,
