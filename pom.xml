@@ -105,6 +105,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <release>8</release>
                     <encoding>UTF-8</encoding>
                     <!--Use this comments args when compiler is NullPointerException-->
                     <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
