@@ -19,6 +19,8 @@
 
 package org.maxgamer.quickshop.util;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.EvictingQueue;
 import de.themoep.minedown.MineDown;
 import de.themoep.minedown.MineDownParser;
@@ -75,8 +77,10 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat.fromLegacyText;
@@ -192,8 +196,27 @@ public class Util {
         return SHOPABLES.contains(material);
     }
 
+    private static final Cache<String, Pattern> regexPatternCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
     public static boolean isBlacklistWorld(@NotNull World world) {
-        return plugin.getConfig().getStringList("shop.blacklist-world").contains(world.getName());
+        String worldNameCurrent = world.getName().toLowerCase();
+        for (String worldName : plugin.getConfig().getStringList("shop.blacklist-world")) {
+            worldName = worldName.toLowerCase();
+            if (!worldName.startsWith("$")) {
+                if (worldNameCurrent.equals(worldName)) {
+                    return true;
+                }
+            } else if (worldName.length() >= 2) {
+                Pattern cachePattern = regexPatternCache.getIfPresent(worldName);
+                if (cachePattern == null) {
+                    cachePattern = Pattern.compile(worldName.substring(1));
+                    regexPatternCache.put(worldName, cachePattern);
+                }
+                if (cachePattern.matcher(worldNameCurrent).matches()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -1463,32 +1486,32 @@ public class Util {
                     out.append('.');
                     break;
                 case '.':
-                    out.append("\\.");
-                    break;
-                case '\\':
-                    out.append("\\\\");
-                    break;
-                default:
-                    out.append(c);
+                        out.append("\\.");
+                        break;
+                    case '\\':
+                        out.append("\\\\");
+                        break;
+                    default:
+                        out.append(c);
+                }
             }
+            out.append('$');
+            return out.toString();
         }
-        out.append('$');
-        return out.toString();
-    }
 
-    /**
-     * Get location that converted to block position (.0)
-     *
-     * @param loc location
-     * @return blocked location
-     */
-    @NotNull
-    public static Location getBlockLocation(@NotNull Location loc) {
-        loc = loc.clone();
-        loc.setX(loc.getBlockX());
-        loc.setY(loc.getBlockY());
-        loc.setZ(loc.getBlockZ());
-        return loc;
-    }
+        /**
+         * Get location that converted to block position (.0)
+         *
+         * @param loc location
+         * @return blocked location
+         */
+        @NotNull
+        public static Location getBlockLocation (@NotNull Location loc){
+            loc = loc.clone();
+            loc.setX(loc.getBlockX());
+            loc.setY(loc.getBlockY());
+            loc.setZ(loc.getBlockZ());
+            return loc;
+        }
 
-}
+    }
