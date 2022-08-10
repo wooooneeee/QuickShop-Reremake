@@ -351,10 +351,11 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <!--Disable for 503
         <repository>
             <id>sk89q-repo</id>
             <url>https://maven.sk89q.com/repo/</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>CodeMC</id>
             <url>https://repo.codemc.io/repository/maven-public/</url>
