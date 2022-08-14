@@ -116,7 +116,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <finalName>${artifactId}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <minimizeJar>true</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <createSourcesJar>false</createSourcesJar>
@@ -309,7 +309,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <archive>${project.basedir}/target/${artifactId}.jar</archive>
+                    <archive>${project.basedir}/target/${project.artifactId}.jar</archive>
                     <keystore>${project.basedir}/keystore.jks</keystore>
                     <alias>selfsigned</alias>
                     <!--suppress UnresolvedMavenProperty -->
