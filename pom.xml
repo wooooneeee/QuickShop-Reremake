@@ -312,7 +312,9 @@
                     <archive>${project.basedir}/target/QuickShop.jar</archive>
                     <keystore>${project.basedir}/keystore.jks</keystore>
                     <alias>selfsigned</alias>
-                    <arguments>-signedjar QuickShop-signed.jar</arguments>
+                    <arguments>
+                        <argument>signedjar QuickShop-signed.jar</argument>
+                    </arguments>
                     <!--suppress UnresolvedMavenProperty -->
                     <storepass>${env.quickshop-signer-pwd}</storepass>
                     <!--suppress UnresolvedMavenProperty -->
