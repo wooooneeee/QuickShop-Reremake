@@ -418,10 +418,12 @@
             <id>IridiumDevelopment</id>
             <url>https://nexus.iridiumdevelopment.net/repository/maven-releases/</url>
         </repository>-->
+
+        <!-- Temporary disable for unknown host
         <repository>
-            <id>Sparky</id>
-            <url>https://nexus.sparky.ac/repository/Sparky/</url>
-        </repository>
+        <id>Sparky</id>
+        <url>https://nexus.sparky.ac/repository/Sparky/</url>
+        </repository>-->
         <repository>
             <id>songoda</id>
             <url>https://repo.songoda.com/repository/public/</url>
