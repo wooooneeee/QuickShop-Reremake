@@ -557,12 +557,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/Clearlag-3.2.2.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>me.lucko.luckperms</groupId>
-            <artifactId>luckperms-api</artifactId>
-            <version>5.4</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.clerezza.ext/org.json.simple -->
         <dependency>
             <groupId>me.clip</groupId>
