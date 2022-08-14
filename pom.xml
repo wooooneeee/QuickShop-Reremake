@@ -560,7 +560,7 @@
         <dependency>
             <groupId>me.lucko.luckperms</groupId>
             <artifactId>luckperms-api</artifactId>
-            <version>5</version>
+            <version>5.4</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.clerezza.ext/org.json.simple -->
@@ -640,8 +640,9 @@
         <dependency>
             <groupId>me.vagdedes.spartan</groupId>
             <artifactId>SpartanAPI</artifactId>
-            <version>5.0</version>
-            <scope>provided</scope>
+            <version>9.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/SpartanAPI-9.0.jar</systemPath>
         </dependency>
         <!--New towny version, As we support 1.13+, so we choose 0.96.2.0 according their README-->
         <dependency>
