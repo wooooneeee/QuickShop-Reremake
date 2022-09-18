@@ -75,12 +75,8 @@ public class SubCommand_Create implements CommandHandler<Player> {
     @Override
     public void onCommand(@NotNull Player sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
         BlockIterator bIt = new BlockIterator(sender, 10);
-        ItemStack item;
-        if (cmdArg.length < 1) {
-            plugin.text().of(sender, "command.wrong-args").send();
-            return;
-        } else if (cmdArg.length == 1) {
-            item = sender.getInventory().getItemInMainHand();
+        ItemStack item = sender.getInventory().getItemInMainHand();
+        if (cmdArg.length <= 1) {
             if (item.getType().isAir()) {
                 plugin.text().of(sender, "no-anythings-in-your-hand").send();
                 return;
@@ -106,8 +102,6 @@ public class SubCommand_Create implements CommandHandler<Player> {
             }
         }
         Util.debugLog("Pending task for material: " + item);
-
-        String price = cmdArg[0];
 
         while (bIt.hasNext()) {
             final Block b = bIt.next();
@@ -146,10 +140,14 @@ public class SubCommand_Create implements CommandHandler<Player> {
                 return;
             }
 
+
             // Send creation menu.
             plugin.getShopManager().getActions().put(sender.getUniqueId(),
                     new SimpleInfo(b.getLocation(), ShopAction.CREATE, item, b.getRelative(sender.getFacing().getOppositeFace()), false));
-            plugin.getShopManager().handleChat(sender, price);
+            if (cmdArg.length >= 1) {
+                String price = cmdArg[0];
+                plugin.getShopManager().handleChat(sender, price);
+            }
             return;
         }
         plugin.text().of(sender, "not-looking-at-valid-shop-block").send();
