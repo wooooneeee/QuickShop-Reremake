@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class PlayerFinder {
 
-    private static final Cache<String, UUID> string2UUIDCache = CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.MINUTES).build();
+    private static final Cache<String, UUID> string2UUIDCache = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build();
 
     private PlayerFinder() {
     }
@@ -49,11 +49,17 @@ public final class PlayerFinder {
     }
 
     @Nullable
-    private static OfflinePlayer findPlayerByName(String name, Iterable<? extends OfflinePlayer> players) {
+    private static OfflinePlayer findPlayerByName(String name, java.util.Collection<? extends org.bukkit.OfflinePlayer> players) {
+        //Cache all players when offline player is too much
+        boolean cacheAllPlayers = players.size() > 5000;
         for (OfflinePlayer player : players) {
             String playerName = player.getName();
-            if (playerName != null && playerName.equalsIgnoreCase(name)) {
-                return player;
+            if (playerName != null) {
+                if (playerName.equalsIgnoreCase(name)) {
+                    return player;
+                } else if (cacheAllPlayers) {
+                    string2UUIDCache.put(playerName.toLowerCase(Locale.ROOT), player.getUniqueId());
+                }
             }
         }
         return null;
