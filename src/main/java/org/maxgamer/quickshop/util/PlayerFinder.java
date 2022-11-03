@@ -50,19 +50,24 @@ public final class PlayerFinder {
 
     @Nullable
     private static OfflinePlayer findPlayerByName(String name, java.util.Collection<? extends org.bukkit.OfflinePlayer> players) {
-        //Cache all players when offline player is too much
+        //Cache all players when offline player is too many
         boolean cacheAllPlayers = players.size() > 5000;
+        OfflinePlayer result = null;
         for (OfflinePlayer player : players) {
             String playerName = player.getName();
             if (playerName != null) {
                 if (playerName.equalsIgnoreCase(name)) {
-                    return player;
-                } else if (cacheAllPlayers) {
+                    result = player;
+                    if (!cacheAllPlayers) {
+                        return result;
+                    }
+                }
+                if (cacheAllPlayers) {
                     string2UUIDCache.put(playerName.toLowerCase(Locale.ROOT), player.getUniqueId());
                 }
             }
         }
-        return null;
+        return result;
     }
 
     public static OfflinePlayer findOfflinePlayerByName(String name) {
