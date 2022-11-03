@@ -28,7 +28,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -186,6 +191,21 @@ public class ShopProtectionListener extends AbstractProtectionListener {
             return true;
         }
         return false;
+    }
+
+    //Prevent skulker box or shop sign being pushed, see https://github.com/PotatoCraft-Studio/QuickShop-Reremake/issues/248
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onBlockBeingPushed(BlockPistonExtendEvent event) {
+        if (!useEnhanceProtection) {
+            return;
+        }
+        for (org.bukkit.block.Block block : event.getBlocks()) {
+            Shop shop = getShopRedstone(block.getLocation(), true);
+            if (shop != null) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
