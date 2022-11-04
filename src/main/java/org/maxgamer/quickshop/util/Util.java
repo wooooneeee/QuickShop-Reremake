@@ -708,12 +708,11 @@ public class Util {
             if (mat == null) {
                 plugin.getLogger().warning("Invalid shop-block: " + s);
             } else {
-                if (!mat.name().contains("SHULKER")) {
-                    SHOPABLES.add(mat);
-                } else {
+                if (mat.name().contains("SHULKER")) {
                     plugin.getConfig().set("shop.enchance-shop-protect", true);
                     plugin.getLogger().log(java.util.logging.Level.SEVERE, "enchance-shop-protect settings was forced enabled to prevent the piston bug, see: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/issues/248");
                 }
+                SHOPABLES.add(mat);
             }
         }
         List<String> configBlacklist = plugin.getConfig().getStringList("blacklist");
