@@ -46,7 +46,16 @@ import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.util.GameVersion;
 import org.maxgamer.quickshop.util.Util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -87,7 +96,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
         chunkLocation = new SimpleShopChunk(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
         VirtualDisplayItemManager.put(chunkLocation, this);
         if (Util.isLoaded(shop.getLocation())) {
-            //Let nearby player can saw fake item
+            //Let nearby player can see the fake item
             Collection<Entity> entityCollection = shop.getLocation().getWorld().getNearbyEntities(shop.getLocation(), PLUGIN.getServer().getViewDistance() * 16, shop.getLocation().getWorld().getMaxHeight(), PLUGIN.getServer().getViewDistance() * 16);
             for (Entity entity : entityCollection) {
                 if (entity instanceof Player) {
@@ -219,6 +228,10 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
         VirtualDisplayItemManager.remove(chunkLocation, this);
     }
 
+    public void sendDestroyFakeItemPacket(@NotNull Player player) {
+        sendPacket(player, fakeItemDestroyPacket);
+    }
+
     public void sendFakeItem(@NotNull Player player) {
         sendPacket(player, fakeItemSpawnPacket);
         sendPacket(player, fakeItemMetaPacket);
@@ -322,8 +335,12 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                         if (!target.shop.isLoaded() || !target.isDisplay || target.shop.isLeftShop()) {
                             continue;
                         }
-                        target.packetSenders.add(player.getUniqueId());
-                        target.sendFakeItem(player);
+                        if (target.packetSenders.add(player.getUniqueId())) {
+                            target.sendFakeItem(player);
+                        } else {
+                            target.sendDestroyFakeItemPacket(player);
+                            target.sendFakeItem(player);
+                        }
                     }
                     return targetList;
                 });
@@ -463,7 +480,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
         }
 
         private static PacketContainer createFakeItemVelocityPacket(int entityID) {
-            //And, create a entity velocity packet to make it at a proper location (otherwise it will fly randomly)
+            //And, create an entity velocity packet to make it at a proper location (otherwise it will fly randomly)
             PacketContainer fakeItemVelocityPacket = PROTOCOL_MANAGER.createPacket(PacketType.Play.Server.ENTITY_VELOCITY);
             fakeItemVelocityPacket.getIntegers()
                     //Entity ID
@@ -488,11 +505,11 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                 //1.17+
                 MinecraftVersion minecraftVersion = PROTOCOL_MANAGER.getMinecraftVersion();
                 if (minecraftVersion.getMajor() == 1 && minecraftVersion.getMinor() == 17 && minecraftVersion.getBuild() == 0) {
-                    //On 1.17, just need to write a int
+                    //On 1.17, just need to write an int
                     //Entity to remove
                     fakeItemDestroyPacket.getIntegers().write(0, entityID);
                 } else {
-                    //On 1.17.1 (may be 1.17.1+? it's enough, Mojang, stop the changes), we need add the int list
+                    //On 1.17.1 (maybe 1.17.1+? it's enough, Mojang, stop the changes), we need add the int list
                     //Entity to remove
                     try {
                         fakeItemDestroyPacket.getIntLists().write(0, Collections.singletonList(entityID));
