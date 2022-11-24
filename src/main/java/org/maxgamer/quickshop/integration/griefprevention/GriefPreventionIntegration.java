@@ -22,10 +22,13 @@ package org.maxgamer.quickshop.integration.griefprevention;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.events.*;
+import me.ryanhamshire.GriefPrevention.events.ClaimChangeEvent;
+import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent;
+import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
+import me.ryanhamshire.GriefPrevention.events.ClaimExpirationEvent;
+import me.ryanhamshire.GriefPrevention.events.TrustChangedEvent;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
@@ -155,7 +158,7 @@ public class GriefPreventionIntegration extends AbstractQSIntegratedPlugin {
     // Player can resize the main claim or the subclaim.
     // So we need to call either the handleMainClaimResized or the handleSubClaimResized method.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onClaimResized(ClaimModifiedEvent event) {
+    public void onClaimResized(ClaimChangeEvent event) {
         if (!deleteOnClaimResized) {
             return;
         }
@@ -337,30 +340,15 @@ public class GriefPreventionIntegration extends AbstractQSIntegratedPlugin {
 
         BUILD {
             @Override
-            boolean check(Claim claim, Player player) {
-                return claim.allowBuild(player, Material.CHEST) == null;
-            }
-
-            @Override
             ClaimPermission toClaimPermission() {
                 return ClaimPermission.Build;
             }
         }, INVENTORY {
             @Override
-            boolean check(Claim claim, Player player) {
-                return claim.allowContainers(player) == null;
-            }
-
-            @Override
             ClaimPermission toClaimPermission() {
                 return ClaimPermission.Inventory;
             }
         }, ACCESS {
-            @Override
-            boolean check(Claim claim, Player player) {
-                return claim.allowAccess(player) == null;
-            }
-
             @Override
             ClaimPermission toClaimPermission() {
                 return ClaimPermission.Access;
@@ -376,7 +364,9 @@ public class GriefPreventionIntegration extends AbstractQSIntegratedPlugin {
             return null;
         }
 
-        abstract boolean check(Claim claim, Player player);
+        boolean check(Claim claim, Player player) {
+            return claim.checkPermission(player, toClaimPermission(), null) == null;
+        }
 
         abstract ClaimPermission toClaimPermission();
     }
