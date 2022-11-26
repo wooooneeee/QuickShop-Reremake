@@ -294,8 +294,12 @@ public class ReflectFactory {
             } else {
                 return (String) getMinecraftKeyNameMethod.invoke(nmsItem);
             }
-        } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            Util.debugLog("getMinecraftKeyNameMethod, error: " + e);
+            return null;
+        } catch (Throwable throwable) {
+            Util.debugLog("getMinecraftKeyNameMethod, Unknown error: " + throwable);
             return null;
         }
     }
