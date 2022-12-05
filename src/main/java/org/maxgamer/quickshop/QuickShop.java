@@ -38,7 +38,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.plugin.*;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,16 +62,36 @@ import org.maxgamer.quickshop.api.event.QSConfigurationReloadEvent;
 import org.maxgamer.quickshop.api.integration.IntegrateStage;
 import org.maxgamer.quickshop.api.integration.IntegrationManager;
 import org.maxgamer.quickshop.api.localization.text.TextManager;
-import org.maxgamer.quickshop.api.shop.*;
+import org.maxgamer.quickshop.api.shop.AbstractDisplayItem;
+import org.maxgamer.quickshop.api.shop.DisplayType;
+import org.maxgamer.quickshop.api.shop.ItemMatcher;
+import org.maxgamer.quickshop.api.shop.Shop;
+import org.maxgamer.quickshop.api.shop.ShopManager;
 import org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat;
 import org.maxgamer.quickshop.command.SimpleCommandManager;
-import org.maxgamer.quickshop.database.*;
+import org.maxgamer.quickshop.database.AbstractDatabaseCore;
+import org.maxgamer.quickshop.database.DatabaseManager;
+import org.maxgamer.quickshop.database.MySQLCore;
+import org.maxgamer.quickshop.database.SQLiteCore;
+import org.maxgamer.quickshop.database.SimpleDatabaseHelper;
 import org.maxgamer.quickshop.economy.Economy_GemsEconomy;
 import org.maxgamer.quickshop.economy.Economy_TNE;
 import org.maxgamer.quickshop.economy.Economy_Vault;
 import org.maxgamer.quickshop.integration.SimpleIntegrationManager;
 import org.maxgamer.quickshop.integration.worldguard.WorldGuardIntegration;
-import org.maxgamer.quickshop.listener.*;
+import org.maxgamer.quickshop.listener.BlockListener;
+import org.maxgamer.quickshop.listener.ChatListener;
+import org.maxgamer.quickshop.listener.ChunkListener;
+import org.maxgamer.quickshop.listener.ClearLaggListener;
+import org.maxgamer.quickshop.listener.CustomInventoryListener;
+import org.maxgamer.quickshop.listener.DisplayProtectionListener;
+import org.maxgamer.quickshop.listener.EconomySetupListener;
+import org.maxgamer.quickshop.listener.InternalListener;
+import org.maxgamer.quickshop.listener.LockListener;
+import org.maxgamer.quickshop.listener.PlayerListener;
+import org.maxgamer.quickshop.listener.PluginListener;
+import org.maxgamer.quickshop.listener.ShopProtectionListener;
+import org.maxgamer.quickshop.listener.WorldListener;
 import org.maxgamer.quickshop.listener.worldedit.WorldEditAdapter;
 import org.maxgamer.quickshop.localization.text.SimpleTextManager;
 import org.maxgamer.quickshop.nonquickshopstuff.com.rylinaux.plugman.util.PluginUtil;
@@ -75,29 +100,61 @@ import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopPurger;
 import org.maxgamer.quickshop.shop.SimpleShopManager;
 import org.maxgamer.quickshop.shop.VirtualDisplayItem;
+import org.maxgamer.quickshop.util.GameVersion;
+import org.maxgamer.quickshop.util.JsonUtil;
+import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PermissionChecker;
+import org.maxgamer.quickshop.util.PlayerFinder;
+import org.maxgamer.quickshop.util.ReflectFactory;
 import org.maxgamer.quickshop.util.Timer;
-import org.maxgamer.quickshop.util.*;
+import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.compatibility.SimpleCompatibilityManager;
 import org.maxgamer.quickshop.util.config.ConfigCommentUpdater;
 import org.maxgamer.quickshop.util.config.ConfigProvider;
 import org.maxgamer.quickshop.util.config.ConfigurationFixer;
-import org.maxgamer.quickshop.util.envcheck.*;
+import org.maxgamer.quickshop.util.envcheck.CheckResult;
+import org.maxgamer.quickshop.util.envcheck.EnvCheckEntry;
+import org.maxgamer.quickshop.util.envcheck.EnvironmentChecker;
+import org.maxgamer.quickshop.util.envcheck.ResultContainer;
+import org.maxgamer.quickshop.util.envcheck.ResultReport;
 import org.maxgamer.quickshop.util.matcher.item.BukkitItemMatcherImpl;
 import org.maxgamer.quickshop.util.matcher.item.QuickShopItemMatcherImpl;
 import org.maxgamer.quickshop.util.reload.ReloadManager;
 import org.maxgamer.quickshop.util.reporter.error.EmptyErrorReporter;
 import org.maxgamer.quickshop.util.reporter.error.IErrorReporter;
 import org.maxgamer.quickshop.util.reporter.error.RollbarErrorReporter;
-import org.maxgamer.quickshop.watcher.*;
+import org.maxgamer.quickshop.watcher.CalendarWatcher;
+import org.maxgamer.quickshop.watcher.DisplayAutoDespawnWatcher;
+import org.maxgamer.quickshop.watcher.DisplayDupeRemoverWatcher;
+import org.maxgamer.quickshop.watcher.DisplayWatcher;
+import org.maxgamer.quickshop.watcher.LogWatcher;
+import org.maxgamer.quickshop.watcher.OngoingFeeWatcher;
+import org.maxgamer.quickshop.watcher.ShopContainerWatcher;
+import org.maxgamer.quickshop.watcher.SignUpdateWatcher;
+import org.maxgamer.quickshop.watcher.TpsWatcher;
+import org.maxgamer.quickshop.watcher.UpdateWatcher;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class QuickShop extends JavaPlugin implements QuickShopAPI {
@@ -999,7 +1056,6 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         new CustomInventoryListener(this).register();
         new ShopProtectionListener(this, this.shopCache).register();
         new PluginListener(this).register();
-        new EconomySetupListener(this).register();
         InternalListener internalListener = new InternalListener(this);
         internalListener.register();
 
@@ -1042,13 +1098,14 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
 
 
-        /* Delay the Ecoonomy system load, give a chance to let economy system regiser. */
+        /* Delay the Ecoonomy system load, give a chance to let economy system register. */
         /* And we have a listener to listen the ServiceRegisterEvent :) */
         Util.debugLog("Loading economy system...");
         new BukkitRunnable() {
             @Override
             public void run() {
                 loadEcon();
+                new EconomySetupListener(QuickShop.this).register();
             }
         }.runTaskLater(this, 1);
         Util.debugLog("Registering watchers...");
