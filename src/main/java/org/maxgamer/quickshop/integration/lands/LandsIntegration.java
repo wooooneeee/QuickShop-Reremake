@@ -42,7 +42,13 @@ import org.maxgamer.quickshop.util.logging.container.ShopRemoveLog;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -81,7 +87,8 @@ public class LandsIntegration extends AbstractQSIntegratedPlugin implements List
         if (landsIntegration.getLandWorld(location.getWorld()) == null) {
             return ignoreDisabledWorlds;
         }
-        Land land = landsIntegration.getLand(location);
+        org.bukkit.Chunk chunk = location.getChunk();
+        Land land = landsIntegration.getLand(chunk.getWorld(), chunk.getX(), chunk.getZ());
         if (land != null) {
             return land.getOwnerUID().equals(player.getUniqueId()) || land.isTrusted(player.getUniqueId());
         } else {
@@ -100,7 +107,7 @@ public class LandsIntegration extends AbstractQSIntegratedPlugin implements List
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLandsDelete(LandDeleteEvent event) {
         @NotNull DeleteReason reason = event.getReason();
-        if (reason != DeleteReason.EXPIRED) {
+        if (reason != me.angeschossen.lands.api.events.land.DeleteReason.CAMP_EXPIRED) {
             if (!deleteWhenLandDeleted) {
                 return;
             }
@@ -110,7 +117,7 @@ public class LandsIntegration extends AbstractQSIntegratedPlugin implements List
         Land land = event.getLand();
         Set<UUID> uuids = new HashSet<>(land.getTrustedPlayers());
         uuids.add(land.getOwnerUID());
-        deleteShopInLand(event.getLand(), uuids, reason == DeleteReason.EXPIRED ? Reason.EXPIRED : Reason.DELETED);
+        deleteShopInLand(event.getLand(), uuids, reason == DeleteReason.CAMP_EXPIRED ? Reason.EXPIRED : Reason.DELETED);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
