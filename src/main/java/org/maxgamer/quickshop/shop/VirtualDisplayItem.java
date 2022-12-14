@@ -28,7 +28,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.utility.MinecraftVersion;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,7 +48,16 @@ import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.util.GameVersion;
 import org.maxgamer.quickshop.util.Util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -391,7 +402,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                 default:
                     //For 1.14+, we should use EntityType
                     fakeItemPacket.getEntityTypeModifier().write(0, EntityType.DROPPED_ITEM);
-                    if (VERSION != GameVersion.v1_19_R1) {
+                    if (VERSION.ordinal() < GameVersion.v1_19_R1.ordinal()) {
                         //int data to marking there have velocity (at last field)
                         integerStructureModifier.write(integerStructureModifier.getFields().size() - 1, 1);
                     }
@@ -445,7 +456,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
 
             //Must in the certain slot:https://wiki.vg/Entity_metadata#Item
             //Is 1.17-?
-            if (GameVersion.v1_17_R1.ordinal() > VERSION.ordinal()) {
+            if (VERSION.ordinal() < GameVersion.v1_17_R1.ordinal()) {
 //                if (version == GameVersion.v1_13_R1 || version == GameVersion.v1_13_R2) {
 //                    //For 1.13 is 6
 //                    wpw.setObject(6, WrappedDataWatcher.Registry.getItemStackSerializer(false), itemStack);
@@ -458,7 +469,24 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                 wpw.setObject(8, WrappedDataWatcher.Registry.getItemStackSerializer(false), itemStack);
             }
             //Add it
-            fakeItemMetaPacket.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+            //For 1.19.2+, we need to use DataValue instead of WatchableObject
+            if (VERSION.ordinal() > GameVersion.v1_19_R1.ordinal()) {
+                //Check for new version protocolLib
+                try {
+                    Class.forName("com.comphenix.protocol.wrappers.WrappedDataValue");
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("Unable to initialize packet, ProtocolLib update needed", e);
+                }
+                //Convert List<WrappedWatchableObject> to List<WrappedDataValue>
+                List<WrappedWatchableObject> wrappedWatchableObjects = wpw.getWatchableObjects();
+                List<WrappedDataValue> wrappedDataValues = new java.util.ArrayList<>(wrappedWatchableObjects.size());
+                for (WrappedWatchableObject watchableObject : wrappedWatchableObjects) {
+                    wrappedDataValues.set(watchableObject.getIndex(), new WrappedDataValue(watchableObject.getHandle()));
+                }
+                fakeItemMetaPacket.getDataValueCollectionModifier().write(0, wrappedDataValues);
+            } else {
+                fakeItemMetaPacket.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+            }
             return fakeItemMetaPacket;
         }
 
@@ -480,7 +508,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
         private static PacketContainer createFakeItemDestroyPacket(int entityID) {
             //Also make a DestroyPacket to remove it
             PacketContainer fakeItemDestroyPacket = PROTOCOL_MANAGER.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-            if (GameVersion.v1_17_R1.ordinal() > VERSION.ordinal()) {
+            if (VERSION.ordinal() < GameVersion.v1_17_R1.ordinal()) {
                 //On 1.17-, we need to write an integer array
                 //Entity to remove
                 fakeItemDestroyPacket.getIntegerArrays().write(0, new int[]{entityID});
@@ -492,7 +520,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                     //Entity to remove
                     fakeItemDestroyPacket.getIntegers().write(0, entityID);
                 } else {
-                    //On 1.17.1 (may be 1.17.1+? it's enough, Mojang, stop the changes), we need add the int list
+                    //On 1.17.1 (maybe 1.17.1+? it's enough, Mojang, stop the changes), we need add the int list
                     //Entity to remove
                     try {
                         fakeItemDestroyPacket.getIntLists().write(0, Collections.singletonList(entityID));
