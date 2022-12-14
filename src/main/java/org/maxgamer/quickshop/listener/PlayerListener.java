@@ -33,7 +33,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLocaleChangeEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -48,6 +54,7 @@ import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.shop.SimpleInfo;
 import org.maxgamer.quickshop.util.InteractUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PermissionChecker;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
@@ -403,7 +410,7 @@ public class PlayerListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerBreakShopCreationChest(BlockBreakEvent event) {
         @Nullable Player player = event.getPlayer();
-        if (player == null) {
+        if (event instanceof PermissionChecker.FakeBlockBreakEvent || player == null) {
             return;
         }
         Map<UUID, Info> actionMap = plugin.getShopManager().getActions();

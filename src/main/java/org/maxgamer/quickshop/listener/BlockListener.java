@@ -44,6 +44,7 @@ import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PermissionChecker;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.logging.container.ShopRemoveLog;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
@@ -71,6 +72,9 @@ public class BlockListener extends AbstractProtectionListener {
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
+        if (e instanceof PermissionChecker.FakeBlockBreakEvent) {
+            return;
+        }
         final Block b = e.getBlock();
         final Player p = e.getPlayer();
         // If the shop was a chest

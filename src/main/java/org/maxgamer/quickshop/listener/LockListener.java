@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.Cache;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.shop.Shop;
+import org.maxgamer.quickshop.util.PermissionChecker;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
@@ -66,10 +67,13 @@ public class LockListener extends AbstractProtectionListener {
     }
 
     /*
-     * Removes chests when they're destroyed.
+     * Removes sign when shop owner destroyed.
      */
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
+        if (e instanceof PermissionChecker.FakeBlockBreakEvent) {
+            return;
+        }
         Block b = e.getBlock();
         BlockState state = PaperLib.getBlockState(b, false).getState();
         if (state instanceof Sign) {
