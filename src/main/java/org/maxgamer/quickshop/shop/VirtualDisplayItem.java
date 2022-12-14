@@ -479,9 +479,10 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                 }
                 //Convert List<WrappedWatchableObject> to List<WrappedDataValue>
                 List<WrappedWatchableObject> wrappedWatchableObjects = wpw.getWatchableObjects();
-                List<WrappedDataValue> wrappedDataValues = new java.util.ArrayList<>(wrappedWatchableObjects.size());
-                for (WrappedWatchableObject watchableObject : wrappedWatchableObjects) {
-                    wrappedDataValues.set(watchableObject.getIndex(), new WrappedDataValue(watchableObject.getHandle()));
+                List<WrappedDataValue> wrappedDataValues = new java.util.LinkedList<>();
+                for (WrappedWatchableObject wrappedWatchableObject : wrappedWatchableObjects) {
+                    WrappedDataWatcher.WrappedDataWatcherObject watchableObject = wrappedWatchableObject.getWatcherObject();
+                    wrappedDataValues.add(new WrappedDataValue(watchableObject.getIndex(), watchableObject.getSerializer(), wrappedWatchableObject.getRawValue()));
                 }
                 fakeItemMetaPacket.getDataValueCollectionModifier().write(0, wrappedDataValues);
             } else {
