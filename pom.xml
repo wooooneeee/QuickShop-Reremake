@@ -638,9 +638,9 @@
         <dependency>
             <groupId>me.vagdedes.spartan</groupId>
             <artifactId>SpartanAPI</artifactId>
-            <version>9.0</version>
+            <version>9.1</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/SpartanAPI-9.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/SpartanAPI-9.1.jar</systemPath>
         </dependency>
         <!--New towny version, As we support 1.13+, so we choose 0.96.2.0 according their README-->
         <dependency>
