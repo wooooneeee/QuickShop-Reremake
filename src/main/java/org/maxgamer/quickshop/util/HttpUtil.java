@@ -21,7 +21,11 @@ package org.maxgamer.quickshop.util;
 
 import com.google.common.cache.CacheBuilder;
 import lombok.val;
-import okhttp3.*;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +40,8 @@ public class HttpUtil {
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .cache(new Cache(getCacheFolder(), 50L * 1024L * 1024L)).build();
 
+
+    @Deprecated
     public static HttpUtil create() {
         return new HttpUtil();
     }
@@ -83,16 +89,24 @@ public class HttpUtil {
             return null;
         }
     }
+
     @NotNull
     public static Response makePost(@NotNull String url, @NotNull RequestBody body) throws IOException {
         return client.newCall(new Request.Builder().post(body).url(url).build()).execute();
     }
+
     @NotNull
     private static File getCacheFolder() {
         File file = new File(Util.getCacheFolder(), "okhttp_tmp");
         file.mkdirs();
         return file;
     }
+
+    public static OkHttpClient getClientInstance() {
+        return client;
+    }
+
+    @Deprecated
     @NotNull
     public OkHttpClient getClient() {
         return client;
