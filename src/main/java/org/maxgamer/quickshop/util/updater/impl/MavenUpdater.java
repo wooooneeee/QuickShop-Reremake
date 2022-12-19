@@ -126,6 +126,14 @@ public class MavenUpdater implements QuickUpdater {
                         parser.parse(is, indexMetaHandler);
                         if (indexMetaHandler.getLatestRelease() != null) {
                             remoteVersion = indexMetaHandler.getLatestRelease();
+                            //Exclude wrong version from list
+                            if (remoteVersion.equals("6.0.0.0-BETA-SNAPSHOT")) {
+                                List<String> versionList = indexMetaHandler.getVersionList();
+                                versionList.remove("6.0.0.0-BETA-SNAPSHOT");
+                                if (versionList.size() >= 1) {
+                                    remoteVersion = versionList.get(versionList.size() - 1);
+                                }
+                            }
                             isLatest = remoteVersion.equals(QuickShop.getVersion());
                         }
                     }
