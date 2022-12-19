@@ -27,6 +27,7 @@ import org.maxgamer.quickshop.BootError;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.command.CommandHandler;
 import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.updater.QuickUpdater;
 
 import java.util.logging.Level;
@@ -56,6 +57,8 @@ public class SubCommand_Update implements CommandHandler<CommandSender> {
                 MsgUtil.sendDirectMessage(sender, ChatColor.RED + "Type " + ChatColor.BOLD + "/qs update confirm" + ChatColor.RESET + ChatColor.RED + " to confirm update");
                 return;
             }
+            //Let JVM load this class
+            Util.isClassAvailable("org.maxgamer.quickshop.BootError");
             MsgUtil.sendDirectMessage(sender, ChatColor.YELLOW + "Downloading update! This may take a while...");
             try {
                 updater.installUpdate();
