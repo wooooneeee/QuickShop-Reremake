@@ -33,8 +33,11 @@ import org.maxgamer.quickshop.shop.SimpleInfo;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
 
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
+
+import static org.maxgamer.quickshop.api.shop.ShopAction.CREATE_TYPE_INPUT;
 
 @AllArgsConstructor
 public class SubCommand_SuperCreate implements CommandHandler<Player> {
@@ -64,9 +67,16 @@ public class SubCommand_SuperCreate implements CommandHandler<Player> {
 //            }
             // Send creation menu.
             final SimpleInfo info = new SimpleInfo(b.getLocation(), ShopAction.CREATE, sender.getInventory().getItemInMainHand(), b.getRelative(sender.getFacing().getOppositeFace()), true);
-
             plugin.getShopManager().getActions().put(sender.getUniqueId(), info);
-            plugin.text().of(sender, "how-much-to-trade-for", MsgUtil.getTranslateText(info.getItem()), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+            if (plugin.getConfig().getBoolean("shop.create-needs-select-type")) {
+                info.setAction(CREATE_TYPE_INPUT);
+                plugin.getQuickChat().sendExecutableChat(sender, plugin.text().of(sender, "select-shop-type-or-cancel").forLocale(),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(sender, "select-shop-type-or-cancel-selling-button").forLocale(), "/qs amount SELL"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(sender, "select-shop-type-or-cancel-buying-button").forLocale(), "/qs amount BUY"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(sender, "select-shop-type-or-cancel-cancel-button").forLocale(), "/qs amount CANCEL"));
+            } else {
+                plugin.text().of(sender, "how-much-to-trade-for", MsgUtil.getTranslateText(info.getItem()), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+            }
             return;
         }
         plugin.text().of(sender, "not-looking-at-shop").send();

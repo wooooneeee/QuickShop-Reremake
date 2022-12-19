@@ -1,7 +1,7 @@
 # QuickShop-Reremake Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 160
+config-version: 161
 
 #Set the default language code the plugin should use, it will apply to:
 #Item Name
@@ -221,8 +221,12 @@ shop:
   lock: true
 
   #Should QS disable the quick creation of shop?
-  #To quickly create a shop click a chest with an Item.
+  #Quick creation means the way of create a shop click a chest with an Item.
   disable-quick-create: false
+
+  #Should QS should ask which shop type to use?
+  #It will be asked which creating shop
+  create-needs-select-type: false
 
   #Interaction settings.
   interact:

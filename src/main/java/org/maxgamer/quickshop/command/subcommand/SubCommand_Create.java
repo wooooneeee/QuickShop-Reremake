@@ -30,15 +30,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.command.CommandHandler;
+import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.shop.SimpleInfo;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.holder.Result;
 
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static org.maxgamer.quickshop.api.shop.ShopAction.CREATE_TYPE_INPUT;
 
 public class SubCommand_Create implements CommandHandler<Player> {
 
@@ -142,11 +146,24 @@ public class SubCommand_Create implements CommandHandler<Player> {
 
 
             // Send creation menu.
-            plugin.getShopManager().getActions().put(sender.getUniqueId(),
-                    new SimpleInfo(b.getLocation(), ShopAction.CREATE, item, b.getRelative(sender.getFacing().getOppositeFace()), false));
-            if (cmdArg.length >= 1) {
-                String price = cmdArg[0];
-                plugin.getShopManager().handleChat(sender, price);
+            Info info = new SimpleInfo(b.getLocation(), ShopAction.CREATE, item, b.getRelative(sender.getFacing().getOppositeFace()), false);
+            plugin.getShopManager().getActions().put(sender.getUniqueId(), info);
+            if (plugin.getConfig().getBoolean("shop.create-needs-select-type")) {
+                if (cmdArg.length >= 1) {
+                    info.setPendingCreateMessage(cmdArg[0]);
+                }
+                info.setAction(CREATE_TYPE_INPUT);
+                plugin.getQuickChat().sendExecutableChat(sender, plugin.text().of(sender, "select-shop-type-or-cancel").forLocale(),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(sender, "select-shop-type-or-cancel-selling-button").forLocale(), "/qs amount SELL"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(sender, "select-shop-type-or-cancel-buying-button").forLocale(), "/qs amount BUY"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(sender, "select-shop-type-or-cancel-cancel-button").forLocale(), "/qs amount CANCEL"));
+            } else {
+                if (cmdArg.length >= 1) {
+                    String price = cmdArg[0];
+                    plugin.getShopManager().handleChat(sender, price);
+                } else {
+                    plugin.text().of(sender, "how-much-to-trade-for", MsgUtil.getTranslateText(Objects.requireNonNull(item)), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+                }
             }
             return;
         }

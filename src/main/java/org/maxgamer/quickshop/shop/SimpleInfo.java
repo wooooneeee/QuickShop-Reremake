@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.api.shop.ShopAction;
+import org.maxgamer.quickshop.api.shop.ShopType;
 
 /**
  * A class contains shop's infomations
@@ -43,23 +44,9 @@ public class SimpleInfo implements Info {
     private ShopAction action;
     private ItemStack item;
     private Shop shop;
+    private String pendingCreateMessage;
 
-    public SimpleInfo(
-            @NotNull Location loc,
-            @NotNull ShopAction action,
-            @Nullable ItemStack item,
-            @Nullable Block last,
-            boolean bypass) {
-        this.loc = loc;
-        this.action = action;
-        this.last = last;
-        this.bypass = bypass;
-        if (item != null) {
-            this.item = item.clone();
-        }
-        this.dirty = true;
-    }
-
+    private ShopType shopType = ShopType.SELLING;
 
     public SimpleInfo(
             @NotNull Location loc,
@@ -78,9 +65,34 @@ public class SimpleInfo implements Info {
         if (shop != null) {
             this.shop = shop.clone();
             this.dirty = shop.isDirty();
+            this.shopType = shop.getShopType();
         } else {
             this.dirty = true;
         }
+    }
+
+    public ShopType getShopType() {
+        return shopType;
+    }
+
+    public SimpleInfo(
+            @NotNull Location loc,
+            @NotNull ShopAction action,
+            @Nullable ItemStack item,
+            @Nullable Block last,
+            boolean bypass) {
+        this.loc = loc;
+        this.action = action;
+        this.last = last;
+        this.bypass = bypass;
+        if (item != null) {
+            this.item = item.clone();
+        }
+        this.dirty = true;
+    }
+
+    public void setShopType(ShopType shopType) {
+        this.shopType = shopType;
     }
 
     /**
@@ -104,6 +116,16 @@ public class SimpleInfo implements Info {
         return this.item;
     }
 
+    /**
+     * @return Pending create message, use as temporary store when creating shop needs select shop type.
+     */
+    public String getPendingCreateMessage() {
+        return pendingCreateMessage;
+    }
+
+    public void setPendingCreateMessage(String pendingCreateMessage) {
+        this.pendingCreateMessage = pendingCreateMessage;
+    }
 
     /**
      * @return Location loc, Get shop's location,

@@ -27,7 +27,13 @@ import com.google.common.collect.Sets;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -48,12 +54,29 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.AbstractEconomy;
 import org.maxgamer.quickshop.api.economy.EconomyTransaction;
-import org.maxgamer.quickshop.api.event.*;
-import org.maxgamer.quickshop.api.shop.*;
+import org.maxgamer.quickshop.api.event.QSHandleChatEvent;
+import org.maxgamer.quickshop.api.event.ShopCreateEvent;
+import org.maxgamer.quickshop.api.event.ShopPreCreateEvent;
+import org.maxgamer.quickshop.api.event.ShopPurchaseEvent;
+import org.maxgamer.quickshop.api.event.ShopSuccessPurchaseEvent;
+import org.maxgamer.quickshop.api.event.ShopTaxEvent;
+import org.maxgamer.quickshop.api.shop.Info;
+import org.maxgamer.quickshop.api.shop.PriceLimiter;
+import org.maxgamer.quickshop.api.shop.PriceLimiterCheckResult;
+import org.maxgamer.quickshop.api.shop.Shop;
+import org.maxgamer.quickshop.api.shop.ShopAction;
+import org.maxgamer.quickshop.api.shop.ShopChunk;
+import org.maxgamer.quickshop.api.shop.ShopManager;
+import org.maxgamer.quickshop.api.shop.ShopType;
 import org.maxgamer.quickshop.economy.Trader;
 import org.maxgamer.quickshop.integration.SimpleIntegrationManager;
 import org.maxgamer.quickshop.localization.LocalizedMessagePair;
-import org.maxgamer.quickshop.util.*;
+import org.maxgamer.quickshop.util.CalculateUtil;
+import org.maxgamer.quickshop.util.ChatSheetPrinter;
+import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PlayerFinder;
+import org.maxgamer.quickshop.util.RomanNumber;
+import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.economyformatter.EconomyFormatter;
 import org.maxgamer.quickshop.util.holder.Result;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
@@ -61,9 +84,18 @@ import org.maxgamer.quickshop.util.reload.ReloadStatus;
 import org.maxgamer.quickshop.util.reload.Reloadable;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import static org.maxgamer.quickshop.api.shop.ShopAction.CREATE_TYPE_INPUT;
 
 /**
  * Manage a lot of shops.
@@ -490,15 +522,52 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             }
             if (info.getAction() == ShopAction.CREATE) {
                 actionCreate(p, info, finalMessage);
-            }
-            if (info.getAction() == ShopAction.BUY) {
+            } else if (info.getAction() == CREATE_TYPE_INPUT) {
+                switch (finalMessage.toUpperCase()) {
+                    case "SELL":
+                        if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.sell")) {
+                            plugin.text().of(p, "no-permission").send();
+                        } else {
+                            info.setShopType(ShopType.SELLING);
+                            plugin.text().of(p, "command.now-selling", MsgUtil.getTranslateText(info.getItem())).send();
+                            info.setAction(ShopAction.CREATE);
+                            actions.put(p.getUniqueId(), info);
+                            if (info.getPendingCreateMessage() == null) {
+                                plugin.text().of(p, "how-much-to-trade-for", MsgUtil.getTranslateText(info.getItem()), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.stacks") ? info.getItem().getAmount() : 1)).send();
+                            } else {
+                                handleChat(p, info.getPendingCreateMessage());
+                            }
+                        }
+                        break;
+                    case "BUY":
+                        if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.buy")) {
+                            plugin.text().of(p, "no-permission").send();
+                        } else {
+                            info.setShopType(ShopType.BUYING);
+                            plugin.text().of(p, "command.now-buying", MsgUtil.getTranslateText(info.getItem())).send();
+                            info.setAction(ShopAction.CREATE);
+                            actions.put(p.getUniqueId(), info);
+                            if (info.getPendingCreateMessage() == null) {
+                                plugin.text().of(p, "how-much-to-trade-for", MsgUtil.getTranslateText(info.getItem()), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.stacks") ? info.getItem().getAmount() : 1)).send();
+                            } else {
+                                handleChat(p, info.getPendingCreateMessage());
+                            }
+                        }
+                        break;
+                    case "CANCEL":
+                        plugin.text().of(p, "shop-creation-cancelled").send();
+                        break;
+                    default:
+                        plugin.text().of(p, "not-a-valid-shop-type").send();
+                }
+            } else if (info.getAction() == ShopAction.BUY) {
                 actionTrade(p, info, finalMessage);
             }
         });
     }
 
     /**
-     * Load shop method for loading shop into mapping, so getShops method will can find it. It also
+     * Load shop method for loading shop into mapping, so getShops method will find it. It also
      * effects a lots of feature, make sure load it after create it.
      *
      * @param world The world the shop is in
@@ -940,7 +1009,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                 info.getItem(),
                 new SimpleShopModerator(p.getUniqueId()),
                 false,
-                ShopType.SELLING,
+                info.getShopType(),
                 new YamlConfiguration(),
                 null,
                 false,

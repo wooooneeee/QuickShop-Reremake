@@ -2197,6 +2197,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("integration.superiorskyblock.trade-privilege-needs-list", new ArrayList<>());
             getConfig().set("config-version", ++selectedVersion);
         }
+        if (selectedVersion == 160) {
+            getConfig().set("shop.create-needs-select-type", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
         if (getConfig().isSet("shop.shop")) {
             getConfig().set("shop.shop", null);
         }

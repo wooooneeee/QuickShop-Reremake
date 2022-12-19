@@ -60,6 +60,20 @@ public interface Info {
     boolean hasChanged(@NotNull Shop shop);
 
     /**
+     * @return Shop type to use
+     */
+    ShopType getShopType();
+
+    void setShopType(ShopType shopType);
+
+    /**
+     * @return Pending create message, use as temporary store when creating shop needs select shop type.
+     */
+    String getPendingCreateMessage();
+
+    void setPendingCreateMessage(String pendingCreateMessage);
+
+    /**
      * Check if this Info marked as skip protection checks
      *
      * @return Bypassed Protection Checks

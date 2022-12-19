@@ -59,10 +59,13 @@ import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static org.maxgamer.quickshop.api.shop.ShopAction.CREATE_TYPE_INPUT;
 
 public class PlayerListener extends AbstractQSListener {
     private final CooldownMap<Player> cooldownMap = CooldownMap.create(Cooldown.of(1, TimeUnit.SECONDS));
@@ -301,7 +304,15 @@ public class PlayerListener extends AbstractQSListener {
             // Send creation menu.
             final SimpleInfo info = new SimpleInfo(b.getLocation(), ShopAction.CREATE, e.getItem(), last, false);
             plugin.getShopManager().getActions().put(p.getUniqueId(), info);
-            plugin.text().of(p, "how-much-to-trade-for", MsgUtil.getTranslateText(Objects.requireNonNull(e.getItem())), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+            if (plugin.getConfig().getBoolean("shop.create-needs-select-type")) {
+                info.setAction(CREATE_TYPE_INPUT);
+                plugin.getQuickChat().sendExecutableChat(p, plugin.text().of(p, "select-shop-type-or-cancel").forLocale(),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(p, "select-shop-type-or-cancel-selling-button").forLocale(), "/qs amount SELL"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(p, "select-shop-type-or-cancel-buying-button").forLocale(), "/qs amount BUY"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(p, "select-shop-type-or-cancel-cancel-button").forLocale(), "/qs amount CANCEL"));
+            } else {
+                plugin.text().of(p, "how-much-to-trade-for", MsgUtil.getTranslateText(Objects.requireNonNull(e.getItem())), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+            }
             //Prevent use item by ancient
             if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 e.setUseItemInHand(Event.Result.DENY);
@@ -419,7 +430,7 @@ public class PlayerListener extends AbstractQSListener {
             actionMap.remove(player.getUniqueId());
             if (info.getAction() == ShopAction.BUY) {
                 plugin.text().of(player, "shop-purchase-cancelled").send();
-            } else if (info.getAction() == ShopAction.CREATE) {
+            } else if (info.getAction() == ShopAction.CREATE || info.getAction() == CREATE_TYPE_INPUT) {
                 plugin.text().of(player, "shop-creation-cancelled").send();
             }
         }
@@ -440,7 +451,7 @@ public class PlayerListener extends AbstractQSListener {
         if (loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25) {
             if (info.getAction() == ShopAction.BUY) {
                 plugin.text().of(p, "shop-purchase-cancelled").send();
-            } else if (info.getAction() == ShopAction.CREATE) {
+            } else if (info.getAction() == ShopAction.CREATE || info.getAction() == CREATE_TYPE_INPUT) {
                 plugin.text().of(p, "shop-creation-cancelled").send();
             }
             Util.debugLog(p.getName() + " too far with the shop location.");
