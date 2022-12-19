@@ -36,7 +36,11 @@ import org.maxgamer.quickshop.util.paste.Paste;
 
 import java.io.IOException;
 import java.net.ProtocolException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -200,7 +204,7 @@ public class RollbarErrorReporter implements IErrorReporter {
         if (plugin.getUpdateWatcher() == null) {
             return false;
         }
-        if (!plugin.getUpdateWatcher().getUpdater().isLatest(plugin.getUpdateWatcher().getUpdater().getCurrentRunning())) { // We only receive latest reports.
+        if (!plugin.getUpdateWatcher().getUpdater().isLatest()) { // We only receive latest reports.
             return false;
         }
         if (!GameVersion.get(ReflectFactory.getServerVersion()).isCoreSupports()) { // Ignore errors if user install quickshop on unsupported

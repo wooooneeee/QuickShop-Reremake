@@ -30,7 +30,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.updater.QuickUpdater;
 import org.maxgamer.quickshop.util.updater.VersionType;
-import org.maxgamer.quickshop.util.updater.impl.JenkinsUpdater;
+import org.maxgamer.quickshop.util.updater.impl.MavenUpdater;
 
 import java.util.List;
 import java.util.Random;
@@ -38,7 +38,7 @@ import java.util.Random;
 //TODO: This is a shit, need refactor
 public class UpdateWatcher implements Listener {
 
-    private final QuickUpdater updater = new JenkinsUpdater(QuickShop.getInstance().getBuildInfo());
+    private final QuickUpdater updater = new MavenUpdater(QuickShop.getInstance().getBuildInfo());
     private final Random random = new Random();
     private BukkitTask cronTask = null;
 
@@ -52,7 +52,7 @@ public class UpdateWatcher implements Listener {
 
     public void init() {
         cronTask = QuickShop.getInstance().getServer().getScheduler().runTaskTimerAsynchronously(QuickShop.getInstance(), () -> {
-            if (!updater.isLatest(getUpdater().getCurrentRunning())) {
+            if (!updater.isLatest()) {
                 if (updater.getCurrentRunning() == VersionType.STABLE) {
                     QuickShop.getInstance()
                             .getLogger()
@@ -134,7 +134,7 @@ public class UpdateWatcher implements Listener {
     public void playerJoin(PlayerJoinEvent e) {
 
         QuickShop.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(QuickShop.getInstance(), () -> {
-            if (!QuickShop.getPermissionManager().hasPermission(e.getPlayer(), "quickshop.alerts") || getUpdater().isLatest(getUpdater().getCurrentRunning())) {
+            if (!QuickShop.getPermissionManager().hasPermission(e.getPlayer(), "quickshop.alerts") || getUpdater().isLatest()) {
                 return;
             }
             List<String> notifys = QuickShop.getInstance().text().ofList(e.getPlayer(), "updatenotify.list").forLocale();

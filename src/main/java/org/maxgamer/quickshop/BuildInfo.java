@@ -38,11 +38,14 @@ public class BuildInfo {
     private final int buildId;
     private final String buildTag;
     private final String buildUrl;
+    @Nullable
     private final String jobUrl;
     private final String gitCommit;
     private final String gitBranch;
     private final String pomGroupId;
     private final String pomArtifactId;
+
+    private final String pomBuildNumber;
     private final String jobName;
     private static final String UNKNOWN = "Unknown";
 
@@ -56,7 +59,8 @@ public class BuildInfo {
             pomGroupId = UNKNOWN;
             pomArtifactId = UNKNOWN;
             jobName = UNKNOWN;
-            jobUrl = "https://ci.codemc.io/job/PotatoCraft-Studio/job/QuickShop-Reremake/";
+            pomBuildNumber = UNKNOWN;
+            jobUrl = null;
             return;
         }
         YamlConfiguration buildInfo = YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -67,8 +71,9 @@ public class BuildInfo {
         gitBranch = buildInfo.getString("git-branch", "Unknown");
         pomGroupId = buildInfo.getString("pom-groupid", "Unknown");
         pomArtifactId = buildInfo.getString("pom-artifactid", "Unknown");
-        jobUrl = buildInfo.getString("job-url", "https://ci.codemc.io/job/PotatoCraft-Studio/job/QuickShop-Reremake/");
+        jobUrl = buildInfo.getString("job-url");
         jobName = buildInfo.getString("job-name", "Unknown");
+        pomBuildNumber = buildInfo.getString("pom-buildNumber", "1");
         try {
             inputStream.close();
         } catch (IOException ignored) {
