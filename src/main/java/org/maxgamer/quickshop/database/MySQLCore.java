@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class MySQLCore extends AbstractDatabaseCore {
@@ -52,7 +53,7 @@ public class MySQLCore extends AbstractDatabaseCore {
             @NotNull String pass,
             @NotNull String database,
             @NotNull String port,
-            boolean useSSL) {
+            boolean useSSL, Map<String, String> options) {
         this.plugin = plugin;
         info = new Properties();
         info.setProperty("autoReconnect", "true");
@@ -60,6 +61,9 @@ public class MySQLCore extends AbstractDatabaseCore {
         info.setProperty("password", pass);
         info.setProperty("useUnicode", "true");
         info.setProperty("characterEncoding", "utf8");
+        for (Map.Entry<String, String> entry : options.entrySet()) {
+            info.setProperty(entry.getKey(), entry.getValue());
+        }
         //info.setProperty("maxReconnects", "65535");
         // info.setProperty("failOverReadOnly", "false");
         info.setProperty("useSSL", String.valueOf(useSSL));

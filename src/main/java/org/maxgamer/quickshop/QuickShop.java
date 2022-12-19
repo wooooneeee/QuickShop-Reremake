@@ -1184,7 +1184,14 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                 String port = dbCfg.getString("port");
                 String database = dbCfg.getString("database");
                 boolean useSSL = dbCfg.getBoolean("usessl");
-                dbCore = new MySQLCore(this, Objects.requireNonNull(host, "MySQL host can't be null"), Objects.requireNonNull(user, "MySQL username can't be null"), Objects.requireNonNull(pass, "MySQL password can't be null"), Objects.requireNonNull(database, "MySQL database name can't be null"), Objects.requireNonNull(port, "MySQL port can't be null"), useSSL);
+                Map<String, String> optionsMap = new HashMap<>();
+                for (String options : dbCfg.getStringList("mysql-connect-options")) {
+                    String[] strings = options.split("=", 2);
+                    if (strings.length == 2) {
+                        optionsMap.put(strings[0], strings[1]);
+                    }
+                }
+                dbCore = new MySQLCore(this, Objects.requireNonNull(host, "MySQL host can't be null"), Objects.requireNonNull(user, "MySQL username can't be null"), Objects.requireNonNull(pass, "MySQL password can't be null"), Objects.requireNonNull(database, "MySQL database name can't be null"), Objects.requireNonNull(port, "MySQL port can't be null"), useSSL, optionsMap);
             } else {
                 // SQLite database - Doing this handles file creation
                 dbCore = new SQLiteCore(this, new File(this.getDataFolder(), "shops.db"));
@@ -2199,6 +2206,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
         if (selectedVersion == 160) {
             getConfig().set("shop.create-needs-select-type", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 161) {
+            getConfig().set("database.mysql-connect-options", new ArrayList<>(Arrays.asList("autoReconnect=true", "useUnicode=true", "characterEncoding=utf8")));
             getConfig().set("config-version", ++selectedVersion);
         }
         if (getConfig().isSet("shop.shop")) {
