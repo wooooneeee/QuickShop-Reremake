@@ -73,7 +73,7 @@ public class BuildInfo {
         pomArtifactId = buildInfo.getString("pom-artifactid", "Unknown");
         jobUrl = buildInfo.getString("job-url");
         jobName = buildInfo.getString("job-name", "Unknown");
-        pomBuildNumber = buildInfo.getString("pom-buildNumber", "1");
+        pomBuildNumber = buildInfo.getString("pom-buildnumber", "1");
         try {
             inputStream.close();
         } catch (IOException ignored) {
