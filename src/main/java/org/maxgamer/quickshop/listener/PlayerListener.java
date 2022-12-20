@@ -55,6 +55,7 @@ import org.maxgamer.quickshop.shop.SimpleInfo;
 import org.maxgamer.quickshop.util.InteractUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.PermissionChecker;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
@@ -389,6 +390,7 @@ public class PlayerListener extends AbstractQSListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent e) {
         Util.debugLog("Player " + e.getPlayer().getName() + " using locale " + e.getPlayer().getLocale() + ": " + plugin.text().of(e.getPlayer(), "file-test").forLocale());
+        PlayerFinder.updateStashIfNeeded(e.getPlayer());
         // Notify the player any messages they were sent
         if (plugin.getConfig().getBoolean("shop.auto-fetch-shop-messages")) {
             //Run Task later to make sure locale is correct

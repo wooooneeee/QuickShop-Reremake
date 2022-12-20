@@ -1429,7 +1429,12 @@ public class Util {
     public static List<String> getPlayerList() {
         List<String> tabList = plugin.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
         if (plugin.getConfig().getBoolean("include-offlineplayer-list")) {
-            tabList.addAll(Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList()));
+            Set<String> names = PlayerFinder.getCachedOfflinePlayerNames();
+            if (!names.isEmpty()) {
+                tabList.addAll(names);
+            } else {
+                tabList.addAll(Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList()));
+            }
         }
         return tabList;
     }

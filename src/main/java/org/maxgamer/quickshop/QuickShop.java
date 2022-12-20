@@ -1144,6 +1144,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         if (getConfig().getBoolean("purge.at-server-startup")) {
             shopPurger.purge();
         }
+        //Detect and do offline player name to uuid caching
+        OfflinePlayer[] offlinePlayers = getServer().getOfflinePlayers();
+        if (offlinePlayers.length > 2000) {
+            getServer().getScheduler().runTaskAsynchronously(this, () -> PlayerFinder.doLargeOfflineCachingWork(this, offlinePlayers));
+        }
         Util.debugLog("Now using display-type: " + AbstractDisplayItem.getNowUsing().name());
         getLogger().info("QuickShop Loaded! " + enableTimer.stopAndGetTimePassed() + " ms.");
     }
