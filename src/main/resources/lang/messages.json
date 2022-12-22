@@ -247,7 +247,7 @@
     "freeze-hover": "&eToggle the shop's freeze status.",
     "toggledisplay": "&eDisplayItem: &b{0} &e[&d&lToggle&e]",
     "toggledisplay-hover": "&eToggle the shop's displayitem status",
-    "staff": "&eStaff amount: &b{0} &e[&d&lModify&e]"
+    "staff": "&aStaff amount: &b{0} &e[&d&lModify&e]"
   },
   "tableformat": {
     "full_line": "+---------------------------------------------------+",
