@@ -110,8 +110,9 @@ public class MavenUpdater implements QuickUpdater {
                         javax.xml.parsers.SAXParser parser = factory.newSAXParser();
                         SAXParser.IndexMetaHandler indexMetaHandler = new SAXParser.IndexMetaHandler();
                         parser.parse(is, indexMetaHandler);
-                        if (indexMetaHandler.getLatestRelease() != null) {
-                            remoteVersion = indexMetaHandler.getLatestRelease();
+                        List<String> versionList = indexMetaHandler.getVersionList();
+                        if (versionList.size() >= 1) {
+                            remoteVersion = versionList.get(versionList.size() - 1);
                             isLatest = remoteVersion.equals(QuickShop.getVersion());
                         }
                     }
