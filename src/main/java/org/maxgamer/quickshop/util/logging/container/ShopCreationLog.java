@@ -21,16 +21,21 @@ package org.maxgamer.quickshop.util.logging.container;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.bukkit.Location;
+import me.lucko.helper.serialize.BlockPosition;
 import org.maxgamer.quickshop.api.shop.ShopInfoStorage;
 
 import java.util.UUID;
 
 @AllArgsConstructor
 @Data
-public class ShopCreationLog {
+public class ShopCreationLog implements ReadableLog {
     private static int v = 1;
     private UUID creator;
     private ShopInfoStorage shop;
-    private Location location;
+    private BlockPosition location;
+
+    @Override
+    public String toReadableLog() {
+        return creator + " create a shop at " + location + ", shop data:" + shop.toJson();
+    }
 }

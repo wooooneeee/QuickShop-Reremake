@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import me.lucko.helper.serialize.BlockPosition;
+import org.maxgamer.quickshop.util.JsonUtil;
 
 import java.util.UUID;
 
@@ -44,4 +45,8 @@ public class ShopInfoStorage {
     private final String currency;
     private final boolean disableDisplay;
     private final UUID taxAccount;
+
+    public String toJson() {
+        return JsonUtil.standard().toJson(this);
+    }
 }

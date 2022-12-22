@@ -25,7 +25,7 @@
     <artifactId>QuickShop</artifactId>
 
     <properties>
-        <pluginver>5.1.0.9</pluginver>
+        <pluginver>5.1.1.0</pluginver>
         <package>org.maxgamer.quickshop</package>
         <developer>Ghost-chu</developer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -105,6 +105,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <release>8</release>
                     <encoding>UTF-8</encoding>
                     <!--Use this comments args when compiler is NullPointerException-->
                     <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
@@ -115,7 +116,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <finalName>${artifactId}</finalName>
+                    <finalName>QuickShop</finalName>
                     <minimizeJar>true</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <createSourcesJar>false</createSourcesJar>
@@ -272,7 +273,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <excludePackageNames>org.maxgamer.quickshop.nonquickshopstuff.*</excludePackageNames>
@@ -308,9 +309,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <archive>${project.basedir}/target/${artifactId}.jar</archive>
+                    <archive>${project.basedir}/target/QuickShop.jar</archive>
                     <keystore>${project.basedir}/keystore.jks</keystore>
                     <alias>selfsigned</alias>
+                    <arguments>
+                        <argument>-signedjar</argument>
+                        <argument>target/QuickShop-signed.jar</argument>
+                    </arguments>
                     <!--suppress UnresolvedMavenProperty -->
                     <storepass>${env.quickshop-signer-pwd}</storepass>
                     <!--suppress UnresolvedMavenProperty -->
@@ -351,9 +356,14 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <!--Disable for 503
         <repository>
             <id>sk89q-repo</id>
             <url>https://maven.sk89q.com/repo/</url>
+        </repository>-->
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
         </repository>
         <repository>
             <id>CodeMC</id>
@@ -412,10 +422,12 @@
             <id>IridiumDevelopment</id>
             <url>https://nexus.iridiumdevelopment.net/repository/maven-releases/</url>
         </repository>-->
+
+        <!-- Temporary disable for unknown host
         <repository>
-            <id>Sparky</id>
-            <url>https://nexus.sparky.ac/repository/Sparky/</url>
-        </repository>
+        <id>Sparky</id>
+        <url>https://nexus.sparky.ac/repository/Sparky/</url>
+        </repository>-->
         <repository>
             <id>songoda</id>
             <url>https://repo.songoda.com/repository/public/</url>
@@ -431,7 +443,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.21</version>
+            <version>1.22</version>
         </dependency>
         <dependency>
             <groupId>com.griefcraft.lwc</groupId>
@@ -521,7 +533,7 @@
         <dependency>
             <groupId>com.github.jikoo.OpenInv</groupId>
             <artifactId>openinvapi</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -533,7 +545,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.0.0</version>
+            <version>23.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -549,17 +561,11 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/Clearlag-3.2.2.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>me.lucko.luckperms</groupId>
-            <artifactId>luckperms-api</artifactId>
-            <version>5</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.clerezza.ext/org.json.simple -->
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.11.1</version>
+            <version>2.11.2</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -571,7 +577,7 @@
         <dependency>
             <groupId>com.github.angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
-            <version>6.5.1</version>
+            <version>6.25.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -584,15 +590,14 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.2</version>
+            <version>5.9.1</version>
             <scope>test</scope>
         </dependency>
-
         <!-- Documentation of MockBukkit: https://github.com/seeseemelk/MockBukkit -->
         <dependency>
             <groupId>com.github.seeseemelk</groupId>
-            <artifactId>MockBukkit-v1.18</artifactId>
-            <version>2.22.2</version>
+            <artifactId>MockBukkit-v1.19</artifactId>
+            <version>2.141.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -609,7 +614,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0.3</version>
+            <version>3.40.0.0</version>
             <scope>test</scope>
         </dependency>
         <!-- Database lib for testing-->
@@ -622,7 +627,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19-R0.1-SNAPSHOT</version>
+            <version>1.19.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -633,8 +638,9 @@
         <dependency>
             <groupId>me.vagdedes.spartan</groupId>
             <artifactId>SpartanAPI</artifactId>
-            <version>5.0</version>
-            <scope>provided</scope>
+            <version>9.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/SpartanAPI-9.1.jar</systemPath>
         </dependency>
         <!--New towny version, As we support 1.13+, so we choose 0.96.2.0 according their README-->
         <dependency>
@@ -706,7 +712,7 @@
         <dependency>
             <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Core</artifactId>
-            <version>6.8.1</version>
+            <version>6.10.5</version>
             <scope>provided</scope>
             <!--We just need the core jar-->
             <exclusions>
@@ -744,7 +750,7 @@
         </dependency>
         <dependency>
             <groupId>com.rollbar</groupId>
-            <version>1.8.1</version>
+            <version>1.9.0</version>
             <artifactId>rollbar-java</artifactId>
         </dependency>
         <dependency>
@@ -782,7 +788,7 @@
         <dependency>
             <groupId>com.songoda</groupId>
             <artifactId>SongodaCore</artifactId>
-            <version>2.6.12</version>
+            <version>2.6.16</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
@@ -814,13 +820,13 @@
         <dependency>
             <groupId>com.bgsoftware</groupId>
             <artifactId>SuperiorSkyblockAPI</artifactId>
-            <version>1.10.2</version>
+            <version>1.11.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>
             <artifactId>helper</artifactId>
-            <version>5.6.10</version>
+            <version>5.6.13</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -848,7 +854,7 @@
         <dependency>
             <groupId>com.github.alex9849</groupId>
             <artifactId>advanced-region-market</artifactId>
-            <version>3.3.6</version>
+            <version>3.4.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -862,7 +868,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.9.3</version>
+            <version>4.10.0</version>
             <scope>compile</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
@@ -880,7 +886,7 @@
         <dependency>
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api-plugin</artifactId>
-            <version>2.9.2</version>
+            <version>2.11.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

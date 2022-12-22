@@ -139,33 +139,7 @@ public class PermissionChecker implements Reloadable {
 
         BlockBreakEvent beMainHand;
 
-        beMainHand = new BlockBreakEvent(block, player) {
-
-            @Override
-            public void setCancelled(boolean cancel) {
-                //tracking cancel plugin
-                if (cancel && !isCancelled()) {
-                    Util.debugLog("An plugin blocked the protection checking event! See this stacktrace:");
-                    for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-                        Util.debugLog(element.getClassName() + "." + element.getMethodName() + "(" + element.getLineNumber() + ")");
-                    }
-                    isCanBuild.setMessage(Thread.currentThread().getStackTrace()[2].getClassName());
-                    out:
-                    for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-
-                        for (RegisteredListener listener : getHandlerList().getRegisteredListeners()) {
-                            if (listener.getListener().getClass().getName().equals(element.getClassName())) {
-                                isCanBuild.setResult(false);
-                                isCanBuild.setMessage(listener.getPlugin().getName());
-                                isCanBuild.setListener(listener.getListener().getClass().getName());
-                                break out;
-                            }
-                        }
-                    }
-                }
-                super.setCancelled(cancel);
-            }
-        };
+        beMainHand = new FakeBlockBreakEvent(block, player, isCanBuild);
         // Call for event for protection check start
         this.eventManager.callEvent(new ShopProtectionCheckEvent(block.getLocation(), player, ProtectionCheckStatus.BEGIN, beMainHand));
         beMainHand.setDropItems(false);
@@ -194,6 +168,41 @@ public class PermissionChecker implements Reloadable {
         plugin.getCompatibilityManager().toggleProtectionListeners(true, player);
 
         return isCanBuild;
+    }
+
+    public static class FakeBlockBreakEvent extends BlockBreakEvent {
+
+        private final org.maxgamer.quickshop.util.holder.Result isCanBuild;
+
+        public FakeBlockBreakEvent(@NotNull Block theBlock, @NotNull Player player, @NotNull org.maxgamer.quickshop.util.holder.Result isCanBuild) {
+            super(theBlock, player);
+            this.isCanBuild = isCanBuild;
+        }
+
+        @Override
+        public void setCancelled(boolean cancel) {
+            //tracking cancel plugin
+            if (cancel && !isCancelled()) {
+                Util.debugLog("An plugin blocked the protection checking event! See this stacktrace:");
+                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+                    Util.debugLog(element.getClassName() + "." + element.getMethodName() + "(" + element.getLineNumber() + ")");
+                }
+                isCanBuild.setMessage(Thread.currentThread().getStackTrace()[2].getClassName());
+                out:
+                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+
+                    for (RegisteredListener listener : getHandlerList().getRegisteredListeners()) {
+                        if (listener.getListener().getClass().getName().equals(element.getClassName())) {
+                            isCanBuild.setResult(false);
+                            isCanBuild.setMessage(listener.getPlugin().getName());
+                            isCanBuild.setListener(listener.getListener().getClass().getName());
+                            break out;
+                        }
+                    }
+                }
+            }
+            super.setCancelled(cancel);
+        }
     }
 
     /**

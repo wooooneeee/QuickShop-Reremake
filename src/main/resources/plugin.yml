@@ -270,3 +270,12 @@ permissions:
   quickshop.purge:
     description: Permission to use /qs purge
     default: op
+  quickshop.transfer:
+    description: Permission to use /qs transfer for transering selling shop
+    default: op
+  quickshop.transfer.other:
+    description: Permission to use /qs transfer for transering others shop to someone
+    default: op
+  quickshop.convertlog:
+    description: Permission to use /qs convertlog
+    default: op

@@ -20,7 +20,11 @@
 package org.maxgamer.quickshop.chat.platform.minedown;
 
 import lombok.AllArgsConstructor;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
@@ -41,6 +45,11 @@ import org.maxgamer.quickshop.util.Util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -335,6 +344,51 @@ public class BungeeQuickChat implements QuickChat {
         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, cBuilder.create()));
         return new QuickComponentImpl(component);
 
+    }
+
+    private final String[] indexStrCache = {"{0}", "{1}", "{2}", "{3}", "{4}", "{5}", "{6}", "{7}", "{8}", "{9}"};
+
+    public String getIndexStr(int index) {
+        return index <= 9 ? indexStrCache[index] : "{" + index + "}";
+    }
+
+    @Override
+    public void sendExecutableChat(@NotNull CommandSender receiver, @NotNull String message, Map.Entry<String, String>... textToCommandMapping) {
+        List<BaseComponent> components = new ArrayList<>(Arrays.asList(fromLegacyText(message)));
+        Iterator<Map.Entry<String, String>> iterator = Arrays.asList(textToCommandMapping).iterator();
+
+        int index = 0;
+        replace:
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> replacement = iterator.next();
+            for (int i = 0; i < components.size(); i++) {
+                BaseComponent component = components.get(i);
+                if (component instanceof TextComponent) {
+                    String text = ((TextComponent) component).getText();
+                    if (text.contains(getIndexStr(index))) {
+                        String[] strings = text.split(getIndexStr(index).replace("{", "\\{").replace("}", "\\}"), 2);
+                        TextComponent component1 = new TextComponent(strings[0]);
+                        TextComponent component2 = new TextComponent(strings[1]);
+                        component1.copyFormatting(component);
+                        component2.copyFormatting(component);
+                        BaseComponent[] replacementComponents = fromLegacyText(replacement.getKey());
+                        ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, replacement.getValue());
+                        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, fromLegacyText(replacement.getKey()));
+                        for (BaseComponent baseComponent : replacementComponents) {
+                            baseComponent.setClickEvent(clickEvent);
+                            baseComponent.setHoverEvent(hoverEvent);
+                            component1.addExtra(baseComponent);
+                        }
+                        components.remove(i);
+                        components.add(i, component2);
+                        components.add(i, component1);
+                        index++;
+                        continue replace;
+                    }
+                }
+            }
+        }
+        receiver.spigot().sendMessage(components.toArray(new BaseComponent[0]));
     }
 
     @Override

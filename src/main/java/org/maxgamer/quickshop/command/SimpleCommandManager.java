@@ -277,6 +277,13 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
                         .build());
         registerCmd(
                 CommandContainer.builder()
+                        .prefix("convertlog")
+                        .hidden(true)
+                        .permission("quickshop.convertlog")
+                        .executor(new SubCommand_LogConvert(plugin))
+                        .build());
+        registerCmd(
+                CommandContainer.builder()
                         .prefix("recovery")
                         .hidden(true)
                         .permission("quickshop.recovery")

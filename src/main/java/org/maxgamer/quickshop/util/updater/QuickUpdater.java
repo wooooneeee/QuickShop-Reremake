@@ -41,37 +41,19 @@ public interface QuickUpdater {
     @NotNull String getRemoteServerVersion();
 
     /**
-     * Gets the build id on remote server
+     * Check specified type of version is the latest version on remote version
      *
-     * @return BuildId on remote server
+     * @return is the latest build
      */
-    int getRemoteServerBuildId();
-
-    /**
-     * Check specified type of version is latest version on remote version
-     *
-     * @param versionType The version type needs to check
-     * @return is latest build
-     */
-    boolean isLatest(@NotNull VersionType versionType);
-
-    /**
-     * Download update from remote server
-     *
-     * @param versionType The version type to download
-     * @return The binary array that downloads
-     * @throws IOException IOException will throws if downloading fails
-     */
-    byte[] update(@NotNull VersionType versionType) throws IOException;
+    boolean isLatest();
 
     /**
      * Install updates to server
      * * Warning: It is unstable, recommend to restart server *
      *
-     * @param bytes The bytes will write to jar file
-     * @throws IOException IOException will throws if copying failed
+     * @throws IOException IOException will throw if copying failed
      */
-    void install(byte[] bytes) throws IOException;
+    void installUpdate() throws IOException;
 
     /**
      * Return the updated jar

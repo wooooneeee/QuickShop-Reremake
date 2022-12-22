@@ -57,8 +57,15 @@ import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Level;
 
 
@@ -485,7 +492,16 @@ public class MsgUtil {
                     plugin.text().of(sender, "controlpanel.setowner-hover").forLocale(),
                     "/qs setowner ");
         }
-
+        // Staff
+        if ((QuickShop.getPermissionManager().hasPermission(sender, "quickshop.staff") && shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId()))
+                || QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.staff")) {
+            chatSheetPrinter.printSuggestedCmdLine(
+                    plugin.text().of(sender,
+                            "controlpanel.staff",
+                            shop.getStaffs().size()).forLocale(),
+                    plugin.text().of(sender, "command.description.staff").forLocale(),
+                    "/qs staff ");
+        }
 
         // Unlimited
         if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.unlimited")) {

@@ -33,7 +33,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLocaleChangeEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -48,14 +54,19 @@ import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.shop.SimpleInfo;
 import org.maxgamer.quickshop.util.InteractUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PermissionChecker;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static org.maxgamer.quickshop.api.shop.ShopAction.CREATE_TYPE_INPUT;
 
 public class PlayerListener extends AbstractQSListener {
     private final CooldownMap<Player> cooldownMap = CooldownMap.create(Cooldown.of(1, TimeUnit.SECONDS));
@@ -106,7 +117,16 @@ public class PlayerListener extends AbstractQSListener {
             return;
         }
         // ----Adventure dupe click workaround end----
-        Block focused = event.getPlayer().getTargetBlock(null, 5);
+        Block focused;
+        try {
+            focused = event.getPlayer().getTargetBlock(null, 5);
+        } catch (IllegalStateException exception) {
+            //Not sure if this is server side bug, but we could ignore it this time
+            //java.lang.IllegalStateException: Start block missed in BlockIterator
+            //Could not pass event PlayerArmSwingEvent to QuickShop v5.1.0.9
+            //https://github.com/PotatoCraft-Studio/QuickShop-Reremake/issues/212
+            return;
+        }
         PlayerInteractEvent interactEvent
                 = new PlayerInteractEvent(event.getPlayer(),
                 focused.getType() == Material.AIR ? Action.LEFT_CLICK_AIR : Action.LEFT_CLICK_BLOCK,
@@ -285,7 +305,15 @@ public class PlayerListener extends AbstractQSListener {
             // Send creation menu.
             final SimpleInfo info = new SimpleInfo(b.getLocation(), ShopAction.CREATE, e.getItem(), last, false);
             plugin.getShopManager().getActions().put(p.getUniqueId(), info);
-            plugin.text().of(p, "how-much-to-trade-for", MsgUtil.getTranslateText(Objects.requireNonNull(e.getItem())), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+            if (plugin.getConfig().getBoolean("shop.create-needs-select-type")) {
+                info.setAction(CREATE_TYPE_INPUT);
+                plugin.getQuickChat().sendExecutableChat(p, plugin.text().of(p, "select-shop-type-or-cancel").forLocale(),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(p, "select-shop-type-or-cancel-selling-button").forLocale(), "/qs amount SELL"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(p, "select-shop-type-or-cancel-buying-button").forLocale(), "/qs amount BUY"),
+                        new AbstractMap.SimpleEntry<>(plugin.text().of(p, "select-shop-type-or-cancel-cancel-button").forLocale(), "/qs amount CANCEL"));
+            } else {
+                plugin.text().of(p, "how-much-to-trade-for", MsgUtil.getTranslateText(Objects.requireNonNull(e.getItem())), Integer.toString(plugin.isAllowStack() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.stacks") ? item.getAmount() : 1)).send();
+            }
             //Prevent use item by ancient
             if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 e.setUseItemInHand(Event.Result.DENY);
@@ -362,6 +390,7 @@ public class PlayerListener extends AbstractQSListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent e) {
         Util.debugLog("Player " + e.getPlayer().getName() + " using locale " + e.getPlayer().getLocale() + ": " + plugin.text().of(e.getPlayer(), "file-test").forLocale());
+        PlayerFinder.updateStashIfNeeded(e.getPlayer());
         // Notify the player any messages they were sent
         if (plugin.getConfig().getBoolean("shop.auto-fetch-shop-messages")) {
             //Run Task later to make sure locale is correct
@@ -394,7 +423,7 @@ public class PlayerListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerBreakShopCreationChest(BlockBreakEvent event) {
         @Nullable Player player = event.getPlayer();
-        if (player == null) {
+        if (event instanceof PermissionChecker.FakeBlockBreakEvent || player == null) {
             return;
         }
         Map<UUID, Info> actionMap = plugin.getShopManager().getActions();
@@ -403,7 +432,7 @@ public class PlayerListener extends AbstractQSListener {
             actionMap.remove(player.getUniqueId());
             if (info.getAction() == ShopAction.BUY) {
                 plugin.text().of(player, "shop-purchase-cancelled").send();
-            } else if (info.getAction() == ShopAction.CREATE) {
+            } else if (info.getAction() == ShopAction.CREATE || info.getAction() == CREATE_TYPE_INPUT) {
                 plugin.text().of(player, "shop-creation-cancelled").send();
             }
         }
@@ -424,7 +453,7 @@ public class PlayerListener extends AbstractQSListener {
         if (loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25) {
             if (info.getAction() == ShopAction.BUY) {
                 plugin.text().of(p, "shop-purchase-cancelled").send();
-            } else if (info.getAction() == ShopAction.CREATE) {
+            } else if (info.getAction() == ShopAction.CREATE || info.getAction() == CREATE_TYPE_INPUT) {
                 plugin.text().of(p, "shop-creation-cancelled").send();
             }
             Util.debugLog(p.getName() + " too far with the shop location.");

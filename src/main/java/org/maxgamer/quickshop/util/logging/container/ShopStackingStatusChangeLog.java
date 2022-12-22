@@ -25,9 +25,13 @@ import org.maxgamer.quickshop.shop.ShopLoader;
 
 @AllArgsConstructor
 @Data
-public class ShopStackingStatusChangeLog {
+public class ShopStackingStatusChangeLog implements ReadableLog {
 
     private static int v = 1;
     private ShopLoader.ShopRawDatabaseInfo rawDatabaseInfo;
 
+    @Override
+    public String toReadableLog() {
+        return "Shop at " + rawDatabaseInfo.getWorld() + ", x=" + rawDatabaseInfo.getX() + "y=" + rawDatabaseInfo.getY() + " z=" + rawDatabaseInfo.getZ() + " stacking have been changed, data:" + rawDatabaseInfo;
+    }
 }

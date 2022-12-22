@@ -19,6 +19,8 @@
 
 package org.maxgamer.quickshop.util;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.EvictingQueue;
 import de.themoep.minedown.MineDown;
 import de.themoep.minedown.MineDownParser;
@@ -30,7 +32,13 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Tag;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -64,7 +72,13 @@ import org.maxgamer.quickshop.database.MySQLCore;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -73,10 +87,24 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat.fromLegacyText;
@@ -192,8 +220,27 @@ public class Util {
         return SHOPABLES.contains(material);
     }
 
+    private static final Cache<String, Pattern> regexPatternCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
     public static boolean isBlacklistWorld(@NotNull World world) {
-        return plugin.getConfig().getStringList("shop.blacklist-world").contains(world.getName());
+        String worldNameCurrent = world.getName().toLowerCase();
+        for (String worldName : plugin.getConfig().getStringList("shop.blacklist-world")) {
+            worldName = worldName.toLowerCase();
+            if (!worldName.startsWith("$")) {
+                if (worldNameCurrent.equals(worldName)) {
+                    return true;
+                }
+            } else if (worldName.length() >= 2) {
+                Pattern cachePattern = regexPatternCache.getIfPresent(worldName);
+                if (cachePattern == null) {
+                    cachePattern = Pattern.compile(worldName.substring(1));
+                    regexPatternCache.put(worldName, cachePattern);
+                }
+                if (cachePattern.matcher(worldNameCurrent).matches()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -661,6 +708,10 @@ public class Util {
             if (mat == null) {
                 plugin.getLogger().warning("Invalid shop-block: " + s);
             } else {
+                if (!plugin.getConfig().getBoolean("shop.enchance-shop-protect") && mat.name().contains("SHULKER")) {
+                    plugin.getConfig().set("shop.enchance-shop-protect", true);
+                    plugin.getLogger().log(java.util.logging.Level.SEVERE, "enchance-shop-protect settings was forced enabled to prevent the piston bug, see: https://github.com/PotatoCraft-Studio/QuickShop-Reremake/issues/248");
+                }
                 SHOPABLES.add(mat);
             }
         }
@@ -1378,7 +1429,12 @@ public class Util {
     public static List<String> getPlayerList() {
         List<String> tabList = plugin.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
         if (plugin.getConfig().getBoolean("include-offlineplayer-list")) {
-            tabList.addAll(Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList()));
+            Set<String> names = PlayerFinder.getCachedOfflinePlayerNames();
+            if (!names.isEmpty()) {
+                tabList.addAll(names);
+            } else {
+                tabList.addAll(Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList()));
+            }
         }
         return tabList;
     }
@@ -1463,32 +1519,32 @@ public class Util {
                     out.append('.');
                     break;
                 case '.':
-                    out.append("\\.");
-                    break;
-                case '\\':
-                    out.append("\\\\");
-                    break;
-                default:
-                    out.append(c);
+                        out.append("\\.");
+                        break;
+                    case '\\':
+                        out.append("\\\\");
+                        break;
+                    default:
+                        out.append(c);
+                }
             }
+            out.append('$');
+            return out.toString();
         }
-        out.append('$');
-        return out.toString();
-    }
 
-    /**
-     * Get location that converted to block position (.0)
-     *
-     * @param loc location
-     * @return blocked location
-     */
-    @NotNull
-    public static Location getBlockLocation(@NotNull Location loc) {
-        loc = loc.clone();
-        loc.setX(loc.getBlockX());
-        loc.setY(loc.getBlockY());
-        loc.setZ(loc.getBlockZ());
-        return loc;
-    }
+        /**
+         * Get location that converted to block position (.0)
+         *
+         * @param loc location
+         * @return blocked location
+         */
+        @NotNull
+        public static Location getBlockLocation (@NotNull Location loc){
+            loc = loc.clone();
+            loc.setX(loc.getBlockX());
+            loc.setY(loc.getBlockY());
+            loc.setZ(loc.getBlockZ());
+            return loc;
+        }
 
-}
+    }

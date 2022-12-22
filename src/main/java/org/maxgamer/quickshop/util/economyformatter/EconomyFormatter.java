@@ -24,7 +24,6 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.api.economy.AbstractEconomy;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
@@ -39,14 +38,12 @@ import java.util.Map;
 public class EconomyFormatter implements Reloadable {
     private static final Map<String, String> CURRENCY_SYMBOL_MAPPING = new HashMap<>();
     private final QuickShop plugin;
-    private final AbstractEconomy economy;
     private boolean disableVaultFormat;
     private boolean useDecimalFormat;
     private boolean currencySymbolOnRight;
 
-    public EconomyFormatter(QuickShop plugin, AbstractEconomy economy) {
+    public EconomyFormatter(QuickShop plugin) {
         this.plugin = plugin;
-        this.economy = economy;
         reloadModule();
         plugin.getReloadManager().register(this);
     }

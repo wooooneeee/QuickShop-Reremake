@@ -1,5 +1,5 @@
 /*
- * This file is a part of project QuickShop, the name is ShopModeratorChangedLog.java
+ * This file is a part of project QuickShop, the name is ReadableLog.java
  *  Copyright (C) PotatoCraft Studio and contributors
  *
  *  This program is free software: you can redistribute it and/or modify it
@@ -19,20 +19,6 @@
 
 package org.maxgamer.quickshop.util.logging.container;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.maxgamer.quickshop.api.shop.ShopInfoStorage;
-import org.maxgamer.quickshop.shop.SimpleShopModerator;
-
-@AllArgsConstructor
-@Data
-public class ShopModeratorChangedLog implements ReadableLog {
-    private static int v = 1;
-    private ShopInfoStorage shop;
-    private SimpleShopModerator moderator;
-
-    @Override
-    public String toReadableLog() {
-        return "Shop owner/staff at " + shop.getPosition() + " was changed, current moderator:" + moderator + ", shop raw data:" + shop.toJson();
-    }
+public interface ReadableLog {
+    String toReadableLog();
 }

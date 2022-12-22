@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.api.shop.Shop;
 
+import java.util.Map;
+
 /**
  * QuickChat is a system to allow us to process complex messages
  */
@@ -82,9 +84,18 @@ public interface QuickChat {
     /**
      * Send click-run-command chat to specified receiver
      *
+     * @param receiver             The PLAYER will receive this message
+     * @param message              The text will sent
+     * @param textToCommandMapping The hover text associated with command, will be applied to placeholder (like {0} {1} {2}...)
+     */
+    void sendExecutableChat(@NotNull CommandSender receiver, @NotNull String message, Map.Entry<String, String>... textToCommandMapping);
+
+    /**
+     * Send click-run-command chat to specified receiver
+     *
      * @param receiver  The PLAYER will receive this message
      * @param message   The text will sent
-     * @param hoverText The will show when hover on chat
+     * @param hoverText The hover text will show when hover on chat
      * @param command   The command when click to be run
      */
     void sendExecutableChat(@NotNull CommandSender receiver, @NotNull String message, @NotNull String hoverText, @NotNull String command);

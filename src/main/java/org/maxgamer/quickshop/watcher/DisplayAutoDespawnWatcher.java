@@ -59,7 +59,7 @@ public class DisplayAutoDespawnWatcher extends BukkitRunnable implements Reloada
     public void run() {
         for (Shop shop : plugin.getShopManager().getLoadedShops()) {
             //Shop may be deleted or unloaded when iterating
-            if (shop.isDeleted() || !shop.isLoaded()) {
+            if (shop.isDeleted() || !shop.isLoaded() || shop.isDisableDisplay()) {
                 continue;
             }
             Location location = shop.getLocation();
