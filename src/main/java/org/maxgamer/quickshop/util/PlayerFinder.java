@@ -85,9 +85,8 @@ public final class PlayerFinder {
         isStashNeeded = true;
         for (OfflinePlayer offlinePlayer : quickShop.getServer().getOfflinePlayers()) {
             String name = offlinePlayer.getName();
-            UUID uuid = offlinePlayer.getUniqueId();
-            if (name != null && uuid != null) {
-                string2UUIDStash.put(offlinePlayer.getName(), offlinePlayer.getUniqueId());
+            if (name != null) {
+                string2UUIDStash.put(name, offlinePlayer.getUniqueId());
             }
         }
         quickShop.getLogger().log(Level.INFO, "Done! cached " + offlinePlayers.length + " players.");
