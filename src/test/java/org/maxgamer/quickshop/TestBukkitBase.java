@@ -21,7 +21,7 @@ public abstract class TestBukkitBase {
         try {
             Field CROWDIN_OTA_HOST = Class.forName("org.maxgamer.quickshop.localization.text.distributions.crowdin.CrowdinOTA").getDeclaredField("CROWDIN_OTA_HOST");
             CROWDIN_OTA_HOST.setAccessible(true);
-            CROWDIN_OTA_HOST.set(null, "https://0.0.0.0");
+            CROWDIN_OTA_HOST.set(null, "");
         } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
