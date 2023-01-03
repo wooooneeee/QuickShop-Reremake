@@ -48,7 +48,7 @@ public final class PlayerFinder {
     private static final Map<String, UUID> string2UUIDStash = new java.util.concurrent.ConcurrentHashMap<>();
     private static final Cache<String, UUID> string2UUIDCache = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build();
 
-    private static volatile boolean isStashNeeded;
+    private static volatile boolean useOfflineStash;
 
     private PlayerFinder() {
     }
@@ -75,14 +75,14 @@ public final class PlayerFinder {
     }
 
     public static void updateStashIfNeeded(Player player) {
-        if (isStashNeeded) {
+        if (useOfflineStash) {
             string2UUIDStash.put(player.getName().toLowerCase(Locale.ROOT), player.getUniqueId());
         }
     }
 
     public static void doLargeOfflineCachingWork(QuickShop quickShop, OfflinePlayer[] offlinePlayers) {
         quickShop.getLogger().log(Level.INFO, "Large server detected (offline player > 2000), start offline player caching...");
-        isStashNeeded = true;
+        useOfflineStash = true;
         for (OfflinePlayer offlinePlayer : quickShop.getServer().getOfflinePlayers()) {
             String name = offlinePlayer.getName();
             if (name != null) {
@@ -107,7 +107,7 @@ public final class PlayerFinder {
         } else {
             Server server = Bukkit.getServer();
             result = findPlayerByName(name, server.getOnlinePlayers(), false);
-            if (result == null) {
+            if (!useOfflineStash && result == null) {
                 result = findPlayerByName(name, Arrays.asList(server.getOfflinePlayers()), true);
             }
             if (result == null) {
