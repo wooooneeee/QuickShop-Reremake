@@ -48,7 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class CrowdinOTA implements Distribution {
     private static final String localManifest = "{\"files\":[\"\\/master\\/crowdin\\/lang\\/%locale%\\/messages.json\"],\"languages\":[\"af\",\"ar\",\"bg\",\"ca\",\"zh-CN\",\"zh-TW\",\"zh-HK\",\"cs\",\"da\",\"nl\",\"en\",\"fi\",\"fr\",\"de\",\"el\",\"he\",\"hi\",\"hu\",\"it\",\"ja\",\"ko\",\"lt\",\"no\",\"pl\",\"pt-PT\",\"pt-BR\",\"ro\",\"ru\",\"sr\",\"es-ES\",\"sv-SE\",\"th\",\"tr\",\"uk\",\"vi\"],\"language_mapping\":{\"ro\":{\"locale\":\"ro-RO\"},\"fr\":{\"locale\":\"fr-FR\"},\"es-ES\":{\"locale\":\"es-ES\"},\"af\":{\"locale\":\"af-ZA\"},\"ar\":{\"locale\":\"ar-SA\"},\"bg\":{\"locale\":\"bg-BG\"},\"ca\":{\"locale\":\"ca-ES\"},\"cs\":{\"locale\":\"cs-CZ\"},\"da\":{\"locale\":\"da-DK\"},\"de\":{\"locale\":\"de-DE\"},\"el\":{\"locale\":\"el-GR\"},\"fi\":{\"locale\":\"fi-FI\"},\"he\":{\"locale\":\"he-IL\"},\"hu\":{\"locale\":\"hu-HU\"},\"it\":{\"locale\":\"it-IT\"},\"ja\":{\"locale\":\"ja-JP\"},\"ko\":{\"locale\":\"ko-KR\"},\"lt\":{\"locale\":\"lt-LT\"},\"nl\":{\"locale\":\"nl-NL\"},\"no\":{\"locale\":\"no-NO\"},\"pl\":{\"locale\":\"pl-PL\"},\"pt-PT\":{\"locale\":\"pt-PT\"},\"ru\":{\"locale\":\"ru-RU\"},\"sr\":{\"locale\":\"sr-SP\"},\"sv-SE\":{\"locale\":\"sv-SE\"},\"tr\":{\"locale\":\"tr-TR\"},\"uk\":{\"locale\":\"uk-UA\"},\"zh-CN\":{\"locale\":\"zh-CN\"},\"zh-TW\":{\"locale\":\"zh-TW\"},\"en\":{\"locale\":\"en-US\"},\"vi\":{\"locale\":\"vi-VN\"},\"pt-BR\":{\"locale\":\"pt-BR\"},\"th\":{\"locale\":\"th-TH\"},\"hi\":{\"locale\":\"hi-IN\"},\"zh-HK\":{\"locale\":\"zh-HK\"}},\"custom_languages\":[],\"timestamp\":1671608400,\"content\":{\"af\":[\"\\/content\\/master\\/crowdin\\/lang\\/af-ZA\\/messages.json\"],\"ar\":[\"\\/content\\/master\\/crowdin\\/lang\\/ar-SA\\/messages.json\"],\"bg\":[\"\\/content\\/master\\/crowdin\\/lang\\/bg-BG\\/messages.json\"],\"ca\":[\"\\/content\\/master\\/crowdin\\/lang\\/ca-ES\\/messages.json\"],\"zh-CN\":[\"\\/content\\/master\\/crowdin\\/lang\\/zh-CN\\/messages.json\"],\"zh-TW\":[\"\\/content\\/master\\/crowdin\\/lang\\/zh-TW\\/messages.json\"],\"zh-HK\":[\"\\/content\\/master\\/crowdin\\/lang\\/zh-HK\\/messages.json\"],\"cs\":[\"\\/content\\/master\\/crowdin\\/lang\\/cs-CZ\\/messages.json\"],\"da\":[\"\\/content\\/master\\/crowdin\\/lang\\/da-DK\\/messages.json\"],\"nl\":[\"\\/content\\/master\\/crowdin\\/lang\\/nl-NL\\/messages.json\"],\"en\":[\"\\/content\\/master\\/crowdin\\/lang\\/en-US\\/messages.json\"],\"fi\":[\"\\/content\\/master\\/crowdin\\/lang\\/fi-FI\\/messages.json\"],\"fr\":[\"\\/content\\/master\\/crowdin\\/lang\\/fr-FR\\/messages.json\"],\"de\":[\"\\/content\\/master\\/crowdin\\/lang\\/de-DE\\/messages.json\"],\"el\":[\"\\/content\\/master\\/crowdin\\/lang\\/el-GR\\/messages.json\"],\"he\":[\"\\/content\\/master\\/crowdin\\/lang\\/he-IL\\/messages.json\"],\"hi\":[\"\\/content\\/master\\/crowdin\\/lang\\/hi-IN\\/messages.json\"],\"hu\":[\"\\/content\\/master\\/crowdin\\/lang\\/hu-HU\\/messages.json\"],\"it\":[\"\\/content\\/master\\/crowdin\\/lang\\/it-IT\\/messages.json\"],\"ja\":[\"\\/content\\/master\\/crowdin\\/lang\\/ja-JP\\/messages.json\"],\"ko\":[\"\\/content\\/master\\/crowdin\\/lang\\/ko-KR\\/messages.json\"],\"lt\":[\"\\/content\\/master\\/crowdin\\/lang\\/lt-LT\\/messages.json\"],\"no\":[\"\\/content\\/master\\/crowdin\\/lang\\/no-NO\\/messages.json\"],\"pl\":[\"\\/content\\/master\\/crowdin\\/lang\\/pl-PL\\/messages.json\"],\"pt-PT\":[\"\\/content\\/master\\/crowdin\\/lang\\/pt-PT\\/messages.json\"],\"pt-BR\":[\"\\/content\\/master\\/crowdin\\/lang\\/pt-BR\\/messages.json\"],\"ro\":[\"\\/content\\/master\\/crowdin\\/lang\\/ro-RO\\/messages.json\"],\"ru\":[\"\\/content\\/master\\/crowdin\\/lang\\/ru-RU\\/messages.json\"],\"sr\":[\"\\/content\\/master\\/crowdin\\/lang\\/sr-SP\\/messages.json\"],\"es-ES\":[\"\\/content\\/master\\/crowdin\\/lang\\/es-ES\\/messages.json\"],\"sv-SE\":[\"\\/content\\/master\\/crowdin\\/lang\\/sv-SE\\/messages.json\"],\"th\":[\"\\/content\\/master\\/crowdin\\/lang\\/th-TH\\/messages.json\"],\"tr\":[\"\\/content\\/master\\/crowdin\\/lang\\/tr-TR\\/messages.json\"],\"uk\":[\"\\/content\\/master\\/crowdin\\/lang\\/uk-UA\\/messages.json\"],\"vi\":[\"\\/content\\/master\\/crowdin\\/lang\\/vi-VN\\/messages.json\"]},\"mapping\":[\"\\/mapping\\/master\\/crowdin\\/lang\\/en-US\\/messages.json\"],\"local\":true}";
     //DO NOT final it! Unit-test needs to change it to prevent network flow
-    protected static String CROWDIN_OTA_HOST = "";
+    protected static String CROWDIN_OTA_HOST = "https://crowdinota.reremake.r2.quickshop-powered.top/";
     private final QuickShop plugin;
     private final OTACacheControl otaCacheControl = new OTACacheControl();
 
@@ -76,10 +76,8 @@ public class CrowdinOTA implements Distribution {
      */
     @NotNull
     public String getManifestJson() {
-        //Comment for disable OTA
-        //String url = CROWDIN_OTA_HOST + "manifest.json";
-        //HttpUtil.createGet(url, localManifest);
-        return localManifest;
+        String url = CROWDIN_OTA_HOST + "manifest.json";
+        return HttpUtil.createGet(url, localManifest, false);
     }
 
     /**
@@ -173,7 +171,7 @@ public class CrowdinOTA implements Distribution {
             Util.debugLog("Manifest timestamp check failed " + postProcessingPath + " excepted:" + otaCacheControl.readManifestTimestamp() + " actual: " + getManifest().getTimestamp() + " forceUpdate: " + forceFlush);
         }
         // Out of the cache
-        String url = CROWDIN_OTA_HOST + "content" + fileCrowdinPath.replace("%locale%", crowdinLocale);
+        String url = CROWDIN_OTA_HOST + "content" + fileCrowdinPath.replace("%locale%", crowdinLocale) + "?timestamp=" + manifestTimestamp;
         plugin.getLogger().info("Updating translation " + crowdinLocale + " from: " + url);
         String data = HttpUtil.createGet(url, forceFlush);
         if (data == null) {

@@ -51,13 +51,20 @@ public class HttpUtil {
     }
 
     @NotNull
-    public static String createGet(@NotNull String url, String def) {
+    public static String createGet(@NotNull String url, String def, boolean caching) {
         String result = createGet(url, false);
         if (result == null) {
             result = def;
         }
-        requestCachePool.put(url, result);
+        if (caching) {
+            requestCachePool.put(url, result);
+        }
         return result;
+    }
+
+    @NotNull
+    public static String createGet(@NotNull String url, String def) {
+        return createGet(url, def, true);
     }
 
     @Nullable
