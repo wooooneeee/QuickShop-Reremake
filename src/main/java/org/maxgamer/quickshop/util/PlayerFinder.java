@@ -83,10 +83,21 @@ public final class PlayerFinder {
     public static void doLargeOfflineCachingWork(QuickShop quickShop, OfflinePlayer[] offlinePlayers) {
         quickShop.getLogger().log(Level.INFO, "Large server detected (offline player > 2000), start offline player caching...");
         useOfflineStash = true;
+        int amount = 0;
+        int doneAmount = 0;
         for (OfflinePlayer offlinePlayer : quickShop.getServer().getOfflinePlayers()) {
-            String name = offlinePlayer.getName();
-            if (name != null) {
-                string2UUIDStash.put(name, offlinePlayer.getUniqueId());
+            try {
+                String name = offlinePlayer.getName();
+                if (name != null) {
+                    string2UUIDStash.put(name, offlinePlayer.getUniqueId());
+                }
+            } catch (Throwable ignored) {
+            }
+            amount++;
+            if (amount == 1000) {
+                doneAmount += 1000;
+                amount = 0;
+                quickShop.getLogger().log(Level.INFO, "Caching Offline player...cached " + doneAmount + "/" + offlinePlayers.length + " players.");
             }
         }
         quickShop.getLogger().log(Level.INFO, "Done! cached " + offlinePlayers.length + " players.");
