@@ -28,6 +28,7 @@ import de.tr7zw.nbtapi.plugin.NBTAPI;
 import lombok.Getter;
 import lombok.Setter;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
+import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -101,6 +102,7 @@ import org.maxgamer.quickshop.shop.ShopPurger;
 import org.maxgamer.quickshop.shop.SimpleShopManager;
 import org.maxgamer.quickshop.shop.VirtualDisplayItem;
 import org.maxgamer.quickshop.util.GameVersion;
+import org.maxgamer.quickshop.util.HttpUtil;
 import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.PermissionChecker;
@@ -792,10 +794,20 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
 
         Util.debugLog("Cleanup listeners...");
-
         HandlerList.unregisterAll(this);
         Util.debugLog("Unregistering plugin services...");
         getServer().getServicesManager().unregisterAll(this);
+        Util.debugLog("Shutdown okhttp client...");
+        try {
+            OkHttpClient client = HttpUtil.getClientInstance();
+            client.dispatcher().executorService().shutdown();
+            client.connectionPool().evictAll();
+            okhttp3.Cache cache = client.cache();
+            if (cache != null) {
+                cache.close();
+            }
+        } catch (Throwable ignored) {
+        }
         Util.debugLog("Cleanup...");
         Util.debugLog("All shutdown work is finished.");
 
