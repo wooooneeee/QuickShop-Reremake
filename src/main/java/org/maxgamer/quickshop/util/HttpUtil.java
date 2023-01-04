@@ -37,10 +37,17 @@ public class HttpUtil {
     protected static final com.google.common.cache.Cache<String, String> requestCachePool = CacheBuilder.newBuilder()
             .expireAfterWrite(7, TimeUnit.DAYS)
             .build();
-    private static final File cacheFolder = Util.getCacheFolder();
+    private static final File cacheFolder = getCacheFolder();
     private static OkHttpClient client = new OkHttpClient.Builder().cache(new Cache(cacheFolder, 50L * 1024L * 1024L)).build();
 
     private static volatile boolean shutdown = false;
+
+    @NotNull
+    private static File getCacheFolder() {
+        File file = new File(Util.getCacheFolder(), "okhttp_tmp");
+        file.mkdirs();
+        return file;
+    }
 
     @Deprecated
     public static HttpUtil create() {
