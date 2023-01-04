@@ -32,7 +32,7 @@ import java.util.List;
 public class Manifest {
     private List<String> files;
     private List<String> languages;
-    private List<?> custom_languages;
+    //private List<?> custom_languages;
     private long timestamp;
     private boolean local;
 }
