@@ -28,7 +28,6 @@ import de.tr7zw.nbtapi.plugin.NBTAPI;
 import lombok.Getter;
 import lombok.Setter;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
-import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -798,16 +797,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         Util.debugLog("Unregistering plugin services...");
         getServer().getServicesManager().unregisterAll(this);
         Util.debugLog("Shutdown okhttp client...");
-        try {
-            OkHttpClient client = HttpUtil.getClientInstance();
-            client.dispatcher().executorService().shutdown();
-            client.connectionPool().evictAll();
-            okhttp3.Cache cache = client.cache();
-            if (cache != null) {
-                cache.close();
-            }
-        } catch (Throwable ignored) {
-        }
+        HttpUtil.shutdown();
         Util.debugLog("Cleanup...");
         Util.debugLog("All shutdown work is finished.");
 
