@@ -98,7 +98,7 @@ public final class PlayerFinder {
         UUID uuid = player.getUniqueId();
         emptyNameUUIDSet.remove(uuid);
         if (useOfflineStash) {
-            name2UUIDStash.put(player.getName(), uuid);
+            name2UUIDStash.put(player.getName().toLowerCase(Locale.ROOT), uuid);
         }
     }
 
@@ -112,7 +112,7 @@ public final class PlayerFinder {
             try {
                 String name = offlinePlayer.getName();
                 if (name != null) {
-                    name2UUIDStash.put(name, offlinePlayer.getUniqueId());
+                    name2UUIDStash.put(name.toLowerCase(Locale.ROOT), offlinePlayer.getUniqueId());
                 } else {
                     emptyNameUUIDSet.add(offlinePlayer.getUniqueId());
                 }
