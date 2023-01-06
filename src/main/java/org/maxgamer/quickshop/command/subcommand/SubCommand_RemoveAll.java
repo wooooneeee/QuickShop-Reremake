@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.command.CommandHandler;
 import org.maxgamer.quickshop.api.shop.Shop;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.logging.container.ShopRemoveLog;
 
@@ -47,26 +48,20 @@ public class SubCommand_RemoveAll implements CommandHandler<CommandSender> {
         if (cmdArg.length == 1) {
             //copy it first
             List<Shop> tempList = new ArrayList<>(plugin.getShopManager().getAllShops());
-            OfflinePlayer shopOwner = null;
-            for (OfflinePlayer player : plugin.getServer().getOfflinePlayers()) {
-                if (player.getName() != null && player.getName().equalsIgnoreCase(cmdArg[0])) {
-                    shopOwner = player;
-                    break;
-                }
-            }
+            PlayerFinder.PlayerProfile shopOwner = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
             if (shopOwner == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;
             }
 
             int i = 0;
-            if (!shopOwner.equals(sender)) { //Non-self shop
+            if (sender instanceof OfflinePlayer && !shopOwner.getUuid().equals(((OfflinePlayer) sender).getUniqueId())) { //Non-self shop
                 if (!sender.hasPermission("quickshop.removeall.other")) {
                     plugin.text().of(sender, "no-permission").send();
                     return;
                 }
                 for (Shop shop : tempList) {
-                    if (shop.getOwner().equals(shopOwner.getUniqueId())) {
+                    if (shop.getOwner().equals(shopOwner.getUuid())) {
                         plugin.logEvent(new ShopRemoveLog(Util.getSenderUniqueId(sender), "Deleting shop " + shop + " as requested by the /qs removeall command.", shop.saveToInfoStorage()));
                         shop.delete();
                         i++;

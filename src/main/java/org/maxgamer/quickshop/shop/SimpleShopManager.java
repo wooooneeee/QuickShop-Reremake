@@ -140,11 +140,9 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         String taxAccount = plugin.getConfig().getString("tax-account", "tax");
         if (!taxAccount.isEmpty()) {
             if (Util.isUUID(taxAccount)) {
-                this.cacheTaxAccount = new Trader(taxAccount,
-                        plugin.getServer().getOfflinePlayer(UUID.fromString(taxAccount)));
+                this.cacheTaxAccount = new Trader(taxAccount, PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount)));
             } else {
-                this.cacheTaxAccount = new Trader(taxAccount,
-                        PlayerFinder.findOfflinePlayerByName(taxAccount));
+                this.cacheTaxAccount = PlayerFinder.findPlayerProfileByName(taxAccount, true).getTrader();
             }
         } else {
             // disable tax account
@@ -157,9 +155,9 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                 plugin.getLogger().log(Level.WARNING, "unlimited-shop-owner-change-account is empty, default to \"quickshop\"");
             }
             if (Util.isUUID(uAccount)) {
-                cacheUnlimitedShopAccount = new Trader(uAccount, Bukkit.getOfflinePlayer(UUID.fromString(uAccount)));
+                cacheUnlimitedShopAccount = new Trader(uAccount, PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(uAccount)));
             } else {
-                cacheUnlimitedShopAccount = new Trader(uAccount, PlayerFinder.findOfflinePlayerByName(uAccount));
+                cacheUnlimitedShopAccount = PlayerFinder.findPlayerProfileByName(uAccount, true).getTrader();
             }
         }
         this.priceLimiter = new SimplePriceLimiter(
@@ -754,7 +752,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         }
         Trader taxAccount;
         if (shop.getTaxAccount() != null) {
-            taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+            taxAccount = Trader.adapt(PlayerFinder.findOfflinePlayerByUUID(shop.getTaxAccount()));
         } else {
             taxAccount = this.cacheTaxAccount;
         }
@@ -1155,7 +1153,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         EconomyTransaction transaction;
         Trader taxAccount;
         if (shop.getTaxAccount() != null) {
-            taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+            taxAccount = Trader.adapt(PlayerFinder.findOfflinePlayerByUUID(shop.getTaxAccount()));
         } else {
             taxAccount = this.cacheTaxAccount;
         }

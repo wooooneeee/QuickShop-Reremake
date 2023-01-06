@@ -19,7 +19,6 @@
 
 package org.maxgamer.quickshop.command.subcommand;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,12 +44,16 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
     @Override
     public void onCommand(@NotNull Player sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
         if (cmdArg.length == 1) {
-            final OfflinePlayer targetPlayer = PlayerFinder.findOfflinePlayerByName(cmdArg[0]);
+            final PlayerFinder.PlayerProfile targetPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
+            if (targetPlayer == null) {
+                plugin.text().of(sender, "unknown-player").send();
+                return;
+            }
             String targetPlayerName = targetPlayer.getName();
             if (targetPlayerName == null) {
                 targetPlayerName = "null";
             }
-            final UUID targetPlayerUUID = targetPlayer.getUniqueId();
+            final UUID targetPlayerUUID = targetPlayer.getUuid();
             List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(sender.getUniqueId());
             for (Shop shop : shopList) {
                 if (!shop.isBuying()) {
@@ -64,19 +67,27 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
                 return;
             }
 
-            final OfflinePlayer fromPlayer = PlayerFinder.findOfflinePlayerByName(cmdArg[0]);
+            final PlayerFinder.PlayerProfile fromPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
+            if (fromPlayer == null) {
+                plugin.text().of(sender, "unknown-player").send();
+                return;
+            }
             String fromPlayerName = fromPlayer.getName();
             if (fromPlayerName == null) {
                 fromPlayerName = "null";
             }
             //FIXME: Update this when drop 1.15 supports
-            final OfflinePlayer targetPlayer = PlayerFinder.findOfflinePlayerByName(cmdArg[1]);
+            final PlayerFinder.PlayerProfile targetPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[1], false);
+            if (targetPlayer == null) {
+                plugin.text().of(sender, "unknown-player").send();
+                return;
+            }
             String targetPlayerName = targetPlayer.getName();
             if (targetPlayerName == null) {
                 targetPlayerName = "null";
             }
-            final UUID targetPlayerUUID = targetPlayer.getUniqueId();
-            List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(fromPlayer.getUniqueId());
+            final UUID targetPlayerUUID = targetPlayer.getUuid();
+            List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(fromPlayer.getUuid());
             for (Shop shop : shopList) {
                 shop.setOwner(targetPlayerUUID);
             }

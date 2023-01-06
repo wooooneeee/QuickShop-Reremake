@@ -25,7 +25,11 @@ import io.papermc.lib.PaperLib;
 import lombok.EqualsAndHashCode;
 import me.lucko.helper.serialize.BlockPosition;
 import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.*;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -46,15 +50,41 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.chat.ComponentPackage;
 import org.maxgamer.quickshop.api.economy.EconomyCore;
-import org.maxgamer.quickshop.api.event.*;
-import org.maxgamer.quickshop.api.shop.*;
+import org.maxgamer.quickshop.api.event.ShopClickEvent;
+import org.maxgamer.quickshop.api.event.ShopDeleteEvent;
+import org.maxgamer.quickshop.api.event.ShopInventoryCalculateEvent;
+import org.maxgamer.quickshop.api.event.ShopInventoryEvent;
+import org.maxgamer.quickshop.api.event.ShopItemChangeEvent;
+import org.maxgamer.quickshop.api.event.ShopLoadEvent;
+import org.maxgamer.quickshop.api.event.ShopModeratorChangedEvent;
+import org.maxgamer.quickshop.api.event.ShopOwnerNameGettingEvent;
+import org.maxgamer.quickshop.api.event.ShopPriceChangeEvent;
+import org.maxgamer.quickshop.api.event.ShopSignUpdateEvent;
+import org.maxgamer.quickshop.api.event.ShopTaxAccountGettingEvent;
+import org.maxgamer.quickshop.api.event.ShopTypeChangeEvent;
+import org.maxgamer.quickshop.api.event.ShopUnloadEvent;
+import org.maxgamer.quickshop.api.event.ShopUpdateEvent;
+import org.maxgamer.quickshop.api.shop.AbstractDisplayItem;
+import org.maxgamer.quickshop.api.shop.PriceLimiterCheckResult;
+import org.maxgamer.quickshop.api.shop.PriceLimiterStatus;
+import org.maxgamer.quickshop.api.shop.Shop;
+import org.maxgamer.quickshop.api.shop.ShopInfoStorage;
+import org.maxgamer.quickshop.api.shop.ShopModerator;
+import org.maxgamer.quickshop.api.shop.ShopType;
 import org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat;
 import org.maxgamer.quickshop.economy.Trader;
 import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.logging.container.ShopRemoveLog;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import static org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat.fromLegacyText;
@@ -589,8 +619,7 @@ public class ContainerShop implements Shop {
 
     @Override
     public @NotNull String ownerName(boolean forceUsername) {
-        OfflinePlayer player = plugin.getServer().getOfflinePlayer(this.getOwner());
-        String name = player.getName();
+        String name = PlayerFinder.findNameByUUID(this.getOwner());
         if (name == null || name.isEmpty()) {
             name = plugin.text().of("unknown-owner").forLocale();
         }
@@ -1338,7 +1367,7 @@ public class ContainerShop implements Shop {
         Inventory inv = null;
         if (state.getType() == Material.ENDER_CHEST && plugin.getOpenInvPlugin() != null) {
             try {//FIXME: Need better impl
-                OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(this.getOwner());
+                OfflinePlayer offlinePlayer = PlayerFinder.findOfflinePlayerByUUID(this.getOwner());
                 IOpenInv openInv = ((IOpenInv) plugin.getOpenInvPlugin());
                 Player player = openInv.loadPlayer(offlinePlayer);
                 if (player != null) {

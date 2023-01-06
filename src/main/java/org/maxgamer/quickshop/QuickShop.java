@@ -568,7 +568,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                                 if (Util.isUUID(taxAccount)) {
                                     tax = PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount));
                                 } else {
-                                    tax = PlayerFinder.findOfflinePlayerByName((Objects.requireNonNull(taxAccount)));
+                                    tax = PlayerFinder.findOfflinePlayerByUUID(PlayerFinder.findUUIDByName(Objects.requireNonNull(taxAccount), true));
                                 }
                                 Economy_Vault vault = (Economy_Vault) economy;
                                 if (vault.isValid()) {
@@ -2289,7 +2289,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
 
     public void registerCustomCommands() {
         List<String> customCommands = getConfig().getStringList("custom-commands");
-        PluginCommand quickShopCommand = getCommand("qs");
+        PluginCommand quickShopCommand = Bukkit.getPluginCommand("qs");
         if (quickShopCommand == null) {
             getLogger().warning("Failed to get QuickShop PluginCommand instance.");
             return;

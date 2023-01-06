@@ -25,7 +25,6 @@ import lombok.ToString;
 import net.tnemc.core.TNE;
 import net.tnemc.core.common.api.TNEAPI;
 import net.tnemc.core.common.currency.TNECurrency;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -33,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.AbstractEconomy;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 
@@ -90,7 +90,7 @@ public class Economy_TNE extends AbstractEconomy {
      */
     @Override
     public boolean deposit(@NotNull UUID name, double amount, @NotNull World world, @Nullable String currency) {
-        deposit(Bukkit.getOfflinePlayer(name), amount, world, currency);
+        deposit(PlayerFinder.findOfflinePlayerByUUID(name), amount, world, currency);
         return false;
     }
 
@@ -141,7 +141,7 @@ public class Economy_TNE extends AbstractEconomy {
      */
     @Override
     public double getBalance(@NotNull UUID name, @NotNull World world, @Nullable String currency) {
-        return getBalance(Bukkit.getOfflinePlayer(name), world, currency);
+        return getBalance(PlayerFinder.findOfflinePlayerByUUID(name), world, currency);
     }
 
     /**
@@ -173,7 +173,7 @@ public class Economy_TNE extends AbstractEconomy {
      */
     @Override
     public boolean withdraw(@NotNull UUID name, double amount, @NotNull World world, @Nullable String currency) {
-        return withdraw(Bukkit.getOfflinePlayer(name), amount, world, currency);
+        return withdraw(PlayerFinder.findOfflinePlayerByUUID(name), amount, world, currency);
     }
 
     /**
