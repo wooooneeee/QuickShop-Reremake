@@ -1335,41 +1335,40 @@ public class ContainerShop implements Shop {
     public @Nullable Inventory getInventory() {
         Util.ensureThread(false);
         BlockState state = PaperLib.getBlockState(location.getBlock(), false).getState();
-        Inventory inv;
-        try {
-            if (state.getType() == Material.ENDER_CHEST
-                    && plugin.getOpenInvPlugin() != null) { //FIXME: Need better impl
+        Inventory inv = null;
+        if (state.getType() == Material.ENDER_CHEST && plugin.getOpenInvPlugin() != null) {
+            try {//FIXME: Need better impl
+                OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(this.getOwner());
                 IOpenInv openInv = ((IOpenInv) plugin.getOpenInvPlugin());
-                inv = openInv.getSpecialEnderChest(
-                        Objects.requireNonNull(
-                                openInv.loadPlayer(
-                                        plugin.getServer().getOfflinePlayer(this.moderator.getOwner()))),
-                        plugin.getServer().getOfflinePlayer((this.moderator.getOwner())).isOnline())
-                        .getBukkitInventory();
-            }
-        } catch (Exception e) {
-            Util.debugLog(e.getMessage());
-            return null;
-        }
-        InventoryHolder container;
-        try {
-            container = (InventoryHolder) state;
-            inv = container.getInventory();
-        } catch (Exception e) {
-            if (!createBackup) {
-                createBackup = Util.backupDatabase();
-                if (createBackup) {
-                    this.delete(false);
+                Player player = openInv.loadPlayer(offlinePlayer);
+                if (player != null) {
+                    inv = openInv.getSpecialEnderChest(player, offlinePlayer.isOnline()).getBukkitInventory();
                 }
-            } else {
-                this.delete(true);
+            } catch (Exception e) {
+                Util.debugLog(e.getMessage());
+                return null;
             }
-            plugin.logEvent(new ShopRemoveLog(Util.getNilUniqueId(), "Inventory Invalid", this.saveToInfoStorage()));
-            Util.debugLog(
-                    "Inventory doesn't exist anymore: " + this + " shop was removed.");
-            return null;
         }
-
+        if (inv == null) {
+            InventoryHolder container;
+            try {
+                container = (InventoryHolder) state;
+                inv = container.getInventory();
+            } catch (Exception e) {
+                if (!createBackup) {
+                    createBackup = Util.backupDatabase();
+                    if (createBackup) {
+                        this.delete(false);
+                    }
+                } else {
+                    this.delete(true);
+                }
+                plugin.logEvent(new ShopRemoveLog(Util.getNilUniqueId(), "Inventory Invalid", this.saveToInfoStorage()));
+                Util.debugLog(
+                        "Inventory doesn't exist anymore: " + this + " shop was removed.");
+                return null;
+            }
+        }
         ShopInventoryEvent event = new ShopInventoryEvent(this, inv);
         event.callEvent();
         return event.getInventory();
