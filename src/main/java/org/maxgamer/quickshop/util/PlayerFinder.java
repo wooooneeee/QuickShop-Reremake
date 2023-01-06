@@ -182,10 +182,12 @@ public final class PlayerFinder {
             }
             //Blocking web request/querying user cache
             //TODO:Adding timeout
-            if (includingBlockingWebReq && profile == null) {
+            if (profile == null && includingBlockingWebReq) {
                 OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(name);
                 profile = new PlayerProfile(player.getName(), player.getUniqueId());
-            } else {
+            }
+
+            if (profile == null) {
                 return null;
             }
             puttingToCache(profile.getName(), profile.getUuid());
