@@ -2289,7 +2289,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
 
     public void registerCustomCommands() {
         List<String> customCommands = getConfig().getStringList("custom-commands");
-        PluginCommand quickShopCommand = Bukkit.getPluginCommand("qs");
+        PluginCommand quickShopCommand = getCommand("qs");
         if (quickShopCommand == null) {
             getLogger().warning("Failed to get QuickShop PluginCommand instance.");
             return;
