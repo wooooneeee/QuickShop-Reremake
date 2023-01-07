@@ -61,7 +61,7 @@ public class SubCommand_Item implements CommandHandler<Player> {
                     plugin.text().of(sender, "blacklisted-item").send();
                     return;
                 }
-                if (!plugin.isAllowStack() && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.stacks")) {
+                if (!plugin.isAllowStack() || !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.stacks")) {
                     itemStack.setAmount(1);
                 }
                 SimplePriceLimiter limiter = new SimplePriceLimiter(
