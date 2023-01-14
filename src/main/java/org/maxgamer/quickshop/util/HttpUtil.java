@@ -28,6 +28,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class HttpUtil {
                 return cache;
             }
         }
-        try (Response response = client.newCall(new Request.Builder().get().url(url).build()).execute()) {
+        try (Response response = client.newCall(new Request.Builder().get().url(url).header("User-Agent", "Java QuickShop-" + QuickShop.getFork() + " " + QuickShop.getVersion()).build()).execute()) {
             val body = response.body();
             if (body == null) {
                 return null;
