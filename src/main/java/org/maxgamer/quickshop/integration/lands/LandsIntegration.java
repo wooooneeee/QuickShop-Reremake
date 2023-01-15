@@ -125,7 +125,7 @@ public class LandsIntegration extends AbstractQSIntegratedPlugin implements List
         if (!deleteWhenLosePermission) {
             return;
         }
-        deleteShopInLand(event.getLand(), event.getTarget(), Reason.UNTRUSTED);
+        deleteShopInLand(event.getLand(), event.getTargetUID(), Reason.UNTRUSTED);
     }
 
     private void deleteShopInLand(Land land, UUID target, Reason reason) {
