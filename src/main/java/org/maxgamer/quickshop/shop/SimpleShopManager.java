@@ -142,7 +142,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             if (Util.isUUID(taxAccount)) {
                 this.cacheTaxAccount = new Trader(taxAccount, PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount)));
             } else {
-                this.cacheTaxAccount = PlayerFinder.findPlayerProfileByName(taxAccount, true).getTrader();
+                this.cacheTaxAccount = PlayerFinder.findPlayerProfileByName(taxAccount, true, true).getTrader();
             }
         } else {
             // disable tax account
@@ -157,7 +157,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             if (Util.isUUID(uAccount)) {
                 cacheUnlimitedShopAccount = new Trader(uAccount, PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(uAccount)));
             } else {
-                cacheUnlimitedShopAccount = PlayerFinder.findPlayerProfileByName(uAccount, true).getTrader();
+                cacheUnlimitedShopAccount = PlayerFinder.findPlayerProfileByName(uAccount, true, true).getTrader();
             }
         }
         this.priceLimiter = new SimplePriceLimiter(

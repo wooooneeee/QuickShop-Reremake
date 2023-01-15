@@ -1,7 +1,7 @@
 # QuickShop-Reremake Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 162
+config-version: 163
 
 #Set the default language code the plugin should use, it will apply to:
 #Item Name
@@ -95,6 +95,12 @@ updater: true
 #Should QS be allowed to automatically report errors to the author?
 #It will also create a paste for data-recovery or debug when the server boots up.
 auto-report-errors: true
+
+#Should QS including offline player for the command which needed the specified player?
+#This might improve player experience, but can cause lag for large amount of offline player
+#false = Only include OnlinePlayer
+#true = Include all players that have ever joined your server.
+include-offlineplayer-for-command: false
 
 #Should QS use OfflinePlayer list for TabComplete?
 #This might improve player experience, but may cause lag due to searching what can be a long list.

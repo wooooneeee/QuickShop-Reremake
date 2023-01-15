@@ -365,7 +365,7 @@ public class MsgUtil {
                 if (Util.isUUID(owner)) {
                     ownerUUID = UUID.fromString(owner);
                 } else {
-                    ownerUUID = PlayerFinder.findUUIDByName(owner, true);
+                    ownerUUID = PlayerFinder.findUUIDByName(owner, true, true);
                 }
                 String message = rs.getString("message");
                 List<ShopTransactionMessageContainer> msgs = OUTGOING_MESSAGES.computeIfAbsent(ownerUUID, k -> new LinkedList<>());

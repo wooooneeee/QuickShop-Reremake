@@ -44,7 +44,7 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
     @Override
     public void onCommand(@NotNull Player sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
         if (cmdArg.length == 1) {
-            final PlayerFinder.PlayerProfile targetPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
+            final PlayerFinder.PlayerProfile targetPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[0], false, plugin.isIncludeOfflinePlayer());
             if (targetPlayer == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;
@@ -67,7 +67,7 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
                 return;
             }
 
-            final PlayerFinder.PlayerProfile fromPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
+            final PlayerFinder.PlayerProfile fromPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[0], false, plugin.isIncludeOfflinePlayer());
             if (fromPlayer == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;
@@ -77,7 +77,7 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
                 fromPlayerName = "null";
             }
             //FIXME: Update this when drop 1.15 supports
-            final PlayerFinder.PlayerProfile targetPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[1], false);
+            final PlayerFinder.PlayerProfile targetPlayer = PlayerFinder.findPlayerProfileByName(cmdArg[1], false, plugin.isIncludeOfflinePlayer());
             if (targetPlayer == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;

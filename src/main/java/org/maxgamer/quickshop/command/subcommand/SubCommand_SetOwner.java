@@ -57,7 +57,7 @@ public class SubCommand_SetOwner implements CommandHandler<Player> {
                 continue;
             }
 
-            final PlayerFinder.PlayerProfile newShopOwnerProfile = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
+            final PlayerFinder.PlayerProfile newShopOwnerProfile = PlayerFinder.findPlayerProfileByName(cmdArg[0], false, plugin.isIncludeOfflinePlayer());
             if (newShopOwnerProfile == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;

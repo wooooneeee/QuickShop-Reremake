@@ -48,7 +48,7 @@ public class SubCommand_RemoveAll implements CommandHandler<CommandSender> {
         if (cmdArg.length == 1) {
             //copy it first
             List<Shop> tempList = new ArrayList<>(plugin.getShopManager().getAllShops());
-            PlayerFinder.PlayerProfile shopOwner = PlayerFinder.findPlayerProfileByName(cmdArg[0], false);
+            PlayerFinder.PlayerProfile shopOwner = PlayerFinder.findPlayerProfileByName(cmdArg[0], false, plugin.isIncludeOfflinePlayer());
             if (shopOwner == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;

@@ -136,8 +136,8 @@ public final class PlayerFinder {
      * @param forceWebRequest whether to use web request, may result blocking server thread
      * @return the uuid of this player name, null when [forceWebRequest] is false
      */
-    public static PlayerProfile findPlayerProfileByName(String name, boolean forceWebRequest) {
-        UUID uuid = findUUIDByName(name, forceWebRequest);
+    public static PlayerProfile findPlayerProfileByName(String name, boolean forceWebRequest, boolean checkOfflinePlayer) {
+        UUID uuid = findUUIDByName(name, forceWebRequest, checkOfflinePlayer);
         if (uuid != null) {
             return new PlayerProfile(findNameByUUID(uuid), uuid);
         } else {
@@ -159,10 +159,11 @@ public final class PlayerFinder {
      *
      * @param name                    the player name, case ignored
      * @param includingBlockingWebReq whether to use web request, may result blocking server thread
+     * @param checkOfflinePlayer      whether to check offline player, beware that should be a large cost for some times
      * @return the uuid of this player name, null when [includingBlockingWebReq] is false
      */
     @Nullable
-    public static UUID findUUIDByName(String name, boolean includingBlockingWebReq) {
+    public static UUID findUUIDByName(String name, boolean includingBlockingWebReq, boolean checkOfflinePlayer) {
 
         UUID uuid = name2UUIDCache.getIfPresent(name.toLowerCase(Locale.ROOT));
 
@@ -177,7 +178,7 @@ public final class PlayerFinder {
             //Online
             PlayerProfile profile = findProfileByName(name, server.getOnlinePlayers(), false);
             //Offline
-            if (!useOfflineStash && profile == null) {
+            if (!useOfflineStash && checkOfflinePlayer && profile == null) {
                 profile = findProfileByName(name, Arrays.asList(server.getOfflinePlayers()), true);
             }
             //Blocking web request/querying user cache

@@ -296,6 +296,8 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     @Getter
     private boolean allowStack;
     @Getter
+    private boolean includeOfflinePlayer;
+    @Getter
     private EnvironmentChecker environmentChecker;
     @Getter
     @Nullable
@@ -569,7 +571,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                                 if (Util.isUUID(taxAccount)) {
                                     tax = PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount));
                                 } else {
-                                    tax = PlayerFinder.findOfflinePlayerByUUID(PlayerFinder.findUUIDByName(Objects.requireNonNull(taxAccount), true));
+                                    tax = PlayerFinder.findOfflinePlayerByUUID(PlayerFinder.findUUIDByName(Objects.requireNonNull(taxAccount), true, true));
                                 }
                                 Economy_Vault vault = (Economy_Vault) economy;
                                 if (vault.isValid()) {
@@ -672,6 +674,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
         this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
         this.allowStack = this.getConfig().getBoolean("shop.allow-stacks");
+        this.includeOfflinePlayer = this.getConfig().getBoolean("include-offlineplayer-for-command");
         this.currency = this.getConfig().getString("currency");
         this.loggingLocation = this.getConfig().getInt("logging.location");
         if (StringUtils.isEmpty(this.currency)) {
@@ -2218,6 +2221,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
         if (selectedVersion == 161) {
             getConfig().set("database.mysql-connect-options", new ArrayList<>(Arrays.asList("autoReconnect=true", "useUnicode=true", "characterEncoding=utf8")));
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 161) {
+            getConfig().set("include-offlineplayer-for-command", false);
             getConfig().set("config-version", ++selectedVersion);
         }
         if (getConfig().isSet("shop.shop")) {
