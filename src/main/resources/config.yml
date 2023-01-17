@@ -14,7 +14,11 @@ config-version: 163
 game-language: default
 
 #Choose which languages should be enabled
-#Any client connect to server that using disabled language, will fallback to game-language option there
+#All clients connect to server that using disabled language using following fallback logic:
+# 1. if just one language was enabled, then it will use this language (Static language)
+# 2. if not, it will use the value of game-language option there
+# 3. if still could not find a valid language, it will use built-in en_us language
+#
 #Set to - '*' to enable all available languages
 #The language files will automatically update thorough Crowdin OTA system, you can translate it there:
 #https://crowdin.com/project/quickshop-reremake
