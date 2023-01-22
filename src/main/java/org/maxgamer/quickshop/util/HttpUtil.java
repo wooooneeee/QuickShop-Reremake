@@ -39,7 +39,7 @@ public class HttpUtil {
             .expireAfterWrite(7, TimeUnit.DAYS)
             .build();
     private static final File cacheFolder = getCacheFolder();
-    private static OkHttpClient client = new OkHttpClient.Builder().cache(new Cache(cacheFolder, 50L * 1024L * 1024L)).build();
+    private static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).cache(new Cache(cacheFolder, 50L * 1024L * 1024L)).build();
 
     private static volatile boolean shutdown = false;
 
