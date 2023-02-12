@@ -20,6 +20,7 @@
 package org.maxgamer.quickshop.shop;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.EconomyTransaction;
 import org.maxgamer.quickshop.api.shop.Shop;
@@ -28,6 +29,7 @@ import org.maxgamer.quickshop.util.Util;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,26 +97,37 @@ public class ShopPurger {
         }
         if (pendingRemovalShops.size() > 0) {
             plugin.getLogger().info("[Shop Purger] Found " + pendingRemovalShops.size() + " need to removed, will remove in the next tick.");
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                for (Shop shop : pendingRemovalShops) {
-                    shop.delete(false);
-                    if (returnCreationFee) {
-                        EconomyTransaction transaction =
-                                EconomyTransaction.builder()
-                                        .amount(plugin.getConfig().getDouble("shop.cost"))
-                                        .allowLoan(false)
-                                        .core(QuickShop.getInstance().getEconomy())
-                                        .currency(shop.getCurrency())
-                                        .world(shop.getLocation().getWorld())
-                                        .to(shop.getOwner())
-                                        .build();
-                        transaction.failSafeCommit();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Iterator<Shop> shopIterator = pendingRemovalShops.iterator();
+                    long startTimeMs = System.currentTimeMillis();
+                    while (shopIterator.hasNext()) {
+                        if (startTimeMs - System.currentTimeMillis() > 130) {
+                            plugin.getLogger().info("[Shop Purger] it seems taking long time to purge shop (>130ms), do it in the next tick...");
+                        }
+                        Shop shop = shopIterator.next();
+                        shop.delete(false);
+                        if (returnCreationFee) {
+                            EconomyTransaction transaction =
+                                    EconomyTransaction.builder()
+                                            .amount(plugin.getConfig().getDouble("shop.cost"))
+                                            .allowLoan(false)
+                                            .core(QuickShop.getInstance().getEconomy())
+                                            .currency(shop.getCurrency())
+                                            .world(shop.getLocation().getWorld())
+                                            .to(shop.getOwner())
+                                            .build();
+                            transaction.failSafeCommit();
+                        }
+                        shopIterator.remove();
+                        plugin.getLogger().info("[Shop Purger] Shop " + shop + " has been purged.");
                     }
-                    plugin.getLogger().info("[Shop Purger] Shop " + shop + " has been purged.");
+                    plugin.getLogger().info("[Shop Purger] Task completed, " + pendingRemovalShops.size() + " shops was purged");
+                    this.cancel();
+                    executing = false;
                 }
-                plugin.getLogger().info("[Shop Purger] Task completed, " + pendingRemovalShops.size() + " shops was purged");
-                executing = false;
-            }, 1L);
+            }.runTaskTimer(plugin, 1L, 1L);
         } else {
             plugin.getLogger().info("[Shop Purger] Task completed, No shops need to purge.");
             executing = false;
