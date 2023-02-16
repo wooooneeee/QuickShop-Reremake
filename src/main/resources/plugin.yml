@@ -45,6 +45,7 @@ softdepend:
   - Reserve
   - PlaceholderAPI
   - NoCheatPlus
+  - Spartan
   - LuckPerms
   - PermissionEx
   - GroupManager
