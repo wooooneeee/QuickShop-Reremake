@@ -31,6 +31,20 @@ public interface CompatibilityModule {
      */
     @NotNull String getName();
 
+    /***
+     * Call on registering module
+     */
+    default void register() {
+
+    }
+
+    /**
+     * Call on unregister module
+     */
+    default void unregister() {
+
+    }
+
     /**
      * Gets the CompatibilityModule provider plugin instance
      *
