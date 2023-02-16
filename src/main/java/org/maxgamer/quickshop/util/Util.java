@@ -552,7 +552,9 @@ public class Util {
                 } else if (potionMeta.hasCustomEffects()) {
                     PotionEffect potionEffect = potionMeta.getCustomEffects().get(0);
                     if (potionEffect != null) {
-                        int level = potionEffect.getAmplifier();
+                        // https://hub.spigotmc.org/jira/browse/SPIGOT-1697
+                        // Internal api notes: amplifier starts from zero, so plus one to get the correct result
+                        int level = potionEffect.getAmplifier() + 1;
                         return MsgUtil.getPotioni18n(potionEffect.getType()) + " " + (level <= 10 ? RomanNumber.toRoman(potionEffect.getAmplifier()) : level);
                     }
                 }

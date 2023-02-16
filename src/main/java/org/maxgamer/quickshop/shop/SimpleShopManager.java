@@ -1356,7 +1356,9 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             }
             if (potionMeta.hasCustomEffects()) {
                 for (PotionEffect potionEffect : potionMeta.getCustomEffects()) {
-                    int level = potionEffect.getAmplifier();
+                    // https://hub.spigotmc.org/jira/browse/SPIGOT-1697
+                    // Internal api notes: amplifier starts from zero, so plus one to get the correct result
+                    int level = potionEffect.getAmplifier() + 1;
                     chatSheetPrinter.printLine(ChatColor.YELLOW + MsgUtil.getPotioni18n(potionEffect.getType()) + " " + (level <= 10 ? RomanNumber.toRoman(potionEffect.getAmplifier()) : level));
                 }
             }
