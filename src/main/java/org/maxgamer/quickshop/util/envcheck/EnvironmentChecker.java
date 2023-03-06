@@ -27,14 +27,25 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.shop.AbstractDisplayItem;
 import org.maxgamer.quickshop.api.shop.DisplayType;
 import org.maxgamer.quickshop.shop.VirtualDisplayItem;
-import org.maxgamer.quickshop.util.*;
+import org.maxgamer.quickshop.util.GameVersion;
+import org.maxgamer.quickshop.util.JsonUtil;
+import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.ReflectFactory;
+import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.security.JarVerifyTool;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -451,13 +462,14 @@ public final class EnvironmentChecker {
         return new ResultContainer(CheckResult.PASSED, "Passed checks");
     }
 
+    /* No idea why ghost adding this check, groupmanager should work along with QS
     @EnvCheckEntry(name = "Permission Manager Test", priority = 10, stage = EnvCheckEntry.Stage.ON_ENABLE)
     public ResultContainer permManagerConflictTest() {
         if (plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
             return new ResultContainer(CheckResult.WARNING, "WARNING: Unsupported plugin management plugin [GroupManager] installed, the permissions may not working.");
         }
         return new ResultContainer(CheckResult.PASSED, "Passed checks");
-    }
+    }*/
 
     @EnvCheckEntry(name = "End of life Test", priority = Integer.MAX_VALUE, stage = EnvCheckEntry.Stage.ON_ENABLE)
     public ResultContainer eolTest() {
