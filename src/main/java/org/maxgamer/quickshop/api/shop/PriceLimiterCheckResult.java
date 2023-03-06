@@ -68,20 +68,27 @@ public interface PriceLimiterCheckResult {
 
     default void sendErrorMsg(QuickShop plugin, CommandSender sender, String input, String itemName) {
         boolean decFormat = plugin.getConfig().getBoolean("use-decimal-format");
+        String maxPriceStr;
+        String minPriceStr;
+        if (decFormat) {
+            maxPriceStr = MsgUtil.decimalFormat(getMax());
+            minPriceStr = MsgUtil.decimalFormat(getMin());
+        } else {
+            maxPriceStr = Double.toString(getMax());
+            minPriceStr = Double.toString(getMin());
+        }
         switch (getStatus()) {
             case REACHED_PRICE_MIN_LIMIT:
                 plugin.text().of(sender, "price-too-cheap",
-                        (decFormat) ? MsgUtil.decimalFormat(getMax())
-                                : Double.toString(getMin())).send();
+                        minPriceStr).send();
             case REACHED_PRICE_MAX_LIMIT:
                 plugin.text().of(sender, "price-too-high",
-                        (decFormat) ? MsgUtil.decimalFormat(getMax())
-                                : Double.toString(getMin())).send();
+                        maxPriceStr).send();
             case PRICE_RESTRICTED:
                 plugin.text().of(sender, "restricted-prices",
                         itemName,
-                        String.valueOf(getMin()),
-                        String.valueOf(getMax())).send();
+                        minPriceStr,
+                        maxPriceStr).send();
             case NOT_VALID:
                 plugin.text().of(sender, "not-a-number", input).send();
             case NOT_A_WHOLE_NUMBER:
@@ -91,8 +98,8 @@ public interface PriceLimiterCheckResult {
             default:
                 plugin.text().of(sender, "restricted-prices",
                         itemName,
-                        String.valueOf(getMin()),
-                        String.valueOf(getMax())).send();
+                        minPriceStr,
+                        maxPriceStr).send();
         }
     }
 }
