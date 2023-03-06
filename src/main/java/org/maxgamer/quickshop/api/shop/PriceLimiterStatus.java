@@ -6,5 +6,6 @@ public enum PriceLimiterStatus {
     REACHED_PRICE_MIN_LIMIT,
     PRICE_RESTRICTED,
     NOT_A_WHOLE_NUMBER,
-    NOT_VALID
+    NOT_VALID,
+    REACH_DIGITS_LIMIT,
 }

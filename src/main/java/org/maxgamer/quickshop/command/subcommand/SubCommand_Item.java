@@ -64,16 +64,10 @@ public class SubCommand_Item implements CommandHandler<Player> {
                 if (!plugin.isAllowStack() || !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.stacks")) {
                     itemStack.setAmount(1);
                 }
-                SimplePriceLimiter limiter = new SimplePriceLimiter(
-                        plugin.getConfig().getDouble("shop.minimum-price"),
-                        plugin.getConfig().getInt("shop.maximum-price"),
-                        plugin.getConfig().getBoolean("shop.allow-free-shop"),
-                        plugin.getConfig().getBoolean("whole-number-prices-only"));
+                SimplePriceLimiter limiter = new SimplePriceLimiter(plugin);
                 PriceLimiterCheckResult checkResult = limiter.check(itemStack, shop.getPrice());
                 if (checkResult.getStatus() != PriceLimiterStatus.PASS) {
-                    plugin.text().of(sender, "restricted-prices", MsgUtil.getTranslateText(shop.getItem()),
-                            String.valueOf(checkResult.getMin()),
-                            String.valueOf(checkResult.getMax())).send();
+                    checkResult.sendErrorMsg(plugin, sender, "", MsgUtil.getTranslateText(shop.getItem()));
                     return;
                 }
                 shop.setItem(itemStack);

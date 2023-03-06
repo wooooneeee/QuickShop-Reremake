@@ -63,6 +63,7 @@ import org.maxgamer.quickshop.api.event.ShopTaxEvent;
 import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.PriceLimiter;
 import org.maxgamer.quickshop.api.shop.PriceLimiterCheckResult;
+import org.maxgamer.quickshop.api.shop.PriceLimiterStatus;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.api.shop.ShopChunk;
@@ -83,7 +84,6 @@ import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 import org.maxgamer.quickshop.util.reload.Reloadable;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -160,11 +160,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                 cacheUnlimitedShopAccount = PlayerFinder.findPlayerProfileByName(uAccount, true, true).getTrader();
             }
         }
-        this.priceLimiter = new SimplePriceLimiter(
-                plugin.getConfig().getDouble("shop.minimum-price"),
-                plugin.getConfig().getInt("shop.maximum-price"),
-                plugin.getConfig().getBoolean("shop.allow-free-shop"),
-                plugin.getConfig().getBoolean("whole-number-prices-only"));
+        this.priceLimiter = new SimplePriceLimiter(plugin);
         this.useOldCanBuildAlgorithm = plugin.getConfig().getBoolean("limits.old-algorithm");
         this.autoSign = plugin.getConfig().getBoolean("shop.auto-sign");
     }
@@ -942,56 +938,17 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         double price;
         try {
             price = Double.parseDouble(message);
-            if (Double.isInfinite(price)) {
-                plugin.text().of(p, "exceeded-maximum", message).send();
-                return;
-            }
-            String strFormat = new DecimalFormat("#.#########").format(Math.abs(price))
-                    .replace(",", ".");
-            String[] processedDouble = strFormat.split("\\.");
-            if (processedDouble.length > 1) {
-                int maximumDigitsLimit = plugin.getConfig()
-                        .getInt("maximum-digits-in-price", -1);
-                if (processedDouble[1].length() > maximumDigitsLimit
-                        && maximumDigitsLimit != -1) {
-                    plugin.text().of(p, "digits-reach-the-limit", String.valueOf(maximumDigitsLimit)).send();
-                    return;
-                }
-            }
         } catch (NumberFormatException ex) {
             Util.debugLog(ex.getMessage());
             plugin.text().of(p, "not-a-number", message).send();
             return;
         }
 
-        // Price limit checking
-        boolean decFormat = plugin.getConfig().getBoolean("use-decimal-format");
-
         PriceLimiterCheckResult priceCheckResult = this.priceLimiter.check(info.getItem(), price);
 
-        switch (priceCheckResult.getStatus()) {
-            case REACHED_PRICE_MIN_LIMIT:
-                plugin.text().of(p, "price-too-cheap",
-                        (decFormat) ? MsgUtil.decimalFormat(this.priceLimiter.getMaxPrice())
-                                : Double.toString(this.priceLimiter.getMinPrice())).send();
-                return;
-            case REACHED_PRICE_MAX_LIMIT:
-                plugin.text().of(p, "price-too-high",
-                        (decFormat) ? MsgUtil.decimalFormat(this.priceLimiter.getMaxPrice())
-                                : Double.toString(this.priceLimiter.getMinPrice())).send();
-                return;
-            case PRICE_RESTRICTED:
-                plugin.text().of(p, "restricted-prices",
-                        MsgUtil.getTranslateText(info.getItem()),
-                        String.valueOf(priceCheckResult.getMin()),
-                        String.valueOf(priceCheckResult.getMax())).send();
-                return;
-            case NOT_VALID:
-                plugin.text().of(p, "not-a-number", message).send();
-                return;
-            case NOT_A_WHOLE_NUMBER:
-                plugin.text().of(p, "not-a-integer", message).send();
-                return;
+        if (priceCheckResult.getStatus() != PriceLimiterStatus.PASS) {
+            priceCheckResult.sendErrorMsg(plugin, p, message, MsgUtil.getTranslateText(info.getItem()));
+            return;
         }
 
         // Set to 1 when disabled stacking shop

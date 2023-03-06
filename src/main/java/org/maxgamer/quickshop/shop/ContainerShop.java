@@ -1032,27 +1032,9 @@ public class ContainerShop implements Shop {
 
         // check price restriction
         PriceLimiterCheckResult priceRestriction = plugin.getShopManager().getPriceLimiter().check(item, price);
-        boolean markUpdate = false;
         if (priceRestriction.getStatus() != PriceLimiterStatus.PASS) {
-            if (priceRestriction.getStatus() == PriceLimiterStatus.NOT_A_WHOLE_NUMBER) {
-                setDirty();
-                price = Math.floor(price);
-                markUpdate = true;
-            } else if (priceRestriction.getStatus() == PriceLimiterStatus.NOT_VALID) {
-                setDirty();
-                price = priceRestriction.getMin();
-                markUpdate = true;
-            }
-            if (price < priceRestriction.getMin()) {
-                setDirty();
-                price = priceRestriction.getMin();
-                markUpdate = true;
-            } else if (price > priceRestriction.getMax()) {
-                setDirty();
-                price = priceRestriction.getMax();
-                markUpdate = true;
-            }
-            if (markUpdate) {
+            if (price != priceRestriction.getPriceShouldBe()) {
+                price = priceRestriction.getPriceShouldBe();
                 update();
             }
         }

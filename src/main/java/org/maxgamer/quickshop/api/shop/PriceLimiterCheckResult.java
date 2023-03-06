@@ -19,6 +19,10 @@
 
 package org.maxgamer.quickshop.api.shop;
 
+import org.bukkit.command.CommandSender;
+import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.util.MsgUtil;
+
 /**
  * Result of PriceLimiter check
  */
@@ -43,4 +47,52 @@ public interface PriceLimiterCheckResult {
      * @return Max price
      */
     double getMax();
+
+    /**
+     * Get the price max digit should be
+     *
+     * @return the max digit limit
+     */
+    default int getMaxDigit() {
+        return -1;
+    }
+
+    /**
+     * Get the price should be in this limitation
+     *
+     * @return the price after adjusted
+     */
+    default double getPriceShouldBe() {
+        return getMin();
+    }
+
+    default void sendErrorMsg(QuickShop plugin, CommandSender sender, String input, String itemName) {
+        boolean decFormat = plugin.getConfig().getBoolean("use-decimal-format");
+        switch (getStatus()) {
+            case REACHED_PRICE_MIN_LIMIT:
+                plugin.text().of(sender, "price-too-cheap",
+                        (decFormat) ? MsgUtil.decimalFormat(getMax())
+                                : Double.toString(getMin())).send();
+            case REACHED_PRICE_MAX_LIMIT:
+                plugin.text().of(sender, "price-too-high",
+                        (decFormat) ? MsgUtil.decimalFormat(getMax())
+                                : Double.toString(getMin())).send();
+            case PRICE_RESTRICTED:
+                plugin.text().of(sender, "restricted-prices",
+                        itemName,
+                        String.valueOf(getMin()),
+                        String.valueOf(getMax())).send();
+            case NOT_VALID:
+                plugin.text().of(sender, "not-a-number", input).send();
+            case NOT_A_WHOLE_NUMBER:
+                plugin.text().of(sender, "not-a-integer", input).send();
+            case REACH_DIGITS_LIMIT:
+                plugin.text().of(sender, "digits-reach-the-limit", String.valueOf(getMaxDigit()));
+            default:
+                plugin.text().of(sender, "restricted-prices",
+                        itemName,
+                        String.valueOf(getMin()),
+                        String.valueOf(getMax())).send();
+        }
+    }
 }
