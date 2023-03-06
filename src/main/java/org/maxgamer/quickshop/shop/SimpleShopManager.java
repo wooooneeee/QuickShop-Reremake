@@ -944,6 +944,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             return;
         }
 
+        // Price limit checking
         PriceLimiterCheckResult priceCheckResult = this.priceLimiter.check(info.getItem(), price);
 
         if (priceCheckResult.getStatus() != PriceLimiterStatus.PASS) {
