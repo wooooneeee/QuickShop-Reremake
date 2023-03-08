@@ -65,7 +65,7 @@ public class SimplePriceLimiter implements PriceLimiter {
     private DecimalFormat getDecimalFormat() {
         if (decimalFormat == null) {
             StringBuilder builder = new StringBuilder("#.");
-            for (int i = 0; i <= maximumDigitsInPrice; i++) {
+            for (int i = 0; i <= (maximumDigitsInPrice + 1); i++) {
                 builder.append("#");
             }
             decimalFormat = new DecimalFormat(builder.toString());
