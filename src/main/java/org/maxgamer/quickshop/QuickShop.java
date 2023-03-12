@@ -2223,9 +2223,18 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             getConfig().set("database.mysql-connect-options", new ArrayList<>(Arrays.asList("autoReconnect=true", "useUnicode=true", "characterEncoding=utf8")));
             getConfig().set("config-version", ++selectedVersion);
         }
-        if (selectedVersion == 161) {
+        if (selectedVersion == 162) {
             getConfig().set("include-offlineplayer-for-command", false);
             getConfig().set("config-version", ++selectedVersion);
+        }
+        //Fix broken maximum-digits-in-price option
+        if (getConfig().isSet("maximum-digits-in-price")) {
+            int maximumDigitsInPrice = getConfig().getInt("maximum-digits-in-price", -1);
+            int maximumDigitsInPriceNew = getConfig().getInt("shop.maximum-digits-in-price", -1);
+            if (maximumDigitsInPrice != -1 && maximumDigitsInPriceNew == -1) {
+                getConfig().set("shop.maximum-digits-in-price", maximumDigitsInPrice);
+            }
+            getConfig().set("maximum-digits-in-price", null);
         }
         if (getConfig().isSet("shop.shop")) {
             getConfig().set("shop.shop", null);

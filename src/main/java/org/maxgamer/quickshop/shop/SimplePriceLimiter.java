@@ -59,7 +59,7 @@ public class SimplePriceLimiter implements PriceLimiter {
                 plugin.getConfig().getInt("shop.maximum-price"),
                 plugin.getConfig().getBoolean("shop.allow-free-shop"),
                 plugin.getConfig().getBoolean("whole-number-prices-only"),
-                plugin.getConfig().getInt("maximum-digits-in-price", -1));
+                plugin.getConfig().getInt("shop.maximum-digits-in-price", -1));
     }
 
     private DecimalFormat getDecimalFormat() {
