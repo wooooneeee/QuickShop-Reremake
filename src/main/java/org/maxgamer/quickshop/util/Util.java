@@ -1192,11 +1192,18 @@ public class Util {
         if (StringUtils.isEmpty(text)) {
             return "";
         }
+
         MineDownParser parser = MINEDOWN.get().parser();
         parser.reset();
         //A hack for saving reset character
         text = text.replace("&r", "&l&r").replace("§r", "§l§r");
-        return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).backwardsCompatibility(true).parse(text).create());
+        String parseResult = toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).backwardsCompatibility(true).parse(text).create());
+        if (parseResult.isEmpty()) {
+            //Pure color code hack handle
+            return parseColours(text + "😂").replace("😂", "");
+        } else {
+            return parseResult;
+        }
     }
 
     /**
