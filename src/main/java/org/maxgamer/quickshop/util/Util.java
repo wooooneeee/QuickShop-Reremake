@@ -582,9 +582,9 @@ public class Util {
     /**
      * Check all enchantments on a book and return true if they contain the
      * nameToMatch
-     * 
-     * @param itemStack The enchanted book itemstack
-     * @param String    The name of the enchant to check the book for
+     *
+     * @param itemStack   The enchanted book itemstack
+     * @param nameToMatch The name of the enchant to check the book for
      * @return The names of enchants contained on the enchanted book
      */
     @NotNull
