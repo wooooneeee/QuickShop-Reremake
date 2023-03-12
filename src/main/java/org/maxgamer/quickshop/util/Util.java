@@ -1196,7 +1196,7 @@ public class Util {
         parser.reset();
         //A hack for saving reset character
         text = text.replace("&r", "&l&r").replace("§r", "§l§r");
-        return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).backwardsCompatibility(true).parse(text).create());
+        return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).enable(MineDownParser.Option.APPEND_COLORS_TO_EMPTY_STRING).backwardsCompatibility(true).parse(text).create());
     }
 
     /**

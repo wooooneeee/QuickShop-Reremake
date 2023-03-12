@@ -754,9 +754,9 @@
             <artifactId>rollbar-java</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.themoep</groupId>
-            <artifactId>minedown</artifactId>
-            <version>1.7.1-SNAPSHOT</version>
+            <groupId>com.github.PotatoCraft-Studio</groupId>
+            <artifactId>MineDown</artifactId>
+            <version>1.7.1-modified</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
