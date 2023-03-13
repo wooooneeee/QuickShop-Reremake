@@ -1241,7 +1241,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                         MsgUtil.getTranslateText(shop.getItem()),
                         format(total, shop)).forLocale());
         if (plugin.getConfig().getBoolean("show-tax")) {
-            double tax = plugin.getConfig().getDouble("tax");
+            double tax = getTax(shop, seller);
             if (tax != 0) {
                 if (!seller.equals(shop.getOwner())) {
                     chatSheetPrinter.printLine(
