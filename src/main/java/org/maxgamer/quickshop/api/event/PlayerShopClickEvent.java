@@ -1,5 +1,5 @@
 /*
- * This file is a part of project QuickShop, the name is ShopClickEvent.java
+ * This file is a part of project QuickShop, the name is PlayerShopClickEvent.java
  *  Copyright (C) PotatoCraft Studio and contributors
  *
  *  This program is free software: you can redistribute it and/or modify it
@@ -19,48 +19,30 @@
 
 package org.maxgamer.quickshop.api.event;
 
-import org.bukkit.event.Cancellable;
+import lombok.Getter;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.api.shop.Shop;
 
 /**
- * Calling when shop clicked
+ * A click event which have player variable
  * <p>
- * Deprecated, use PlayerShopClickEvent instead
+ * Since  5.1.1.3
  */
-@Deprecated
-public class ShopClickEvent extends AbstractQSEvent implements Cancellable {
+public class PlayerShopClickEvent extends ShopClickEvent {
 
-    @NotNull
-    private final Shop shop;
 
-    private boolean cancelled;
+    @Getter
+    private final Player player;
 
     /**
      * Call when shop was clicked.
      *
-     * @param shop The shop bought from
+     * @param shop   The shop bought from
+     * @param player the player clicking shop
      */
-    public ShopClickEvent(@NotNull Shop shop) {
-        this.shop = shop;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
-    /**
-     * Getting the shops that clicked
-     *
-     * @return Clicked shop
-     */
-    public @NotNull Shop getShop() {
-        return this.shop;
+    public PlayerShopClickEvent(@NotNull Shop shop, Player player) {
+        super(shop);
+        this.player = player;
     }
 }
