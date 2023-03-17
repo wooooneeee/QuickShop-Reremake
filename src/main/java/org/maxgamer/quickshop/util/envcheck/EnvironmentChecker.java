@@ -422,7 +422,7 @@ public final class EnvironmentChecker {
         GameVersion gameVersion = GameVersion.get(nmsVersion);
         Throwable throwable;
         if (!gameVersion.isVirtualDisplaySupports()) {
-            throwable = new IllegalStateException("Version not supports Virtual DisplayItem.");
+            throwable = new IllegalStateException("This game version " + gameVersion + " not supports Virtual DisplayItem.");
         } else {
             if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
                 throwable = VirtualDisplayItem.PacketFactory.testFakeItem();
