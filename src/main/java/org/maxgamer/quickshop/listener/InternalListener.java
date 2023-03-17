@@ -27,14 +27,23 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.api.event.*;
+import org.maxgamer.quickshop.api.event.ShopCreateEvent;
+import org.maxgamer.quickshop.api.event.ShopDeleteEvent;
+import org.maxgamer.quickshop.api.event.ShopInventoryCalculateEvent;
+import org.maxgamer.quickshop.api.event.ShopModeratorChangedEvent;
+import org.maxgamer.quickshop.api.event.ShopPriceChangeEvent;
+import org.maxgamer.quickshop.api.event.ShopPurchaseEvent;
+import org.maxgamer.quickshop.api.event.ShopSuccessPurchaseEvent;
 import org.maxgamer.quickshop.shop.SimpleShopModerator;
 import org.maxgamer.quickshop.util.Util;
-import org.maxgamer.quickshop.util.logging.container.*;
+import org.maxgamer.quickshop.util.logging.container.PlayerEconomyPreCheckLog;
+import org.maxgamer.quickshop.util.logging.container.ShopCreationLog;
+import org.maxgamer.quickshop.util.logging.container.ShopModeratorChangedLog;
+import org.maxgamer.quickshop.util.logging.container.ShopPriceChangedLog;
+import org.maxgamer.quickshop.util.logging.container.ShopPurchaseLog;
+import org.maxgamer.quickshop.util.logging.container.ShopRemoveLog;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
-
-import java.util.Objects;
 
 
 public class InternalListener extends AbstractQSListener {
@@ -94,7 +103,7 @@ public class InternalListener extends AbstractQSListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void shopPriceChanges(ShopPriceChangeEvent event) {
         if (loggingAction) {
-            plugin.logEvent(new ShopPriceChangedLog(event.getShop().saveToInfoStorage(), event.getOldPrice(), event.getOldPrice()));
+            plugin.logEvent(new ShopPriceChangedLog(event.getShop().saveToInfoStorage(), event.getOldPrice(), event.getNewPrice()));
         }
     }
 
