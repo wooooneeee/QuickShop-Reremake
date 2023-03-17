@@ -27,7 +27,7 @@ import org.maxgamer.quickshop.api.shop.Shop;
 /**
  * A click event which have player variable
  * <p>
- * Since  5.1.1.3
+ * Since  5.1.2.0
  */
 public class PlayerShopClickEvent extends ShopClickEvent {
 
