@@ -102,6 +102,7 @@ public class SimpleCompatibilityManager extends QuickShopInstanceHolder implemen
     public void register(@NotNull CompatibilityModule module) {
         if (!registeredModules.containsKey(module.getName())) {
             plugin.getLogger().info("Registering " + module.getName() + " Compatibility Module");
+            module.register();
             registeredModules.put(module.getName(), module);
         }
     }
@@ -128,12 +129,16 @@ public class SimpleCompatibilityManager extends QuickShopInstanceHolder implemen
     @Override
     public void unregister(@NotNull String moduleName) {
         plugin.getLogger().info("Unregistering " + moduleName + " compatibility module");
-        registeredModules.remove(moduleName);
+        CompatibilityModule module = registeredModules.remove(moduleName);
+        if (module != null) {
+            module.unregister();
+        }
     }
 
     @Override
     public void unregister(@NotNull CompatibilityModule module) {
         plugin.getLogger().info("Unregistering " + module.getName() + " compatibility module");
         registeredModules.remove(module.getName());
+        module.unregister();
     }
 }

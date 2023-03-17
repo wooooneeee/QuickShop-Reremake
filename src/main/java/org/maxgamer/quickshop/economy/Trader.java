@@ -20,6 +20,7 @@
 package org.maxgamer.quickshop.economy;
 
 import lombok.AllArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.util.PlayerFinder;
 
 import java.util.Map;
 import java.util.UUID;
@@ -36,13 +38,18 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Trader implements OfflinePlayer {
 
+
     @Nullable
-    private final String name;
+    private String lastKnownName;
     @NotNull
     private final OfflinePlayer offlinePlayer;
 
     public static Trader adapt(OfflinePlayer offlinePlayer) {
         return new Trader(offlinePlayer.getName(), offlinePlayer);
+    }
+
+    public static Trader adapt(PlayerFinder.PlayerProfile profile) {
+        return new Trader(profile.getName(), Bukkit.getOfflinePlayer(profile.getUuid()));
     }
 
     @Override
@@ -52,7 +59,7 @@ public class Trader implements OfflinePlayer {
 
     @Override
     public @Nullable String getName() {
-        return name == null ? offlinePlayer.getName() : name;
+        return lastKnownName == null && offlinePlayer.isOnline() ? lastKnownName = offlinePlayer.getName() : lastKnownName;
     }
 
     @Override

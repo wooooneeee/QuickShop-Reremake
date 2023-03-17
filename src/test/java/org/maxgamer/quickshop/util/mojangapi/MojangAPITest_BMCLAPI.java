@@ -21,10 +21,11 @@ package org.maxgamer.quickshop.util.mojangapi;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.maxgamer.quickshop.TestBukkitBase;
 
 import java.util.Optional;
 
-public class MojangAPITest_BMCLAPI {
+public class MojangAPITest_BMCLAPI extends TestBukkitBase {
     @Test
     public void testMojangMetaApi() {
         MojangAPI api = new MojangAPI(new MojangApiBmclApiMirror());

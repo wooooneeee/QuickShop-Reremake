@@ -20,9 +20,7 @@
 package org.maxgamer.quickshop.command.subcommand;
 
 import lombok.AllArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
@@ -76,7 +74,7 @@ public class SubCommand_Staff implements CommandHandler<Player> {
                                 MsgUtil.sendDirectMessage(sender,
                                         ChatColor.GREEN
                                                 + plugin.text().of(sender, "tableformat.left_begin").forLocale()
-                                                + Bukkit.getOfflinePlayer(uuid).getName());
+                                                + PlayerFinder.findNameByUUID(uuid));
                             }
                             return;
                         case "add":
@@ -86,19 +84,22 @@ public class SubCommand_Staff implements CommandHandler<Player> {
                             return;
                     }
                 case 2:
-                    final OfflinePlayer offlinePlayer = PlayerFinder.findOfflinePlayerByName(cmdArg[1]);
-                    String offlinePlayerName = offlinePlayer.getName();
-
+                    final PlayerFinder.PlayerProfile profile = PlayerFinder.findPlayerProfileByName(cmdArg[1], false, plugin.isIncludeOfflinePlayer());
+                    if (profile == null) {
+                        plugin.text().of(sender, "unknown-player").send();
+                        return;
+                    }
+                    String offlinePlayerName = profile.getName();
                     if (offlinePlayerName == null) {
                         offlinePlayerName = "null";
                     }
                     switch (cmdArg[0]) {
                         case "add":
-                            shop.addStaff(offlinePlayer.getUniqueId());
+                            shop.addStaff(profile.getUuid());
                             plugin.text().of(sender, "shop-staff-added", offlinePlayerName).send();
                             return;
                         case "del":
-                            shop.delStaff(offlinePlayer.getUniqueId());
+                            shop.delStaff(profile.getUuid());
                             plugin.text().of(sender,
                                     "shop-staff-deleted", offlinePlayerName).send();
                             return;

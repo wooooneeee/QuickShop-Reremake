@@ -28,6 +28,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +38,17 @@ public class HttpUtil {
     protected static final com.google.common.cache.Cache<String, String> requestCachePool = CacheBuilder.newBuilder()
             .expireAfterWrite(7, TimeUnit.DAYS)
             .build();
-    private static final OkHttpClient client = new OkHttpClient.Builder()
-            .cache(new Cache(getCacheFolder(), 50L * 1024L * 1024L)).build();
+    private static final File cacheFolder = getCacheFolder();
+    private static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).cache(new Cache(cacheFolder, 50L * 1024L * 1024L)).build();
 
+    private static volatile boolean shutdown = false;
+
+    @NotNull
+    private static File getCacheFolder() {
+        File file = new File(Util.getCacheFolder(), "okhttp_tmp");
+        file.mkdirs();
+        return file;
+    }
 
     @Deprecated
     public static HttpUtil create() {
@@ -47,17 +56,25 @@ public class HttpUtil {
     }
 
     public static Response makeGet(@NotNull String url) throws IOException {
+        checkIfNeedToRecreateClient();
         return client.newCall(new Request.Builder().get().url(url).build()).execute();
     }
 
     @NotNull
-    public static String createGet(@NotNull String url, String def) {
+    public static String createGet(@NotNull String url, String def, boolean caching) {
         String result = createGet(url, false);
         if (result == null) {
             result = def;
         }
-        requestCachePool.put(url, result);
+        if (caching) {
+            requestCachePool.put(url, result);
+        }
         return result;
+    }
+
+    @NotNull
+    public static String createGet(@NotNull String url, String def) {
+        return createGet(url, def, true);
     }
 
     @Nullable
@@ -67,6 +84,7 @@ public class HttpUtil {
 
     @Nullable
     public static String createGet(@NotNull String url, boolean flushCache) {
+        checkIfNeedToRecreateClient();
         String cache;
         if (!flushCache) {
             cache = requestCachePool.getIfPresent(url);
@@ -74,7 +92,7 @@ public class HttpUtil {
                 return cache;
             }
         }
-        try (Response response = client.newCall(new Request.Builder().get().url(url).build()).execute()) {
+        try (Response response = client.newCall(new Request.Builder().get().url(url).header("User-Agent", "Java QuickShop-" + QuickShop.getFork() + " " + QuickShop.getVersion()).build()).execute()) {
             val body = response.body();
             if (body == null) {
                 return null;
@@ -92,23 +110,43 @@ public class HttpUtil {
 
     @NotNull
     public static Response makePost(@NotNull String url, @NotNull RequestBody body) throws IOException {
+        checkIfNeedToRecreateClient();
         return client.newCall(new Request.Builder().post(body).url(url).build()).execute();
     }
 
-    @NotNull
-    private static File getCacheFolder() {
-        File file = new File(Util.getCacheFolder(), "okhttp_tmp");
-        file.mkdirs();
-        return file;
-    }
 
     public static OkHttpClient getClientInstance() {
+        checkIfNeedToRecreateClient();
         return client;
+    }
+
+    private static void checkIfNeedToRecreateClient() {
+        if (shutdown) {
+            shutdown = false;
+            client = new OkHttpClient.Builder().cache(new Cache(cacheFolder, 50L * 1024L * 1024L)).build();
+            new RuntimeException("Quickshop HTTPUtil: OkHttpClient is rebuilding, it should not happened outside the testing!").printStackTrace();
+        }
+    }
+
+    public static void shutdown() {
+        try {
+            if (!shutdown) {
+                shutdown = true;
+                client.dispatcher().executorService().shutdown();
+                client.connectionPool().evictAll();
+                okhttp3.Cache cache = client.cache();
+                if (cache != null) {
+                    cache.close();
+                }
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     @Deprecated
     @NotNull
     public OkHttpClient getClient() {
+        checkIfNeedToRecreateClient();
         return client;
     }
 }

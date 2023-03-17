@@ -21,18 +21,24 @@ package org.maxgamer.quickshop.util;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.economy.Trader;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -45,77 +51,186 @@ import java.util.logging.Level;
 public final class PlayerFinder {
 
     //Hold store for large server
-    private static final Map<String, UUID> string2UUIDStash = new java.util.concurrent.ConcurrentHashMap<>();
-    private static final Cache<String, UUID> string2UUIDCache = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build();
+    private static final Map<String, UUID> name2UUIDStash = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Cache<String, UUID> name2UUIDCache = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build();
+    private static final Cache<UUID, String> uuid2StringCache = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build();
 
-    private static volatile boolean isStashNeeded;
+    private static final Set<UUID> emptyNameUUIDSet = new ConcurrentSkipListSet<>();
 
-    private PlayerFinder() {
-    }
-
-    public static UUID findUUIDByName(String name) {
-        return findOfflinePlayerByName(name).getUniqueId();
-    }
+    private static volatile boolean useOfflineStash;
 
     @Nullable
-    private static OfflinePlayer findPlayerByName(String name, java.util.Collection<? extends org.bukkit.OfflinePlayer> players, boolean isOfflinePlayer) {
+    private static PlayerProfile findProfileByName(String name, java.util.Collection<? extends org.bukkit.OfflinePlayer> players, boolean isOfflinePlayer) {
         for (OfflinePlayer player : players) {
+            UUID uuid = player.getUniqueId();
+            if (isOfflinePlayer && emptyNameUUIDSet.contains(uuid)) {
+                continue;
+            }
             String playerName = player.getName();
             if (playerName != null) {
                 if (playerName.equalsIgnoreCase(name)) {
-                    return player;
+                    return new PlayerProfile(playerName, player.getUniqueId());
                 }
+            } else {
+                emptyNameUUIDSet.add(uuid);
             }
         }
         return null;
     }
 
-    public static Set<String> getCachedOfflinePlayerNames() {
-        return string2UUIDStash.keySet();
+    private PlayerFinder() {
     }
 
-    public static void updateStashIfNeeded(Player player) {
-        if (isStashNeeded) {
-            string2UUIDStash.put(player.getName().toLowerCase(Locale.ROOT), player.getUniqueId());
+    /**
+     * Get the unmodified list of cached offline player names
+     * will return empty when useOfflineStash is false
+     */
+    public static Set<String> getCachedOfflinePlayerNames() {
+        return Collections.unmodifiableSet(name2UUIDStash.keySet());
+    }
+
+    /**
+     * Update the cache when needed
+     *
+     * @param player player instance needed to be updated
+     */
+    public static void updateIfNeeded(Player player) {
+        UUID uuid = player.getUniqueId();
+        emptyNameUUIDSet.remove(uuid);
+        if (useOfflineStash) {
+            name2UUIDStash.put(player.getName().toLowerCase(Locale.ROOT), uuid);
         }
     }
 
     public static void doLargeOfflineCachingWork(QuickShop quickShop, OfflinePlayer[] offlinePlayers) {
         quickShop.getLogger().log(Level.INFO, "Large server detected (offline player > 2000), start offline player caching...");
-        isStashNeeded = true;
+        useOfflineStash = true;
+        int amount = 0;
+        int errorAmount = 0;
+        int doneAmount = 0;
         for (OfflinePlayer offlinePlayer : quickShop.getServer().getOfflinePlayers()) {
-            String name = offlinePlayer.getName();
-            if (name != null) {
-                string2UUIDStash.put(name, offlinePlayer.getUniqueId());
+            try {
+                String name = offlinePlayer.getName();
+                if (name != null) {
+                    name2UUIDStash.put(name.toLowerCase(Locale.ROOT), offlinePlayer.getUniqueId());
+                } else {
+                    emptyNameUUIDSet.add(offlinePlayer.getUniqueId());
+                }
+            } catch (Throwable ignored) {
+                errorAmount++;
+            }
+            amount++;
+            if (amount == 1000) {
+                doneAmount += 1000;
+                amount = 0;
+                quickShop.getLogger().log(Level.INFO, "Caching Offline player...cached " + doneAmount + "/" + offlinePlayers.length + " players, " + errorAmount + " errors got when caching players.");
             }
         }
-        quickShop.getLogger().log(Level.INFO, "Done! cached " + offlinePlayers.length + " players.");
+        quickShop.getLogger().log(Level.INFO, "Done! cached " + offlinePlayers.length + " players, " + errorAmount + " errors got when caching players.");
     }
 
-    public static OfflinePlayer findOfflinePlayerByName(String name) {
-        OfflinePlayer result;
-        UUID uuid;
+    /**
+     * Getting built-in PlayerProfile from PlayerFinder by name
+     *
+     * @param name            the player name, case ignored
+     * @param forceWebRequest whether to use web request, may result blocking server thread
+     * @return the uuid of this player name, null when [forceWebRequest] is false
+     */
+    public static PlayerProfile findPlayerProfileByName(String name, boolean forceWebRequest, boolean checkOfflinePlayer) {
+        UUID uuid = findUUIDByName(name, forceWebRequest, checkOfflinePlayer);
+        if (uuid != null) {
+            return new PlayerProfile(findNameByUUID(uuid), uuid);
+        } else {
+            return null;
+        }
+    }
 
-        uuid = string2UUIDCache.getIfPresent(name.toLowerCase(Locale.ROOT));
+    private static void puttingToCache(String realPlayerName, UUID uuid) {
+        if (realPlayerName == null) {
+            emptyNameUUIDSet.add(uuid);
+        } else {
+            uuid2StringCache.put(uuid, realPlayerName);
+            name2UUIDCache.put(realPlayerName.toLowerCase(Locale.ROOT), uuid);
+        }
+    }
 
-        if (uuid == null && !string2UUIDStash.isEmpty()) {
-            uuid = string2UUIDStash.get(name.toLowerCase(Locale.ROOT));
+    /**
+     * Get player uuid from its name
+     *
+     * @param name                    the player name, case ignored
+     * @param includingBlockingWebReq whether to use web request, may result blocking server thread
+     * @param checkOfflinePlayer      whether to check offline player, beware that should be a large cost for some times
+     * @return the uuid of this player name, null when [includingBlockingWebReq] is false
+     */
+    @Nullable
+    public static UUID findUUIDByName(String name, boolean includingBlockingWebReq, boolean checkOfflinePlayer) {
+
+        UUID uuid = name2UUIDCache.getIfPresent(name.toLowerCase(Locale.ROOT));
+
+        if (uuid == null && useOfflineStash) {
+            uuid = name2UUIDStash.get(name.toLowerCase(Locale.ROOT));
         }
 
         if (uuid != null) {
-            return Bukkit.getOfflinePlayer(uuid);
+            return uuid;
         } else {
             Server server = Bukkit.getServer();
-            result = findPlayerByName(name, server.getOnlinePlayers(), false);
-            if (result == null) {
-                result = findPlayerByName(name, Arrays.asList(server.getOfflinePlayers()), true);
+            //Online
+            PlayerProfile profile = findProfileByName(name, server.getOnlinePlayers(), false);
+            //Offline
+            if (!useOfflineStash && checkOfflinePlayer && profile == null) {
+                profile = findProfileByName(name, Arrays.asList(server.getOfflinePlayers()), true);
             }
-            if (result == null) {
-                result = Bukkit.getServer().getOfflinePlayer(name);
+            //Blocking web request/querying user cache
+            //TODO:Adding timeout
+            if (profile == null && includingBlockingWebReq) {
+                OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(name);
+                profile = new PlayerProfile(player.getName(), player.getUniqueId());
             }
-            string2UUIDCache.put(name.toLowerCase(Locale.ROOT), result.getUniqueId());
+
+            if (profile == null) {
+                return null;
+            }
+            puttingToCache(profile.getName(), profile.getUuid());
+            return profile.getUuid();
+        }
+    }
+
+    /**
+     * Get player name from its uuid
+     *
+     * @param uuid the player uuid
+     * @return the player name, null when it does not exist in local
+     */
+    @Nullable
+    public static String findNameByUUID(UUID uuid) {
+        if (emptyNameUUIDSet.contains(uuid)) {
+            return null;
+        }
+        String result = uuid2StringCache.getIfPresent(uuid);
+        if (result == null) {
+            OfflinePlayer player = findOfflinePlayerByUUID(uuid);
+            result = player.getName();
+            puttingToCache(result, uuid);
         }
         return result;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class PlayerProfile {
+        @Nullable
+        private String name;
+        @NotNull
+        private UUID uuid;
+
+        public Trader getTrader() {
+            return Trader.adapt(this);
+        }
+
+        public OfflinePlayer getOfflinePlayer() {
+            return Bukkit.getOfflinePlayer(uuid);
+        }
     }
 
     public static OfflinePlayer findOfflinePlayerByUUID(UUID uuid) {

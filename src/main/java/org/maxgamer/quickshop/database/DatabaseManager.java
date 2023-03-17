@@ -32,7 +32,11 @@ import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 import org.maxgamer.quickshop.util.reload.Reloadable;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -265,7 +269,7 @@ public class DatabaseManager implements Reloadable {
      */
     @Override
     public ReloadResult reloadModule() throws Exception {
-        init();
+        //init();
         return ReloadResult.builder().status(ReloadStatus.SUCCESS).build();
     }
 

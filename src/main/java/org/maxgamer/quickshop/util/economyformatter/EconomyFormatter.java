@@ -24,6 +24,7 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.api.economy.AbstractEconomy;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.Util;
@@ -99,11 +100,12 @@ public class EconomyFormatter implements Reloadable {
 
     @NotNull
     public String format(double n, boolean internalFormat, @NotNull World world, @Nullable String currency) {
-        if (internalFormat) {
+        AbstractEconomy economy = QuickShop.getInstance().getEconomy();
+        if (internalFormat || economy == null) {
             return getInternalFormat(n, currency);
         }
         try {
-            String formatted = QuickShop.getInstance().getEconomy().format(n, world, currency);
+            String formatted = economy.format(n, world, currency);
             if (StringUtils.isEmpty(formatted)) {
                 Util.debugLog(
                         "Use alternate-currency-symbol to formatting, Cause economy plugin returned null");

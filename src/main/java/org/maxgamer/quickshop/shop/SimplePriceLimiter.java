@@ -19,8 +19,8 @@
 
 package org.maxgamer.quickshop.shop;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
@@ -32,41 +32,84 @@ import org.maxgamer.quickshop.util.Util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Map;
 
-@AllArgsConstructor
 @Data
 public class SimplePriceLimiter implements PriceLimiter {
+
     private double minPrice;
     private double maxPrice;
     private boolean allowFreeShop;
     private boolean wholeNumberOnly;
+    private int maximumDigitsInPrice;
+    @EqualsAndHashCode.Exclude
+    private DecimalFormat decimalFormat;
+
+    public SimplePriceLimiter(double minPrice, double maxPrice, boolean allowFreeShop, boolean wholeNumberOnly, int maximumDigitsInPrice) {
+        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
+        this.allowFreeShop = allowFreeShop;
+        this.wholeNumberOnly = wholeNumberOnly;
+        this.maximumDigitsInPrice = maximumDigitsInPrice;
+    }
+
+    public SimplePriceLimiter(QuickShop plugin) {
+        this(plugin.getConfig().getDouble("shop.minimum-price"),
+                plugin.getConfig().getInt("shop.maximum-price"),
+                plugin.getConfig().getBoolean("shop.allow-free-shop"),
+                plugin.getConfig().getBoolean("whole-number-prices-only"),
+                plugin.getConfig().getInt("shop.maximum-digits-in-price", -1));
+    }
+
+    private DecimalFormat getDecimalFormat() {
+        if (decimalFormat == null) {
+            StringBuilder builder = new StringBuilder("#.");
+            for (int i = 0; i <= (maximumDigitsInPrice + 1); i++) {
+                builder.append("#");
+            }
+            decimalFormat = new DecimalFormat(builder.toString());
+        }
+        return decimalFormat;
+    }
 
     @Override
     @NotNull
     public PriceLimiterCheckResult check(@NotNull ItemStack stack, double price) {
+        SimplePriceLimiterCheckResult result = new SimplePriceLimiterCheckResult(PriceLimiterStatus.PASS, minPrice, maxPrice, price, maximumDigitsInPrice);
+
         if (Double.isInfinite(price) || Double.isNaN(price)) {
-            return new SimplePriceLimiterCheckResult(PriceLimiterStatus.NOT_VALID, minPrice, maxPrice);
+            return result.status(PriceLimiterStatus.NOT_VALID)
+                    .priceShouldBe(minPrice);
         }
-        if (allowFreeShop) {
-            if (price != 0 && price < minPrice) {
-                return new SimplePriceLimiterCheckResult(PriceLimiterStatus.REACHED_PRICE_MIN_LIMIT, minPrice, maxPrice);
+        if (maximumDigitsInPrice != -1) {
+            String strFormat = getDecimalFormat().format(Math.abs(price)).replace(",", ".");
+            String[] processedDouble = strFormat.split("\\.");
+            if (processedDouble.length > 1) {
+                if (processedDouble[1].length() > maximumDigitsInPrice) {
+                    return result.status(PriceLimiterStatus.REACH_DIGITS_LIMIT)
+                            .priceShouldBe(Double.parseDouble(processedDouble[0] + "." + processedDouble[1].substring(0, maximumDigitsInPrice)));
+                }
             }
         }
         if (wholeNumberOnly) {
             try {
+                //noinspection ResultOfMethodCallIgnored
                 BigDecimal.valueOf(price).setScale(0, RoundingMode.UNNECESSARY);
             } catch (ArithmeticException exception) {
                 Util.debugLog(exception.getMessage());
-                return new SimplePriceLimiterCheckResult(PriceLimiterStatus.NOT_A_WHOLE_NUMBER, minPrice, maxPrice);
+                return result.status(PriceLimiterStatus.NOT_A_WHOLE_NUMBER)
+                        .priceShouldBe(Math.floor(price));
             }
         }
-        if (price < minPrice) {
-            return new SimplePriceLimiterCheckResult(PriceLimiterStatus.REACHED_PRICE_MIN_LIMIT, minPrice, maxPrice);
-        }
-        if (maxPrice != -1) {
-            if (price > maxPrice) {
-                return new SimplePriceLimiterCheckResult(PriceLimiterStatus.REACHED_PRICE_MAX_LIMIT, minPrice, maxPrice);
+        if (!allowFreeShop || price != 0) {
+            if (price < minPrice) {
+                return result.status(PriceLimiterStatus.REACHED_PRICE_MIN_LIMIT)
+                        .priceShouldBe(minPrice);
+            }
+            if (maxPrice != -1 && price > maxPrice) {
+                return result.status(PriceLimiterStatus.REACHED_PRICE_MAX_LIMIT)
+                        .priceShouldBe(maxPrice);
             }
         }
         double perItemPrice;
@@ -77,11 +120,18 @@ public class SimplePriceLimiter implements PriceLimiter {
         }
         Map.Entry<Double, Double> materialLimit = Util.getPriceRestriction(stack.getType());
         if (materialLimit != null) {
-            if (perItemPrice < materialLimit.getKey() || perItemPrice > materialLimit.getValue()) {
-                return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, materialLimit.getKey(), materialLimit.getValue());
+            //Updating the max and min price
+            result.max(materialLimit.getKey()).min(materialLimit.getValue());
+            if (!allowFreeShop || price != 0) {
+                if (perItemPrice < materialLimit.getKey()) {
+                    return result.status(PriceLimiterStatus.PRICE_RESTRICTED)
+                            .priceShouldBe(materialLimit.getKey());
+                } else if (perItemPrice > materialLimit.getValue()) {
+                    return result.status(PriceLimiterStatus.PRICE_RESTRICTED)
+                            .priceShouldBe(materialLimit.getValue());
+                }
             }
-            return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PASS, materialLimit.getKey(), materialLimit.getValue());
         }
-        return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PASS, minPrice, maxPrice);
+        return result;
     }
 }

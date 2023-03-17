@@ -94,6 +94,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -551,7 +552,9 @@ public class Util {
                 } else if (potionMeta.hasCustomEffects()) {
                     PotionEffect potionEffect = potionMeta.getCustomEffects().get(0);
                     if (potionEffect != null) {
-                        int level = potionEffect.getAmplifier();
+                        // https://hub.spigotmc.org/jira/browse/SPIGOT-1697
+                        // Internal api notes: amplifier starts from zero, so plus one to get the correct result
+                        int level = potionEffect.getAmplifier() + 1;
                         return MsgUtil.getPotioni18n(potionEffect.getType()) + " " + (level <= 10 ? RomanNumber.toRoman(potionEffect.getAmplifier()) : level);
                     }
                 }
@@ -574,6 +577,34 @@ public class Util {
     public static String getItemStackName(@NotNull ItemStack itemStack) {
         String result = getItemCustomName(itemStack);
         return result == null ? MsgUtil.getItemi18n(itemStack.getType().name()) : result;
+    }
+
+    /**
+     * Check all enchantments on a book and return true if they contain the
+     * nameToMatch
+     *
+     * @param itemStack   The enchanted book itemstack
+     * @param nameToMatch The name of the enchant to check the book for
+     * @return The names of enchants contained on the enchanted book
+     */
+    @NotNull
+    public static boolean isBookEnchantmentsMatched(@NotNull ItemStack itemStack, @NotNull String nameToMatch) {
+        if (itemStack.getType() == Material.ENCHANTED_BOOK) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (!(itemMeta instanceof EnchantmentStorageMeta))
+                return false;
+            EnchantmentStorageMeta enchantmentStorageMeta = (EnchantmentStorageMeta) itemStack.getItemMeta();
+            if (enchantmentStorageMeta.hasStoredEnchants()) {
+                for (Enchantment enchantment : enchantmentStorageMeta.getStoredEnchants().keySet()) {
+                    nameToMatch = nameToMatch.toUpperCase(Locale.ROOT);
+                    if (enchantment.getKey().getKey().toUpperCase(Locale.ROOT).contains(nameToMatch)
+                            || MsgUtil.getEnchi18n(enchantment).toUpperCase(Locale.ROOT).contains(nameToMatch)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @NotNull
@@ -1165,7 +1196,7 @@ public class Util {
         parser.reset();
         //A hack for saving reset character
         text = text.replace("&r", "&l&r").replace("§r", "§l§r");
-        return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).backwardsCompatibility(true).parse(text).create());
+        return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).enable(MineDownParser.Option.APPEND_COLORS_TO_EMPTY_STRING).backwardsCompatibility(true).parse(text).create());
     }
 
     /**

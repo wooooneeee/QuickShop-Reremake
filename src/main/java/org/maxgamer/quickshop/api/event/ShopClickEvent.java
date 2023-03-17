@@ -25,7 +25,10 @@ import org.maxgamer.quickshop.api.shop.Shop;
 
 /**
  * Calling when shop clicked
+ * <p>
+ * Deprecated, use PlayerShopClickEvent instead
  */
+@Deprecated
 public class ShopClickEvent extends AbstractQSEvent implements Cancellable {
 
     @NotNull

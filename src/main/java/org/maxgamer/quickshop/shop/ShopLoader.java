@@ -491,7 +491,7 @@ public class ShopLoader {
                     shopModerator = SimpleShopModerator.deserialize(moderatorJson);
                 } catch (JsonSyntaxException ex) {
                     Util.debugLog("Updating old shop data... for " + moderatorJson);
-                    moderatorJson = PlayerFinder.findUUIDByName(moderatorJson).toString();
+                    moderatorJson = PlayerFinder.findUUIDByName(moderatorJson, true, true).toString();
                     shopModerator = new SimpleShopModerator(UUID.fromString(moderatorJson)); // New one
                     needUpdate.set(true);
                 }

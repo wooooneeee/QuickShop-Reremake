@@ -54,7 +54,12 @@ public class SubCommand_TaxAccount implements CommandHandler<Player> {
                 if (Util.isUUID(cmdArg[0])) {
                     shop.setTaxAccount(UUID.fromString(cmdArg[0]));
                 } else {
-                    shop.setTaxAccount(PlayerFinder.findUUIDByName(cmdArg[0]));
+                    UUID uuid = PlayerFinder.findUUIDByName(cmdArg[0], false, plugin.isIncludeOfflinePlayer());
+                    if (uuid == null) {
+                        plugin.text().of(sender, "unknown-player").send();
+                        return;
+                    }
+                    shop.setTaxAccount(uuid);
                 }
                 plugin.text().of(sender, "taxaccount-set", cmdArg[0]).send();
                 return;

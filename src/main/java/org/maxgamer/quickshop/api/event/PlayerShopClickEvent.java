@@ -1,5 +1,5 @@
 /*
- * This file is a part of project QuickShop, the name is Manifest.java
+ * This file is a part of project QuickShop, the name is PlayerShopClickEvent.java
  *  Copyright (C) PotatoCraft Studio and contributors
  *
  *  This program is free software: you can redistribute it and/or modify it
@@ -17,22 +17,32 @@
  *
  */
 
-package org.maxgamer.quickshop.localization.text.distributions.crowdin.bean;
+package org.maxgamer.quickshop.api.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.api.shop.Shop;
 
-import java.util.List;
+/**
+ * A click event which have player variable
+ * <p>
+ * Since  5.1.2.0
+ */
+public class PlayerShopClickEvent extends ShopClickEvent {
 
 
-@AllArgsConstructor
-@Data
-@NoArgsConstructor
-public class Manifest {
-    private List<String> files;
-    private List<String> languages;
-    //private List<?> custom_languages;
-    private long timestamp;
-    private boolean local;
+    @Getter
+    private final Player player;
+
+    /**
+     * Call when shop was clicked.
+     *
+     * @param shop   The shop bought from
+     * @param player the player clicking shop
+     */
+    public PlayerShopClickEvent(@NotNull Shop shop, Player player) {
+        super(shop);
+        this.player = player;
+    }
 }

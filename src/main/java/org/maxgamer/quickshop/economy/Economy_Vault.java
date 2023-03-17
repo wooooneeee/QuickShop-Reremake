@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.AbstractEconomy;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.economyformatter.BuiltInEconomyFormatter;
 import org.maxgamer.quickshop.util.reload.ReloadResult;
@@ -132,7 +133,7 @@ public class Economy_Vault extends AbstractEconomy implements Listener {
         if (!isValid()) {
             return false;
         }
-        return deposit(plugin.getServer().getOfflinePlayer(name), amount, world, currency);
+        return deposit(PlayerFinder.findOfflinePlayerByUUID(name), amount, world, currency);
 
     }
 
@@ -190,7 +191,7 @@ public class Economy_Vault extends AbstractEconomy implements Listener {
             return 0.0;
         }
 
-        return getBalance(plugin.getServer().getOfflinePlayer(name), world, currency);
+        return getBalance(PlayerFinder.findOfflinePlayerByUUID(name), world, currency);
 
     }
 
@@ -216,7 +217,7 @@ public class Economy_Vault extends AbstractEconomy implements Listener {
         if (!isValid()) {
             return false;
         }
-        return withdraw(plugin.getServer().getOfflinePlayer(name), amount, world, currency);
+        return withdraw(PlayerFinder.findOfflinePlayerByUUID(name), amount, world, currency);
     }
 
     @Override

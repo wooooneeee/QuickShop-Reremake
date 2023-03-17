@@ -20,7 +20,6 @@
 package org.maxgamer.quickshop.command.subcommand;
 
 import lombok.AllArgsConstructor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
@@ -58,13 +57,13 @@ public class SubCommand_SetOwner implements CommandHandler<Player> {
                 continue;
             }
 
-            final OfflinePlayer newShopOwner = PlayerFinder.findOfflinePlayerByName(cmdArg[0]);
-            if (newShopOwner.getName() == null) {
+            final PlayerFinder.PlayerProfile newShopOwnerProfile = PlayerFinder.findPlayerProfileByName(cmdArg[0], false, plugin.isIncludeOfflinePlayer());
+            if (newShopOwnerProfile == null) {
                 plugin.text().of(sender, "unknown-player").send();
                 return;
             }
-            shop.setOwner(newShopOwner.getUniqueId());
-            plugin.text().of(sender, "command.new-owner", newShopOwner.getName()).send();
+            shop.setOwner(newShopOwnerProfile.getUuid());
+            plugin.text().of(sender, "command.new-owner", newShopOwnerProfile.getName()).send();
             return;
         }
 

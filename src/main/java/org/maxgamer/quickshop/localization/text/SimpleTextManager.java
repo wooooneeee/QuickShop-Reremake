@@ -53,7 +53,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -291,7 +296,9 @@ public class SimpleTextManager implements TextManager, Reloadable {
         String result = languagesCache.getIfPresent(langCode);
         if (result == null) {
             result = "en_us";
-            if (availableLanguages.contains(langCode)) {
+            if (availableLanguages.size() == 1) {
+                result = availableLanguages.get(0);
+            } else if (availableLanguages.contains(langCode)) {
                 result = langCode;
             } else {
                 String[] splits = langCode.split("_", 2);

@@ -63,6 +63,7 @@ import org.maxgamer.quickshop.api.event.ShopTaxEvent;
 import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.PriceLimiter;
 import org.maxgamer.quickshop.api.shop.PriceLimiterCheckResult;
+import org.maxgamer.quickshop.api.shop.PriceLimiterStatus;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.api.shop.ShopChunk;
@@ -83,7 +84,6 @@ import org.maxgamer.quickshop.util.reload.ReloadResult;
 import org.maxgamer.quickshop.util.reload.ReloadStatus;
 import org.maxgamer.quickshop.util.reload.Reloadable;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -140,11 +140,9 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         String taxAccount = plugin.getConfig().getString("tax-account", "tax");
         if (!taxAccount.isEmpty()) {
             if (Util.isUUID(taxAccount)) {
-                this.cacheTaxAccount = new Trader(taxAccount,
-                        plugin.getServer().getOfflinePlayer(UUID.fromString(taxAccount)));
+                this.cacheTaxAccount = new Trader(taxAccount, PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount)));
             } else {
-                this.cacheTaxAccount = new Trader(taxAccount,
-                        PlayerFinder.findOfflinePlayerByName(taxAccount));
+                this.cacheTaxAccount = PlayerFinder.findPlayerProfileByName(taxAccount, true, true).getTrader();
             }
         } else {
             // disable tax account
@@ -157,16 +155,12 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                 plugin.getLogger().log(Level.WARNING, "unlimited-shop-owner-change-account is empty, default to \"quickshop\"");
             }
             if (Util.isUUID(uAccount)) {
-                cacheUnlimitedShopAccount = new Trader(uAccount, Bukkit.getOfflinePlayer(UUID.fromString(uAccount)));
+                cacheUnlimitedShopAccount = new Trader(uAccount, PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(uAccount)));
             } else {
-                cacheUnlimitedShopAccount = new Trader(uAccount, PlayerFinder.findOfflinePlayerByName(uAccount));
+                cacheUnlimitedShopAccount = PlayerFinder.findPlayerProfileByName(uAccount, true, true).getTrader();
             }
         }
-        this.priceLimiter = new SimplePriceLimiter(
-                plugin.getConfig().getDouble("shop.minimum-price"),
-                plugin.getConfig().getInt("shop.maximum-price"),
-                plugin.getConfig().getBoolean("shop.allow-free-shop"),
-                plugin.getConfig().getBoolean("whole-number-prices-only"));
+        this.priceLimiter = new SimplePriceLimiter(plugin);
         this.useOldCanBuildAlgorithm = plugin.getConfig().getBoolean("limits.old-algorithm");
         this.autoSign = plugin.getConfig().getBoolean("shop.auto-sign");
     }
@@ -754,7 +748,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         }
         Trader taxAccount;
         if (shop.getTaxAccount() != null) {
-            taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+            taxAccount = Trader.adapt(PlayerFinder.findOfflinePlayerByUUID(shop.getTaxAccount()));
         } else {
             taxAccount = this.cacheTaxAccount;
         }
@@ -944,22 +938,6 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         double price;
         try {
             price = Double.parseDouble(message);
-            if (Double.isInfinite(price)) {
-                plugin.text().of(p, "exceeded-maximum", message).send();
-                return;
-            }
-            String strFormat = new DecimalFormat("#.#########").format(Math.abs(price))
-                    .replace(",", ".");
-            String[] processedDouble = strFormat.split("\\.");
-            if (processedDouble.length > 1) {
-                int maximumDigitsLimit = plugin.getConfig()
-                        .getInt("maximum-digits-in-price", -1);
-                if (processedDouble[1].length() > maximumDigitsLimit
-                        && maximumDigitsLimit != -1) {
-                    plugin.text().of(p, "digits-reach-the-limit", String.valueOf(maximumDigitsLimit)).send();
-                    return;
-                }
-            }
         } catch (NumberFormatException ex) {
             Util.debugLog(ex.getMessage());
             plugin.text().of(p, "not-a-number", message).send();
@@ -967,33 +945,11 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         }
 
         // Price limit checking
-        boolean decFormat = plugin.getConfig().getBoolean("use-decimal-format");
-
         PriceLimiterCheckResult priceCheckResult = this.priceLimiter.check(info.getItem(), price);
 
-        switch (priceCheckResult.getStatus()) {
-            case REACHED_PRICE_MIN_LIMIT:
-                plugin.text().of(p, "price-too-cheap",
-                        (decFormat) ? MsgUtil.decimalFormat(this.priceLimiter.getMaxPrice())
-                                : Double.toString(this.priceLimiter.getMinPrice())).send();
-                return;
-            case REACHED_PRICE_MAX_LIMIT:
-                plugin.text().of(p, "price-too-high",
-                        (decFormat) ? MsgUtil.decimalFormat(this.priceLimiter.getMaxPrice())
-                                : Double.toString(this.priceLimiter.getMinPrice())).send();
-                return;
-            case PRICE_RESTRICTED:
-                plugin.text().of(p, "restricted-prices",
-                        MsgUtil.getTranslateText(info.getItem()),
-                        String.valueOf(priceCheckResult.getMin()),
-                        String.valueOf(priceCheckResult.getMax())).send();
-                return;
-            case NOT_VALID:
-                plugin.text().of(p, "not-a-number", message).send();
-                return;
-            case NOT_A_WHOLE_NUMBER:
-                plugin.text().of(p, "not-a-integer", message).send();
-                return;
+        if (priceCheckResult.getStatus() != PriceLimiterStatus.PASS) {
+            priceCheckResult.sendErrorMsg(plugin, p, message, MsgUtil.getTranslateText(info.getItem()));
+            return;
         }
 
         // Set to 1 when disabled stacking shop
@@ -1155,7 +1111,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         EconomyTransaction transaction;
         Trader taxAccount;
         if (shop.getTaxAccount() != null) {
-            taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+            taxAccount = Trader.adapt(PlayerFinder.findOfflinePlayerByUUID(shop.getTaxAccount()));
         } else {
             taxAccount = this.cacheTaxAccount;
         }
@@ -1285,7 +1241,7 @@ public class SimpleShopManager implements ShopManager, Reloadable {
                         MsgUtil.getTranslateText(shop.getItem()),
                         format(total, shop)).forLocale());
         if (plugin.getConfig().getBoolean("show-tax")) {
-            double tax = plugin.getConfig().getDouble("tax");
+            double tax = getTax(shop, seller);
             if (tax != 0) {
                 if (!seller.equals(shop.getOwner())) {
                     chatSheetPrinter.printLine(
@@ -1358,7 +1314,9 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             }
             if (potionMeta.hasCustomEffects()) {
                 for (PotionEffect potionEffect : potionMeta.getCustomEffects()) {
-                    int level = potionEffect.getAmplifier();
+                    // https://hub.spigotmc.org/jira/browse/SPIGOT-1697
+                    // Internal api notes: amplifier starts from zero, so plus one to get the correct result
+                    int level = potionEffect.getAmplifier() + 1;
                     chatSheetPrinter.printLine(ChatColor.YELLOW + MsgUtil.getPotioni18n(potionEffect.getType()) + " " + (level <= 10 ? RomanNumber.toRoman(potionEffect.getAmplifier()) : level));
                 }
             }

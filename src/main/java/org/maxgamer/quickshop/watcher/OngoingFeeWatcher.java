@@ -19,7 +19,6 @@
 
 package org.maxgamer.quickshop.watcher;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,6 +32,7 @@ import org.maxgamer.quickshop.localization.LocalizedMessagePair;
 import org.maxgamer.quickshop.shop.ShopTransactionMessageContainer;
 import org.maxgamer.quickshop.shop.SimpleShopManager;
 import org.maxgamer.quickshop.util.MsgUtil;
+import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
 import org.maxgamer.quickshop.util.WarningSender;
 
@@ -77,7 +77,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
                 if (allowLoan || plugin.getEconomy().getBalance(shopOwner, Objects.requireNonNull(world), shop.getCurrency()) >= cost) {
                     Trader taxAccount;
                     if (shop.getTaxAccount() != null) {
-                        taxAccount = Trader.adapt(Bukkit.getOfflinePlayer(shop.getTaxAccount()));
+                        taxAccount = Trader.adapt(PlayerFinder.findOfflinePlayerByUUID(shop.getTaxAccount()));
                     } else {
                         taxAccount = ((SimpleShopManager) plugin.getShopManager()).getCacheTaxAccount();
                     }

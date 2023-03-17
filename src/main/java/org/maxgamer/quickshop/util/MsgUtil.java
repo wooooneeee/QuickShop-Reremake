@@ -365,7 +365,7 @@ public class MsgUtil {
                 if (Util.isUUID(owner)) {
                     ownerUUID = UUID.fromString(owner);
                 } else {
-                    ownerUUID = PlayerFinder.findUUIDByName(owner);
+                    ownerUUID = PlayerFinder.findUUIDByName(owner, true, true);
                 }
                 String message = rs.getString("message");
                 List<ShopTransactionMessageContainer> msgs = OUTGOING_MESSAGES.computeIfAbsent(ownerUUID, k -> new LinkedList<>());
@@ -390,7 +390,7 @@ public class MsgUtil {
             return; // Ignore unlimited shops messages.
         }
         Util.debugLog(shopTransactionMessage.getMessage(null));
-        OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+        OfflinePlayer p = PlayerFinder.findOfflinePlayerByUUID(uuid);
         if (!p.isOnline()) {
             List<ShopTransactionMessageContainer> msgs = OUTGOING_MESSAGES.getOrDefault(uuid, new LinkedList<>());
             msgs.add(shopTransactionMessage);
@@ -427,7 +427,7 @@ public class MsgUtil {
         if (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.ignore-unlimited-shop-messages")) {
             return; // Ignore unlimited shops messages.
         }
-        OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+        OfflinePlayer p = PlayerFinder.findOfflinePlayerByUUID(uuid);
         if (!p.isOnline()) {
             List<ShopTransactionMessageContainer> msgs = OUTGOING_MESSAGES.getOrDefault(uuid, new LinkedList<>());
             msgs.add(shopTransactionMessageContainer);

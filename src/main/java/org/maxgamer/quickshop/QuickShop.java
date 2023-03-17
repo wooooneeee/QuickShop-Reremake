@@ -101,6 +101,7 @@ import org.maxgamer.quickshop.shop.ShopPurger;
 import org.maxgamer.quickshop.shop.SimpleShopManager;
 import org.maxgamer.quickshop.shop.VirtualDisplayItem;
 import org.maxgamer.quickshop.util.GameVersion;
+import org.maxgamer.quickshop.util.HttpUtil;
 import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.PermissionChecker;
@@ -228,6 +229,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
      * The economy we hook into for transactions
      */
     @Getter
+    @Nullable
     private AbstractEconomy economy;
     /**
      * Whether or not to limit players shop amounts
@@ -293,6 +295,8 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     private Cache shopCache;
     @Getter
     private boolean allowStack;
+    @Getter
+    private boolean includeOfflinePlayer;
     @Getter
     private EnvironmentChecker environmentChecker;
     @Getter
@@ -567,7 +571,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                                 if (Util.isUUID(taxAccount)) {
                                     tax = PlayerFinder.findOfflinePlayerByUUID(UUID.fromString(taxAccount));
                                 } else {
-                                    tax = PlayerFinder.findOfflinePlayerByName((Objects.requireNonNull(taxAccount)));
+                                    tax = PlayerFinder.findOfflinePlayerByUUID(PlayerFinder.findUUIDByName(Objects.requireNonNull(taxAccount), true, true));
                                 }
                                 Economy_Vault vault = (Economy_Vault) economy;
                                 if (vault.isValid()) {
@@ -670,6 +674,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
         this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
         this.allowStack = this.getConfig().getBoolean("shop.allow-stacks");
+        this.includeOfflinePlayer = this.getConfig().getBoolean("include-offlineplayer-for-command");
         this.currency = this.getConfig().getString("currency");
         this.loggingLocation = this.getConfig().getInt("logging.location");
         if (StringUtils.isEmpty(this.currency)) {
@@ -792,10 +797,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         }
 
         Util.debugLog("Cleanup listeners...");
-
         HandlerList.unregisterAll(this);
         Util.debugLog("Unregistering plugin services...");
         getServer().getServicesManager().unregisterAll(this);
+        Util.debugLog("Shutdown okhttp client...");
+        HttpUtil.shutdown();
         Util.debugLog("Cleanup...");
         Util.debugLog("All shutdown work is finished.");
 
@@ -2216,6 +2222,19 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         if (selectedVersion == 161) {
             getConfig().set("database.mysql-connect-options", new ArrayList<>(Arrays.asList("autoReconnect=true", "useUnicode=true", "characterEncoding=utf8")));
             getConfig().set("config-version", ++selectedVersion);
+        }
+        if (selectedVersion == 162) {
+            getConfig().set("include-offlineplayer-for-command", false);
+            getConfig().set("config-version", ++selectedVersion);
+        }
+        //Fix broken maximum-digits-in-price option
+        if (getConfig().isSet("maximum-digits-in-price")) {
+            int maximumDigitsInPrice = getConfig().getInt("maximum-digits-in-price", -1);
+            int maximumDigitsInPriceNew = getConfig().getInt("shop.maximum-digits-in-price", -1);
+            if (maximumDigitsInPrice != -1 && maximumDigitsInPriceNew == -1) {
+                getConfig().set("shop.maximum-digits-in-price", maximumDigitsInPrice);
+            }
+            getConfig().set("maximum-digits-in-price", null);
         }
         if (getConfig().isSet("shop.shop")) {
             getConfig().set("shop.shop", null);
