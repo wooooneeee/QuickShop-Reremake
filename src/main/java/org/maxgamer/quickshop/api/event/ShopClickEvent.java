@@ -19,6 +19,7 @@
 
 package org.maxgamer.quickshop.api.event;
 
+import org.bukkit.Warning;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.api.shop.Shop;
@@ -29,6 +30,7 @@ import org.maxgamer.quickshop.api.shop.Shop;
  * Deprecated, use PlayerShopClickEvent instead
  */
 @Deprecated
+@Warning(reason = "Deprecated for improper api event design")
 public class ShopClickEvent extends AbstractQSEvent implements Cancellable {
 
     @NotNull

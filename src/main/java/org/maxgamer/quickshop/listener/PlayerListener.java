@@ -49,6 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.economy.AbstractEconomy;
 import org.maxgamer.quickshop.api.event.PlayerShopClickEvent;
+import org.maxgamer.quickshop.api.event.ShopClickEvent;
 import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.api.shop.ShopAction;
@@ -215,7 +216,9 @@ public class PlayerListener extends AbstractQSListener {
             //Prevent use item by ancient
             e.setUseItemInHand(Event.Result.DENY);
             PlayerShopClickEvent event = new PlayerShopClickEvent(shop, p);
-            if (Util.fireCancellableEvent(event)) {
+            @SuppressWarnings("deprecation")
+            ShopClickEvent eventOld = new ShopClickEvent(shop);
+            if (Util.fireCancellableEvent(event) || Util.fireCancellableEvent(eventOld)) {
                 Util.debugLog("Ignore shop click, because some plugin cancel it.");
                 return;
             }
