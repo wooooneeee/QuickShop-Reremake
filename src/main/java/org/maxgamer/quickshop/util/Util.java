@@ -1194,10 +1194,11 @@ public class Util {
         }
         MineDownParser parser = MINEDOWN.get().parser();
         parser.reset();
-        //MineDown does not support legacy color character, so replace it as well
-        text = text.replace('§', '&');
+
+        //Fix some item name using escape character, causing rgb color could not decode correctly
+        text = text.replace("&&x", "&x").replace("§§x", "§x");
         //A hack for saving reset character
-        text = text.replace("&r", "&l&r");
+        text = text.replace("&r", "&l&r").replace("§r", "§l§r");
         return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).enable(MineDownParser.Option.APPEND_COLORS_TO_EMPTY_STRING).backwardsCompatibility(true).parse(text).create());
     }
 
