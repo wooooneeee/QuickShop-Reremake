@@ -198,12 +198,14 @@ public class BungeeQuickChat implements QuickChat {
                 builder = appendItemHoloChat(ReflectFactory.convertBukkitItemStackToJson(itemStack), message);
             }
             if (QuickShop.getPermissionManager().hasPermission(player, "quickshop.preview")) {
+                //Skip the previous component, avoid it was apply with click event
+                builder.append(" ");
                 builder.event(new ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
                         MsgUtil.fillArgs(
                                 "/qs silentpreview {0}",
                                 shop.getRuntimeRandomUniqueId().toString())));
-                builder.appendLegacy(" ", plugin.text().of(player, "menu.preview").forLocale());
+                builder.appendLegacy(plugin.text().of(player, "menu.preview").forLocale());
 
             }
             BaseComponent[] result = builder.create();
