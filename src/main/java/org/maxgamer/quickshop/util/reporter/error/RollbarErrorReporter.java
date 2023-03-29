@@ -207,7 +207,7 @@ public class RollbarErrorReporter implements IErrorReporter {
         if (!plugin.getUpdateWatcher().getUpdater().isLatest()) { // We only receive latest reports.
             return false;
         }
-        if (!plugin.getBuildInfo().buildUrl.getBuildUrl().startsWith("https://ci.codemc.io/job/PotatoCraft-Studio/")) { // Ignored custom build or 3rd fork
+        if (!plugin.getBuildInfo().getBuildUrl().startsWith("https://ci.codemc.io/job/PotatoCraft-Studio/")) { // Ignored custom build or 3rd fork
             return false;
         }
 
