@@ -37,7 +37,11 @@ import org.maxgamer.quickshop.util.Util;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 @AllArgsConstructor
@@ -123,7 +127,7 @@ public class SubCommand_Debug implements CommandHandler<CommandSender> {
             plugin.reloadConfiguration();
             plugin.getConfig().set("dev-mode", false);
             plugin.saveConfiguration();
-            plugin.reload();
+            plugin.getReloadManager().reload();
             plugin.text().of(sender, "command.now-nolonger-debuging").send();
             return;
         }
@@ -131,7 +135,7 @@ public class SubCommand_Debug implements CommandHandler<CommandSender> {
         plugin.reloadConfiguration();
         plugin.getConfig().set("dev-mode", true);
         plugin.saveConfiguration();
-        plugin.reload();
+        plugin.getReloadManager().reload();
         plugin.text().of(sender, "command.now-debuging").send();
     }
 

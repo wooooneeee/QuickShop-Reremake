@@ -423,15 +423,16 @@
             <url>https://nexus.iridiumdevelopment.net/repository/maven-releases/</url>
         </repository>-->
 
-        <!-- Temporary disable for unknown host
+        <!--
         <repository>
         <id>Sparky</id>
         <url>https://nexus.sparky.ac/repository/Sparky/</url>
         </repository>-->
+        <!-- 502 Bad Gateway
         <repository>
             <id>songoda</id>
             <url>https://repo.songoda.com/repository/public/</url>
-        </repository>
+        </repository>-->
         <!--MineDown -->
         <repository>
             <id>minebench-repo</id>
