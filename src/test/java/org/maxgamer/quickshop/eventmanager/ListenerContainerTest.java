@@ -20,6 +20,7 @@
 package org.maxgamer.quickshop.eventmanager;
 
 
+import io.papermc.paper.plugin.configuration.PluginMeta;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -49,7 +50,6 @@ public class ListenerContainerTest {
             public File getDataFolder() {
                 return null;
             }
-
             @NotNull
             @Override
             public PluginDescriptionFile getDescription() {
@@ -66,6 +66,7 @@ public class ListenerContainerTest {
             public FileConfiguration getConfiguration() {
                 return null;
             }
+
 
             @Nullable
             @Override
@@ -162,6 +163,11 @@ public class ListenerContainerTest {
             @Override
             public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
                 return false;
+            }
+
+            @Override
+            public @NotNull PluginMeta getPluginMeta() {
+                return null;
             }
 
             @Nullable

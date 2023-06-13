@@ -91,6 +91,7 @@ import org.maxgamer.quickshop.listener.LockListener;
 import org.maxgamer.quickshop.listener.PlayerListener;
 import org.maxgamer.quickshop.listener.PluginListener;
 import org.maxgamer.quickshop.listener.ShopProtectionListener;
+import org.maxgamer.quickshop.listener.SignListener;
 import org.maxgamer.quickshop.listener.WorldListener;
 import org.maxgamer.quickshop.listener.worldedit.WorldEditAdapter;
 import org.maxgamer.quickshop.localization.text.SimpleTextManager;
@@ -1054,6 +1055,10 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         // Register events
         // Listeners (These don't)
         new BlockListener(this, this.shopCache).register();
+        // SignChangeListener for 1.20+
+        if (getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
+            new SignListener(this, this.shopCache).register();
+        }
         new PlayerListener(this).register();
         new WorldListener(this).register();
         // Listeners - We decide which one to use at runtime
