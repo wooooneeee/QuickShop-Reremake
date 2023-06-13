@@ -428,11 +428,10 @@
         <id>Sparky</id>
         <url>https://nexus.sparky.ac/repository/Sparky/</url>
         </repository>-->
-        <!-- 502 Bad Gateway
         <repository>
             <id>songoda</id>
-            <url>https://repo.songoda.com/repository/public/</url>
-        </repository>-->
+            <url>https://repo.craftaro.com/repository/public/</url>
+        </repository>
         <!--MineDown -->
         <repository>
             <id>minebench-repo</id>
@@ -546,7 +545,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.1.0</version>
+            <version>24.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -584,21 +583,21 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.1</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
-        <!-- Documentation of MockBukkit: https://github.com/seeseemelk/MockBukkit -->
+        <!-- Documentation of MockBukkit: https://github.com/MockBukkit/MockBukkit -->
         <dependency>
             <groupId>com.github.seeseemelk</groupId>
             <artifactId>MockBukkit-v1.19</artifactId>
-            <version>2.141.0</version>
+            <version>3.1.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -615,14 +614,14 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.40.0.0</version>
+            <version>3.40.1.0</version>
             <scope>test</scope>
         </dependency>
         <!-- Database lib for testing-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>[8.0.16,)</version>
+            <version>8.0.33</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -751,7 +750,7 @@
         </dependency>
         <dependency>
             <groupId>com.rollbar</groupId>
-            <version>1.9.0</version>
+            <version>1.10.0</version>
             <artifactId>rollbar-java</artifactId>
         </dependency>
         <dependency>
