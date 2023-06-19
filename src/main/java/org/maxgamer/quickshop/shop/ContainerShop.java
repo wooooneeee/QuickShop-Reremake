@@ -876,7 +876,9 @@ public class ContainerShop implements Shop {
                         }
                     }
                     //Due to spigot internal changes, snapshot need to be updated for nbt changes
-                    sign = (Sign) sign.getBlock().getState();
+                    //Such thing not happened to paper (we disable snapshot when getting state),
+                    //for performance improvement, we use paperlib to skip snapshot creating again
+                    sign = (Sign) PaperLib.getBlockState(sign.getBlock(), false);
                 } catch (Exception e) {
                     plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, disable and fallback... (You can safely ignore this)", e);
                     plugin.disableNBTAPI();
