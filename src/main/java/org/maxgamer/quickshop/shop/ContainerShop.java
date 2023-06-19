@@ -851,36 +851,38 @@ public class ContainerShop implements Shop {
         for (Sign sign : signs) {
             if (this.plugin.getNbtapi() != null) {
                 NBTTileEntity tileSign = new NBTTileEntity(sign);
-                NBTList<String> messageNBTList = null;
-                if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
-                    NBTCompound frontNBTCompound = tileSign.getCompound("front_text");
-                    if (frontNBTCompound == null) {
-                        // It should never run into there, but just in case
-                        sign.getSide(Side.FRONT).setLine(0, "[Fix]");
-                        sign.update(true);
-                        frontNBTCompound = tileSign.getCompound("front_text");
-                    }
-                    messageNBTList = frontNBTCompound.getStringList("messages");
-                }
-                for (int i = 0; i < lines.size(); i++) {
-                    try {
-                        if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
-                            if (messageNBTList != null) {
-                                messageNBTList.set(i, Util.componentsToJson(lines.get(i).getComponents()));
-                            } else {
-                                throw new IllegalStateException("Sign NBT seems broken!");
-                            }
-                        } else {
+                try {
+                    if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
+                        NBTCompound frontNBTCompound = tileSign.getCompound("front_text");
+                        if (frontNBTCompound == null) {
+                            // It should never run into there, but just in case
+                            sign.getSide(Side.FRONT).setLine(0, "[Fix]");
+                            sign.update(true);
+                            frontNBTCompound = tileSign.getCompound("front_text");
+                        }
+                        if (frontNBTCompound == null) {
+                            throw new IllegalStateException("Sign NBT structure seems changed/broken! original dump:" + tileSign);
+                        }
+                        NBTList<String> messageNBTList = frontNBTCompound.getStringList("messages");
+                        if (messageNBTList == null) {
+                            throw new IllegalStateException("Sign NBT structure seems changed/broken! original dump:" + tileSign);
+                        }
+                        for (int i = 0; i < lines.size(); i++) {
+                            messageNBTList.set(i, Util.componentsToJson(lines.get(i).getComponents()));
+                        }
+                    } else {
+                        for (int i = 0; i < lines.size(); i++) {
                             tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
                         }
-                    } catch (Exception e) {
-                        plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, disable and fallback... (You can safely ignore this)", e);
-                        plugin.disableNBTAPI();
-                        Util.debugLog("NBTAPI is broken, error: " + e.getMessage() + "\n stacktrace:  \n" + Arrays.toString(e.getStackTrace()));
-                        //Reset it since we disable nbt api, text need to change
-                        setSignText();
-                        return;
                     }
+                    sign.update(true);
+                } catch (Exception e) {
+                    plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, disable and fallback... (You can safely ignore this)", e);
+                    plugin.disableNBTAPI();
+                    Util.debugLog("NBTAPI is broken, error: " + e.getMessage() + "\n stacktrace:  \n" + Arrays.toString(e.getStackTrace()));
+                    //Reset it since we disable nbt api, text need to change
+                    setSignText();
+                    return;
                 }
             } else {
                 for (int i = 0; i < lines.size(); i++) {
@@ -900,6 +902,7 @@ public class ContainerShop implements Shop {
             sign.update(true);
             plugin.getServer().getPluginManager().callEvent(new ShopSignUpdateEvent(this, sign));
         }
+
     }
 
     /**
