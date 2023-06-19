@@ -875,7 +875,8 @@ public class ContainerShop implements Shop {
                             tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
                         }
                     }
-                    sign.update(true);
+                    //Due to spigot internal changes, snapshot need to be updated for nbt changes
+                    sign = (Sign) sign.getBlock().getState();
                 } catch (Exception e) {
                     plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, disable and fallback... (You can safely ignore this)", e);
                     plugin.disableNBTAPI();
