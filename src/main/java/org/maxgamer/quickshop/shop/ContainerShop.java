@@ -867,12 +867,14 @@ public class ContainerShop implements Shop {
                         if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
                             if (messageNBTList != null) {
                                 messageNBTList.set(i, Util.componentsToJson(lines.get(i).getComponents()));
+                            } else {
+                                throw new IllegalStateException("Sign NBT seems broken!");
                             }
                         } else {
                             tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
                         }
                     } catch (Exception e) {
-                        plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, dsiable and fallback... (You can safely ignore this)", e);
+                        plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, disable and fallback... (You can safely ignore this)", e);
                         plugin.disableNBTAPI();
                         Util.debugLog("NBTAPI is broken, error: " + e.getMessage() + "\n stacktrace:  \n" + Arrays.toString(e.getStackTrace()));
                         //Reset it since we disable nbt api, text need to change
