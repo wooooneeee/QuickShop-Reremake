@@ -20,6 +20,8 @@
 package org.maxgamer.quickshop.shop;
 
 import com.lishid.openinv.IOpenInv;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTList;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import io.papermc.lib.PaperLib;
 import lombok.EqualsAndHashCode;
@@ -35,6 +37,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Chest;
+import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -72,6 +75,7 @@ import org.maxgamer.quickshop.api.shop.ShopModerator;
 import org.maxgamer.quickshop.api.shop.ShopType;
 import org.maxgamer.quickshop.chat.platform.minedown.BungeeQuickChat;
 import org.maxgamer.quickshop.economy.Trader;
+import org.maxgamer.quickshop.util.GameVersion;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.PlayerFinder;
 import org.maxgamer.quickshop.util.Util;
@@ -847,9 +851,26 @@ public class ContainerShop implements Shop {
         for (Sign sign : signs) {
             if (this.plugin.getNbtapi() != null) {
                 NBTTileEntity tileSign = new NBTTileEntity(sign);
+                NBTList<String> messageNBTList = null;
+                if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
+                    NBTCompound frontNBTCompound = tileSign.getCompound("front_text");
+                    if (frontNBTCompound == null) {
+                        // It should never run into there, but just in case
+                        sign.getSide(Side.FRONT).setLine(0, "[Fix]");
+                        sign.update(true);
+                        frontNBTCompound = tileSign.getCompound("front_text");
+                    }
+                    messageNBTList = frontNBTCompound.getStringList("messages");
+                }
                 for (int i = 0; i < lines.size(); i++) {
                     try {
-                        tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
+                        if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
+                            if (messageNBTList != null) {
+                                messageNBTList.set(i, Util.componentsToJson(lines.get(i).getComponents()));
+                            }
+                        } else {
+                            tileSign.setString("Text" + (i + 1), Util.componentsToJson(lines.get(i).getComponents()));
+                        }
                     } catch (Exception e) {
                         plugin.getLogger().log(Level.WARNING, "NBTAPI support is broken, dsiable and fallback... (You can safely ignore this)", e);
                         plugin.disableNBTAPI();
