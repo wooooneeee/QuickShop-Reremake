@@ -25,7 +25,7 @@
     <artifactId>QuickShop</artifactId>
 
     <properties>
-        <pluginver>5.1.2.0</pluginver>
+        <pluginver>5.1.2.1</pluginver>
         <package>org.maxgamer.quickshop</package>
         <developer>Ghost-chu</developer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -423,14 +423,14 @@
             <url>https://nexus.iridiumdevelopment.net/repository/maven-releases/</url>
         </repository>-->
 
-        <!-- Temporary disable for unknown host
+        <!--
         <repository>
         <id>Sparky</id>
         <url>https://nexus.sparky.ac/repository/Sparky/</url>
         </repository>-->
         <repository>
             <id>songoda</id>
-            <url>https://repo.songoda.com/repository/public/</url>
+            <url>https://repo.craftaro.com/repository/public/</url>
         </repository>
         <!--MineDown -->
         <repository>
@@ -484,7 +484,7 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>5.0.0-SNAPSHOT</version>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
         <!--JsonConfiguration Dependency Start-->
@@ -533,19 +533,19 @@
         <dependency>
             <groupId>com.github.jikoo.OpenInv</groupId>
             <artifactId>openinvapi</artifactId>
-            <version>4.2.2</version>
+            <version>4.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.1.0</version>
+            <version>24.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -577,27 +577,27 @@
         <dependency>
             <groupId>com.github.angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
-            <version>6.28.11</version>
+            <version>6.29.12</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.1</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
-        <!-- Documentation of MockBukkit: https://github.com/seeseemelk/MockBukkit -->
+        <!-- Documentation of MockBukkit: https://github.com/MockBukkit/MockBukkit -->
         <dependency>
             <groupId>com.github.seeseemelk</groupId>
             <artifactId>MockBukkit-v1.19</artifactId>
-            <version>2.141.0</version>
+            <version>3.1.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -614,20 +614,20 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.40.0.0</version>
+            <version>3.40.1.0</version>
             <scope>test</scope>
         </dependency>
         <!-- Database lib for testing-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>[8.0.16,)</version>
+            <version>8.0.33</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.4-R0.1-SNAPSHOT</version>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -652,7 +652,7 @@
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.7</version>
+            <version>7.0.8</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -750,7 +750,7 @@
         </dependency>
         <dependency>
             <groupId>com.rollbar</groupId>
-            <version>1.9.0</version>
+            <version>1.10.0</version>
             <artifactId>rollbar-java</artifactId>
         </dependency>
         <dependency>
@@ -776,7 +776,7 @@
         <dependency>
             <groupId>com.songoda</groupId>
             <artifactId>skyblock</artifactId>
-            <version>2.5.0</version>
+            <version>2.3.30</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -886,7 +886,7 @@
         <dependency>
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api-plugin</artifactId>
-            <version>2.11.1</version>
+            <version>2.11.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -1380,7 +1380,13 @@ public class SimpleShopManager implements ShopManager, Reloadable {
         }
         if (shop.isBuying()) {
             if (StringUtils.isNumeric(message)) {
-                amount = Integer.parseInt(message);
+                try {
+                    amount = Integer.parseInt(message);
+                } catch (NumberFormatException ex) {
+                    Util.debugLog(ex.getMessage());
+                    plugin.text().of(p, "not-a-number", message).send();
+                    return;
+                }
             } else {
                 if (message.equalsIgnoreCase(
                         plugin.getConfig().getString("shop.word-for-trade-all-items", "all"))) {
@@ -1450,7 +1456,13 @@ public class SimpleShopManager implements ShopManager, Reloadable {
             actionBuy(p.getUniqueId(), p.getInventory(), eco, info, shop, amount);
         } else if (shop.isSelling()) {
             if (StringUtils.isNumeric(message)) {
-                amount = Integer.parseInt(message);
+                try {
+                    amount = Integer.parseInt(message);
+                } catch (NumberFormatException ex) {
+                    Util.debugLog(ex.getMessage());
+                    plugin.text().of(p, "not-a-number", message).send();
+                    return;
+                }
             } else {
                 if (message.equalsIgnoreCase(plugin.getConfig().getString("shop.word-for-trade-all-items", "all"))) {
                     int shopHaveItems = shop.getRemainingStock();

@@ -450,7 +450,7 @@ public class VirtualDisplayItem extends AbstractDisplayItem {
                 } else {
                     itemName = Util.getItemStackName(itemStack);
                 }
-                wpw.setObject(2, WrappedDataWatcher.Registry.getChatComponentSerializer(true), Optional.of(WrappedChatComponent.fromText(itemName).getHandle()));
+                wpw.setObject(2, WrappedDataWatcher.Registry.getChatComponentSerializer(true), Optional.of(WrappedChatComponent.fromLegacyText(itemName).getHandle()));
                 wpw.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, WrappedDataWatcher.Registry.get(Boolean.class)), true);
             }
 

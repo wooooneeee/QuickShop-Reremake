@@ -37,7 +37,11 @@ import org.maxgamer.quickshop.util.JsonUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.ReflectFactory;
 import org.maxgamer.quickshop.util.Util;
-import org.maxgamer.quickshop.util.mojangapi.*;
+import org.maxgamer.quickshop.util.mojangapi.MojangAPI;
+import org.maxgamer.quickshop.util.mojangapi.MojangApiBmclApiMirror;
+import org.maxgamer.quickshop.util.mojangapi.MojangApiMcbbsApiMirror;
+import org.maxgamer.quickshop.util.mojangapi.MojangApiMirror;
+import org.maxgamer.quickshop.util.mojangapi.MojangApiOfficialMirror;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +50,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -134,10 +142,38 @@ public class MojangGameLanguageImpl extends BukkitGameLanguageImpl implements Ga
         if (!lang.isPresent()) {
             return super.getItem(material);
         }
-        JsonElement element = lang.get().get("item.minecraft." + material.name().toLowerCase());
+        JsonElement element;
+        String name = material.name().toLowerCase();
+        boolean isSmithingTemplate = false;
+        boolean hasDesc = false;
+        if (name.endsWith("_banner_pattern") || name.startsWith("music_disc")) {
+            hasDesc = true;
+            element = lang.get().get("item.minecraft." + name);
+        } else if (name.endsWith("_armor_trim_smithing_template")) {
+            isSmithingTemplate = true;
+            element = lang.get().get("trim_pattern.minecraft." + name.substring(0, name.length() - "_armor_trim_smithing_template".length()));
+        } else if (name.endsWith("_upgrade_smithing_template")) {
+            isSmithingTemplate = true;
+            element = lang.get().get("upgrade.minecraft." + name.substring(0, name.length() - "_smithing_template".length()));
+        } else {
+            element = lang.get().get("item.minecraft." + name);
+        }
         if (element == null) {
             return getBlock(material);
         } else {
+            if (isSmithingTemplate) {
+                JsonElement prefix = lang.get().get("item.minecraft.smithing_template");
+                if (prefix != null) {
+                    return prefix.getAsString() + ":" + element.getAsString();
+                }
+            }
+            if (hasDesc) {
+                JsonElement desc = lang.get().get("item.minecraft." + name + ".desc");
+                if (desc != null) {
+                    return element.getAsString() + ":" + desc.getAsString();
+                }
+            }
+
             return element.getAsString();
         }
     }

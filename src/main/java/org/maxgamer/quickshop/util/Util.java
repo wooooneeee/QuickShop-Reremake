@@ -567,6 +567,9 @@ public class Util {
             if (displayName == null || displayName.isEmpty()) {
                 return null;
             } else {
+                //Some item name using escape character, causing rgb color could not decode correctly
+                //So fix it there
+                displayName = displayName.replace("&&x", "&x").replace("§§x", "§x");
                 return displayName;
             }
         }
@@ -1194,6 +1197,7 @@ public class Util {
         }
         MineDownParser parser = MINEDOWN.get().parser();
         parser.reset();
+
         //A hack for saving reset character
         text = text.replace("&r", "&l&r").replace("§r", "§l§r");
         return toLegacyText(parser.enable(MineDownParser.Option.LEGACY_COLORS).enable(MineDownParser.Option.APPEND_COLORS_TO_EMPTY_STRING).backwardsCompatibility(true).parse(text).create());

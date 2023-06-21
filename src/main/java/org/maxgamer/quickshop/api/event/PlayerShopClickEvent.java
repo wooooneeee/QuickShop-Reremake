@@ -21,6 +21,7 @@ package org.maxgamer.quickshop.api.event;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.api.shop.Shop;
 
@@ -29,11 +30,16 @@ import org.maxgamer.quickshop.api.shop.Shop;
  * <p>
  * Since  5.1.2.0
  */
-public class PlayerShopClickEvent extends ShopClickEvent {
+public class PlayerShopClickEvent extends AbstractQSEvent implements Cancellable {
 
 
     @Getter
     private final Player player;
+
+    @NotNull
+    private final Shop shop;
+
+    private boolean cancelled;
 
     /**
      * Call when shop was clicked.
@@ -42,7 +48,26 @@ public class PlayerShopClickEvent extends ShopClickEvent {
      * @param player the player clicking shop
      */
     public PlayerShopClickEvent(@NotNull Shop shop, Player player) {
-        super(shop);
+        this.shop = shop;
         this.player = player;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return this.cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    /**
+     * Getting the shops that clicked
+     *
+     * @return Clicked shop
+     */
+    public @NotNull Shop getShop() {
+        return this.shop;
     }
 }
