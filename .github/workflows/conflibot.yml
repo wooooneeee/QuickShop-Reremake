@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Warn potential conflicts
-        uses: wktk/conflibot@v1
+        uses: wktk/conflibot@v1.1.0
         with:
           github-token: ${{ github.token }}
           exclude: |
