@@ -70,6 +70,7 @@
   "unknown-owner": "Неизвестно",
   "owner-bypass-check": "&eВсе проверки прошли, вы можете торговать! (Теперь вы владелец магазина!)",
   "reached-maximum-can-create": "&cВы уже создали максимум {0}/{1} магазинов!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cЦена ограничена {0}: от {1} до {2}",
   "no-enough-money-to-keep-shops": "&7Недостаточно средств для аренды магазинов. Все магазины были удалены...",
   "nothing-to-flush": "&aУ вас нет новых сообщений в магазине.",

@@ -70,6 +70,7 @@
   "unknown-owner": "Ukjent",
   "owner-bypass-check": "&aAlle sjekker ble ignorert. Overføringen ble gjennomført! (Du er nå eieren av butikken!)",
   "reached-maximum-can-create": "&cDu har allerede opprettet maksimum {0}/{1} butikker!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cBegrenset pris for {0}: Min {1}, maks {2}",
   "no-enough-money-to-keep-shops": "&cDu har ikke nok penger til å beholde butikkene! Alle butikker ble fjernet...",
   "nothing-to-flush": "&aDu har ingen nye butikkmeldinger.",

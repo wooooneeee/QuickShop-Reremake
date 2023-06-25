@@ -70,6 +70,7 @@
   "unknown-owner": "Desconegut",
   "owner-bypass-check": "&eIntercanviat amb èxit! (Ara ets el propietari de la botiga!)",
   "reached-maximum-can-create": "&cJa has creat un màxim de {0}/{1} botigues!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cPreu restringit per {0}: Mínim {1}, màxim {2}.",
   "no-enough-money-to-keep-shops": "&cNo tenies prou diners per mantenir les teves botigues! Totes les botigues s'han eliminat...",
   "nothing-to-flush": "&aNo tens missatges de botigues nous.",

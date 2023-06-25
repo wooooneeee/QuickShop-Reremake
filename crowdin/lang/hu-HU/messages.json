@@ -70,6 +70,7 @@
   "unknown-owner": "Ismeretlen",
   "owner-bypass-check": "&eSikeresen átmentél az összes ellenőrzésen! Üzlet sikeresen megtörtént! (Te vagy a bolt tulajdonosa)",
   "reached-maximum-can-create": "&cNeked van már {0}/{1} boltod!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cKorlátozott ár van a {0}n: min {1} , max {2}",
   "no-enough-money-to-keep-shops": "&cNincs elég pénzed, hogy fentartsd a boltjaidat! Az összes bolt törölve lett...",
   "nothing-to-flush": "&aNeked nincs új bolti üzeneted.",

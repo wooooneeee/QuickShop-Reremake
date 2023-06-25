@@ -70,6 +70,7 @@
   "unknown-owner": "Desconhecido",
   "owner-bypass-check": "&eIgnorado todas as verificações, operação bem sucedida! (Agora \nvocê é o dono da loja!)",
   "reached-maximum-can-create": "&cVocê já criou o máximo de lojas! ({0}/{1})",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cPreço restrito para {0}: Mínimo de {1}, máximo de {2}",
   "no-enough-money-to-keep-shops": "&cVocê não tinha dinheiro suficiente para manter suas lojas! Todas as lojas foram removidas...",
   "nothing-to-flush": "&aVocê não tem novas mensagens da loja.",
