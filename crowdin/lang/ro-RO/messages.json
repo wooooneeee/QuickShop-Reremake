@@ -70,6 +70,7 @@
   "unknown-owner": "Necunoscută",
   "owner-bypass-check": "&eA trecut toate cecurile. Tranzacționați cu succes! (Fii proprietarul magazinului!)",
   "reached-maximum-can-create": "&cAi creat deja un maxim de {0}/{1} magazine!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cPret limitat pentru {0}: Min {1}, max {2}",
   "no-enough-money-to-keep-shops": "&cNu ai destui bani pentru a-ti pastra magazinele! Toate magazinele au fost sterse...",
   "nothing-to-flush": "&aYou have no new shop messages.",

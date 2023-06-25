@@ -70,6 +70,7 @@
   "unknown-owner": "Không xác định",
   "owner-bypass-check": "&eBỏ qua tất cả các kiểm tra. Giao dịch thành công! (Bây giờ bạn là chủ cửa hàng!)",
   "reached-maximum-can-create": "&cBạn đã tạo tối đa {0}/{1} cửa hàng!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cGiá hạn chế cho {0}: Tối thiểu {1}, tối đa {2}",
   "no-enough-money-to-keep-shops": "&cBạn không có đủ tiền để giữ cửa hàng của mình! Tất cả các cửa hàng đã bị xóa ...",
   "nothing-to-flush": "&aBạn không có tin nhắn từ của hàng.",

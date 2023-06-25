@@ -70,6 +70,7 @@
   "unknown-owner": "未知",
   "owner-bypass-check": "&e已繞過所有檢查. 交易成功! (你宜家係新既店主!)",
   "reached-maximum-can-create": "&c你已經創建咗 {0}/{1} 個商店!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&c{0} 既限制價格：最低 {1}，最高 {2}",
   "no-enough-money-to-keep-shops": "&c你冇足夠既錢黎維持你既商店! 你所有既商店已被移除...",
   "nothing-to-flush": "&a你冇任何來自商店既新消息.",

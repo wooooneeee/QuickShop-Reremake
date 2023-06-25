@@ -70,6 +70,7 @@
   "unknown-owner": "Okänd",
   "owner-bypass-check": "&eIgnorerade alla checkar. Bytet lyckades! (Du är nu butiksägaren!)",
   "reached-maximum-can-create": "&cDu har redan skapat {0}/{1} butiker vilket är max!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cBegränsat pris för {0}: Minst {1}, högst {2}",
   "no-enough-money-to-keep-shops": "&cDu har inte tillräckligt med pengar för att behålla dina butiker! Alla butiker har tagits bort...",
   "nothing-to-flush": "&aDu har inga nya butiksmeddelanden.",

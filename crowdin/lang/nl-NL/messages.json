@@ -70,6 +70,7 @@
   "unknown-owner": "onbekend",
   "owner-bypass-check": "&eBypassed alle controles. Handel succesvol! (Je bent nu de eigenaar van de winkel!)",
   "reached-maximum-can-create": "&cJe hebt al een maximum van {0}/{1} winkels gemaakt!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cBeperkte prijs voor {0}: Min {1}, max {2}",
   "no-enough-money-to-keep-shops": "&cJe had niet genoeg geld om je winkels te houden! Alle winkels zijn verwijderd...",
   "nothing-to-flush": "&aU heeft geen nieuwe winkel berichten.",

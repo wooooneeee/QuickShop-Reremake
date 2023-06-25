@@ -70,6 +70,7 @@
   "unknown-owner": "알 수 없음",
   "owner-bypass-check": "&e모든 조사를 통과하여, 거래를 완료했습니다! (당신은 상점 주인입니다.)",
   "reached-maximum-can-create": "&c당신은 이미 최대 {0}/{1} 개의 상점을 생성했습니다!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&c{0} 에 대한 가격이 제한되었습니다. 최소 {1} 원, 최대 {2} 원",
   "no-enough-money-to-keep-shops": "&c당신은 당신의 상점유지에 필요한 돈이 없습니다! 모든상점이 제거 됩니다...",
   "nothing-to-flush": "&a새로운 상점 메세지가 없습니다.",

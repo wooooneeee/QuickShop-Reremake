@@ -70,6 +70,7 @@
   "unknown-owner": "Tuntematon",
   "owner-bypass-check": "&eOhitit kaikki tarkastukset. Vaihto onnistui! (Olet nyt kaupan omistaja!)",
   "reached-maximum-can-create": "&cOlet jo luonut jo {0}/{1}, eli maksimi määrän kauppoja!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cRajattu hinta tuotteelle {0}: vähintään {1}, enintään {2}",
   "no-enough-money-to-keep-shops": "&cSinulla ei ollut tarpeeksi rahaa kauppojen ylläpitoon! Kaikki kaupat on poistettu...",
   "nothing-to-flush": "&aSinulle ei ole uusia kauppaviestejä.",
