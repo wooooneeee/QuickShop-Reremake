@@ -19,6 +19,7 @@
 
 package org.maxgamer.quickshop.command.subcommand;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +56,16 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
             }
             final UUID targetPlayerUUID = targetPlayer.getUuid();
             List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(sender.getUniqueId());
+            if (plugin.isLimit()) {
+                final Player player = plugin.getServer().getPlayer(targetPlayerUUID);
+                if (player == null) {
+                    plugin.text().of(sender, "unknown-player").send();
+                    return;
+                }
+                if (!checkAndSendLimitMessage(player, sender, shopList.size())) {
+                    return;
+                }
+            }
             for (Shop shop : shopList) {
                 if (!shop.isBuying()) {
                     shop.setOwner(targetPlayerUUID);
@@ -88,6 +99,16 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
             }
             final UUID targetPlayerUUID = targetPlayer.getUuid();
             List<Shop> shopList = plugin.getShopManager().getPlayerAllShops(fromPlayer.getUuid());
+            if (plugin.isLimit()) {
+                final Player player = plugin.getServer().getPlayer(targetPlayerUUID);
+                if (player == null) {
+                    plugin.text().of(sender, "unknown-player").send();
+                    return;
+                }
+                if (!checkAndSendLimitMessage(player, sender, shopList.size())) {
+                    return;
+                }
+            }
             for (Shop shop : shopList) {
                 shop.setOwner(targetPlayerUUID);
             }
@@ -96,6 +117,27 @@ public class SubCommand_Transfer implements CommandHandler<Player> {
         } else {
             plugin.text().of(sender, "command.wrong-args").send();
         }
+    }
+
+    private boolean checkAndSendLimitMessage(Player checkingPlayer, CommandSender commandSender, int increment) {
+        if (plugin.isLimit()) {
+            int owned = 0;
+            if (plugin.getConfig().getBoolean("limits.old-algorithm")) {
+                owned = plugin.getShopManager().getPlayerAllShops(checkingPlayer.getUniqueId()).size();
+            } else {
+                for (final Shop shop : plugin.getShopManager().getPlayerAllShops(checkingPlayer.getUniqueId())) {
+                    if (!shop.isUnlimited()) {
+                        owned++;
+                    }
+                }
+            }
+            int max = plugin.getShopLimit(checkingPlayer);
+            if (owned + increment <= max) {
+                plugin.text().of(commandSender, "reached-maximum-other-can-hold", String.valueOf(owned), String.valueOf(max)).send();
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

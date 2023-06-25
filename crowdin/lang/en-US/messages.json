@@ -70,6 +70,7 @@
   "unknown-owner": "Unknown",
   "owner-bypass-check": "&eBypassed all checks. Trade successful! (You are now the shop owner!)",
   "reached-maximum-can-create": "&cYou already created a maximum of {0}/{1} shops!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&cRestricted price for {0}: Min {1}, max {2}",
   "no-enough-money-to-keep-shops": "&cYou didn't had enough money to keep your shops! All your shops have been removed...",
   "nothing-to-flush": "&aYou have no new shop messages.",

@@ -70,6 +70,7 @@
   "unknown-owner": "Nezname",
   "owner-bypass-check": "&b▪&8▏ &bSystem &8› &7Prošel všechny kontroly. Obchod byl úspěšný! (Nyní jste vlastníkem obchodu!)",
   "reached-maximum-can-create": "&b▪&8▏ &bSystem &8› &cJiž jste vytvořili maximum {0}/{1} obchodů!",
+  "reached-maximum-other-can-hold": "&cTarget player has reached the maximum of {0}/{1} shops!",
   "restricted-prices": "&b▪&8▏ &bSystem &8› &cOmezená cena za {0}: Min {1}, max {2}",
   "no-enough-money-to-keep-shops": "&b▪&8▏ &bSystem &8› &cNemáte dostatek peněz na udržení svých obchodů! Všechny obchody byly odstraněny...",
   "nothing-to-flush": "&b▪&8▏ &bSystem &8› &7Nemáte žádné nové zprávy o obchodu.",
