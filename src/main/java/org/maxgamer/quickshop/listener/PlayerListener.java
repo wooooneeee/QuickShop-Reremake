@@ -54,6 +54,7 @@ import org.maxgamer.quickshop.api.shop.Info;
 import org.maxgamer.quickshop.api.shop.Shop;
 import org.maxgamer.quickshop.api.shop.ShopAction;
 import org.maxgamer.quickshop.shop.SimpleInfo;
+import org.maxgamer.quickshop.util.GameVersion;
 import org.maxgamer.quickshop.util.InteractUtil;
 import org.maxgamer.quickshop.util.MsgUtil;
 import org.maxgamer.quickshop.util.PermissionChecker;
@@ -168,6 +169,10 @@ public class PlayerListener extends AbstractQSListener {
                 //Prevent use item by ancient
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     e.setUseItemInHand(Event.Result.DENY);
+                }
+                //Cancel for interacting with sign (editing)
+                if (plugin.getGameVersion().ordinal() >= GameVersion.v1_20_R1.ordinal()) {
+                    e.setCancelled(true);
                 }
             }
         }
