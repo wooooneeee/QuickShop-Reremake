@@ -214,8 +214,11 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     private DatabaseManager databaseManager;
     /**
      * Default database prefix, can overwrite by config
+     * <p>
+     * Deprecated: use manager#getDatabase#getTableprefix instead
      */
     @Getter
+    @Deprecated
     private String dbPrefix = "";
     /**
      * Whether we should use display items or not
@@ -1190,10 +1193,12 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             AbstractDatabaseCore dbCore;
             if (Objects.requireNonNull(dbCfg).getBoolean("mysql")) {
                 // MySQL database - Required database be created first.
-                dbPrefix = dbCfg.getString("prefix");
-                if (dbPrefix == null || "none".equals(dbPrefix)) {
-                    dbPrefix = "";
+                String prefix = dbCfg.getString("prefix");
+                if (prefix == null || "none".equals(prefix)) {
+                    prefix = "";
                 }
+                //just keep backward compatible
+                dbPrefix = prefix;
                 String user = dbCfg.getString("user");
                 String pass = dbCfg.getString("password");
                 String host = dbCfg.getString("host");
@@ -1207,7 +1212,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
                         optionsMap.put(strings[0], strings[1]);
                     }
                 }
-                dbCore = new MySQLCore(this, Objects.requireNonNull(host, "MySQL host can't be null"), Objects.requireNonNull(user, "MySQL username can't be null"), Objects.requireNonNull(pass, "MySQL password can't be null"), Objects.requireNonNull(database, "MySQL database name can't be null"), Objects.requireNonNull(port, "MySQL port can't be null"), useSSL, optionsMap);
+                dbCore = new MySQLCore(this, Objects.requireNonNull(host, "MySQL host can't be null"), Objects.requireNonNull(user, "MySQL username can't be null"), Objects.requireNonNull(pass, "MySQL password can't be null"), Objects.requireNonNull(database, "MySQL database name can't be null"), Objects.requireNonNull(port, "MySQL port can't be null"), prefix, useSSL, optionsMap);
             } else {
                 // SQLite database - Doing this handles file creation
                 dbCore = new SQLiteCore(this, new File(this.getDataFolder(), "shops.db"));

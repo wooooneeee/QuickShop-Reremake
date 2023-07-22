@@ -57,6 +57,10 @@ public abstract class AbstractDatabaseCore {
 
     }
 
+    public String getTablePrefix() {
+        return "";
+    }
+
     /**
      * Close all not in-use connections created by DatabaseCore.
      */
