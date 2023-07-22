@@ -86,7 +86,10 @@ public class SubCommand_Convert implements CommandHandler<ConsoleCommandSender> 
             String port = dbCfg.getString("port");
             String databaseStr = dbCfg.getString("database");
             boolean useSSL = dbCfg.getBoolean("usessl");
-            String prefix = dbCfg.getString("prefix", "");
+            String prefix = dbCfg.getString("prefix");
+            if (prefix == null || "none".equals(prefix)) {
+                prefix = "";
+            }
             Map<String, String> optionsMap = new HashMap<>();
             for (String options : dbCfg.getStringList("mysql-connect-options")) {
                 String[] strings = options.split("=", 2);
@@ -95,9 +98,10 @@ public class SubCommand_Convert implements CommandHandler<ConsoleCommandSender> 
                 }
             }
             running = true;
+            final String finalPrefix = prefix;
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
-                    AbstractDatabaseCore dbCore = new MySQLCore(plugin, Objects.requireNonNull(host, "MySQL host can't be null"), Objects.requireNonNull(user, "MySQL username can't be null"), Objects.requireNonNull(pass, "MySQL password can't be null"), Objects.requireNonNull(databaseStr, "MySQL database name can't be null"), Objects.requireNonNull(port, "MySQL port can't be null"), prefix, useSSL, optionsMap);
+                    AbstractDatabaseCore dbCore = new MySQLCore(plugin, Objects.requireNonNull(host, "MySQL host can't be null"), Objects.requireNonNull(user, "MySQL username can't be null"), Objects.requireNonNull(pass, "MySQL password can't be null"), Objects.requireNonNull(databaseStr, "MySQL database name can't be null"), Objects.requireNonNull(port, "MySQL port can't be null"), finalPrefix, useSSL, optionsMap);
                     DatabaseManager databaseManager = new DatabaseManager(QuickShop.getInstance(), dbCore);
                     sender.sendMessage(ChatColor.GREEN + "Converting...");
                     transferShops(new SimpleDatabaseHelper(plugin, databaseManager), sender);
