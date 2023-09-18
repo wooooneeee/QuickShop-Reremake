@@ -46,6 +46,9 @@ public class MySQLCore extends AbstractDatabaseCore {
     @NotNull
     private final QuickShop plugin;
 
+
+    private final String tablePrefix;
+
     public MySQLCore(
             @NotNull QuickShop plugin,
             @NotNull String host,
@@ -53,8 +56,10 @@ public class MySQLCore extends AbstractDatabaseCore {
             @NotNull String pass,
             @NotNull String database,
             @NotNull String port,
+            @NotNull String tablePrefix,
             boolean useSSL, Map<String, String> options) {
         this.plugin = plugin;
+        this.tablePrefix = tablePrefix;
         info = new Properties();
         info.setProperty("autoReconnect", "true");
         info.setProperty("user", user);
@@ -76,6 +81,10 @@ public class MySQLCore extends AbstractDatabaseCore {
         }
     }
 
+    @Override
+    public String getTablePrefix() {
+        return tablePrefix;
+    }
 
     @Override
     synchronized void close() {

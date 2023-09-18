@@ -20,6 +20,7 @@
 package org.maxgamer.quickshop.economy;
 
 import lombok.AllArgsConstructor;
+import org.bukkit.BanEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,6 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.util.PlayerFinder;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -76,6 +80,24 @@ public class Trader implements OfflinePlayer {
     @Override
     public boolean isBanned() {
         return offlinePlayer.isBanned();
+    }
+
+    @Nullable
+    @Override
+    public BanEntry<PlayerProfile> ban(@Nullable String s, @Nullable Date date, @Nullable String s1) {
+        return offlinePlayer.ban(s, date, s1);
+    }
+
+    @Nullable
+    @Override
+    public BanEntry<PlayerProfile> ban(@Nullable String s, @Nullable Instant instant, @Nullable String s1) {
+        return offlinePlayer.ban(s, instant, s1);
+    }
+
+    @Nullable
+    @Override
+    public BanEntry<PlayerProfile> ban(@Nullable String s, @Nullable Duration duration, @Nullable String s1) {
+        return offlinePlayer.ban(s, duration, s1);
     }
 
     @Override

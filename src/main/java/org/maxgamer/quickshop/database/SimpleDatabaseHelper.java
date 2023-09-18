@@ -61,16 +61,16 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     }
 
     private void init() throws SQLException {
-        if (!manager.hasTable(plugin.getDbPrefix() + "shops")) {
+        if (!manager.hasTable(manager.getDatabase().getTablePrefix() + "shops")) {
             createShopsTable();
         }
-        if (!manager.hasTable(plugin.getDbPrefix() + "messages")) {
+        if (!manager.hasTable(manager.getDatabase().getTablePrefix() + "messages")) {
             createMessagesTable();
         }
-        if (!manager.hasTable(plugin.getDbPrefix() + "logs")) {
+        if (!manager.hasTable(manager.getDatabase().getTablePrefix() + "logs")) {
             createLogsTable();
         }
-        if (!manager.hasTable(plugin.getDbPrefix() + "external_cache")) {
+        if (!manager.hasTable(manager.getDatabase().getTablePrefix() + "external_cache")) {
             createExternalCacheTable();
         }
         checkColumns();
@@ -81,9 +81,9 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
      */
 
     private void createShopsTable() {
-        String sqlString = "CREATE TABLE " + plugin.getDbPrefix() + "shops (owner  VARCHAR(255) NOT NULL, price  double(32, 2) NOT NULL, itemConfig TEXT CHARSET utf8 NOT NULL, x  INTEGER(32) NOT NULL, y  INTEGER(32) NOT NULL, z  INTEGER(32) NOT NULL, world VARCHAR(32) NOT NULL, unlimited  boolean, type  boolean, PRIMARY KEY (x, y, z, world) );";
+        String sqlString = "CREATE TABLE " + manager.getDatabase().getTablePrefix() + "shops (owner  VARCHAR(255) NOT NULL, price  double(32, 2) NOT NULL, itemConfig TEXT CHARSET utf8 NOT NULL, x  INTEGER(32) NOT NULL, y  INTEGER(32) NOT NULL, z  INTEGER(32) NOT NULL, world VARCHAR(32) NOT NULL, unlimited  boolean, type  boolean, PRIMARY KEY (x, y, z, world) );";
         if (manager.getDatabase() instanceof MySQLCore) {
-            sqlString = "CREATE TABLE " + plugin.getDbPrefix() + "shops (owner  VARCHAR(255) NOT NULL, price  double(32, 2) NOT NULL, itemConfig TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci, x  INTEGER(32) NOT NULL, y  INTEGER(32) NOT NULL, z  INTEGER(32) NOT NULL, world VARCHAR(32) NOT NULL, unlimited  boolean, type  boolean, PRIMARY KEY (x, y, z, world) );";
+            sqlString = "CREATE TABLE " + manager.getDatabase().getTablePrefix() + "shops (owner  VARCHAR(255) NOT NULL, price  double(32, 2) NOT NULL, itemConfig TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci, x  INTEGER(32) NOT NULL, y  INTEGER(32) NOT NULL, z  INTEGER(32) NOT NULL, world VARCHAR(32) NOT NULL, unlimited  boolean, type  boolean, PRIMARY KEY (x, y, z, world) );";
         }
         manager.runInstantTask(new DatabaseTask(sqlString));
     }
@@ -92,17 +92,17 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
      * Creates the database table 'messages'
      */
     private void createMessagesTable() {
-        String createTable = "CREATE TABLE " + plugin.getDbPrefix()
+        String createTable = "CREATE TABLE " + manager.getDatabase().getTablePrefix()
                 + "messages (owner  VARCHAR(255) NOT NULL, message  TEXT(25) NOT NULL, time  BIGINT(32) NOT NULL );";
         if (manager.getDatabase() instanceof MySQLCore) {
-            createTable = "CREATE TABLE " + plugin.getDbPrefix()
+            createTable = "CREATE TABLE " + manager.getDatabase().getTablePrefix()
                     + "messages (owner  VARCHAR(255) NOT NULL, message  TEXT(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL , time  BIGINT(32) NOT NULL );";
         }
         manager.runInstantTask(new DatabaseTask(createTable));
     }
 
     private void createLogsTable() {
-        String createTable = "CREATE TABLE " + plugin.getDbPrefix()
+        String createTable = "CREATE TABLE " + manager.getDatabase().getTablePrefix()
                 + "logs (time BIGINT(32) NOT NULL);";
         manager.runInstantTask(new DatabaseTask(createTable));
         createColumn("logs", "classname", new DataType(DataTypeMapping.TEXT, null, ""));
@@ -110,7 +110,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     }
 
     private void createExternalCacheTable() {
-        String createTable = "CREATE TABLE " + plugin.getDbPrefix()
+        String createTable = "CREATE TABLE " + manager.getDatabase().getTablePrefix()
                 + "external_cache  (x INTEGER(32) NOT NULL, y  INTEGER(32) NOT NULL, z  INTEGER(32) NOT NULL, world VARCHAR(32) NOT NULL, PRIMARY KEY (x, y, z, world));";
         manager.runInstantTask(new DatabaseTask(createTable));
         createColumn("external_cache", "space", new DataType(DataTypeMapping.INT, null));
@@ -135,11 +135,9 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
             }
         };
         // V3.4.2
-        manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                .getDbPrefix() + "shops MODIFY COLUMN price double(32,2) NOT NULL AFTER owner", checkTask));
+        manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "shops MODIFY COLUMN price double(32,2) NOT NULL AFTER owner", checkTask));
         // V3.4.3
-        manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                .getDbPrefix() + "messages MODIFY COLUMN time BIGINT(32) NOT NULL AFTER message", checkTask));
+        manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "messages MODIFY COLUMN time BIGINT(32) NOT NULL AFTER message", checkTask));
         //Extra column
         createColumn("shops", "extra", new DataType(DataTypeMapping.LONGTEXT, null, ""));
         createColumn("shops", "currency", new DataType(DataTypeMapping.TEXT));
@@ -148,16 +146,11 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
 
 
         if (manager.getDatabase() instanceof MySQLCore) {
-            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                    .getDbPrefix() + "messages MODIFY COLUMN message text CHARACTER SET utf8mb4 NOT NULL AFTER owner", checkTask));
-            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                    .getDbPrefix() + "shops MODIFY COLUMN itemConfig text CHARACTER SET utf8mb4 NOT NULL AFTER price", checkTask));
-            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                    .getDbPrefix() + "shops TO CHARACTER SET uft8mb4 COLLATE utf8mb4_general_ci", checkTask));
-            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                    .getDbPrefix() + "messages TO CHARACTER SET uft8mb4 COLLATE utf8mb4_general_ci", checkTask));
-            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + plugin
-                    .getDbPrefix() + "history TO CHARACTER SET uft8mb4 COLLATE utf8mb4_general_ci", checkTask));
+            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "messages MODIFY COLUMN message text CHARACTER SET utf8mb4 NOT NULL AFTER owner", checkTask));
+            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "shops MODIFY COLUMN itemConfig text CHARACTER SET utf8mb4 NOT NULL AFTER price", checkTask));
+            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "shops TO CHARACTER SET uft8mb4 COLLATE utf8mb4_general_ci", checkTask));
+            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "messages TO CHARACTER SET uft8mb4 COLLATE utf8mb4_general_ci", checkTask));
+            manager.runInstantTask(new DatabaseTask("ALTER TABLE " + manager.getDatabase().getTablePrefix() + "history TO CHARACTER SET uft8mb4 COLLATE utf8mb4_general_ci", checkTask));
         }
         plugin.getLogger().info("Finished!");
     }
@@ -166,7 +159,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     public boolean createColumn(@NotNull String tableName, @NotNull String columnName, @NotNull DataType type) {
 
         try {
-            String table = plugin.getDbPrefix() + tableName;
+            String table = manager.getDatabase().getTablePrefix() + tableName;
             if (manager.hasColumn(table, columnName)) {
                 return false;
             }
@@ -177,7 +170,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
                 sqlString = "alter table " + table + " add column " + columnName + " " + type.getDatatype().getSqlite();
             }
             if (type.getLength() != null) {
-                sqlString += "(" + type.getLength().toString() + ") ";
+                sqlString += "(" + type.getLength() + ") ";
             }
             Util.debugLog("Append sql for creating column is " + sqlString);
             manager.runInstantTask(new DatabaseTask(sqlString, new DatabaseTask.Task() {
@@ -201,21 +194,20 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
 
     @Override
     public void cleanMessage(long weekAgo) {
-        String sqlString = "DELETE FROM " + plugin
-                .getDbPrefix() + "messages WHERE time < ?";
+        String sqlString = "DELETE FROM " + manager.getDatabase().getTablePrefix() + "messages WHERE time < ?";
         manager.addDelayTask(new DatabaseTask(sqlString, ps -> ps.setLong(1, weekAgo)));
     }
 
     @Override
     public void cleanMessageForPlayer(@NotNull UUID player) {
-        String sqlString = "DELETE FROM " + plugin.getDbPrefix() + "messages WHERE owner = ?";
+        String sqlString = "DELETE FROM " + manager.getDatabase().getTablePrefix() + "messages WHERE owner = ?";
         manager.addDelayTask(new DatabaseTask(sqlString, (ps) -> ps.setString(1, player.toString())));
     }
 
     @Override
     public void createShop(@NotNull Shop shop, @Nullable Runnable onSuccess, @Nullable Consumer<SQLException> onFailed) {
         removeShop(shop); //First purge old exist shop before create new shop.
-        String sqlString = "INSERT INTO " + plugin.getDbPrefix() + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlString = "INSERT INTO " + manager.getDatabase().getTablePrefix() + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         manager.addDelayTask(new DatabaseTask(sqlString, new DatabaseTask.Task() {
             @Override
             public void edit(PreparedStatement ps) throws SQLException {
@@ -260,7 +252,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     @Override
     public void removeShop(Shop shop) {
         String sqlString = "DELETE FROM "
-                + plugin.getDbPrefix()
+                + manager.getDatabase().getTablePrefix()
                 + "shops WHERE x = ? AND y = ? AND z = ? AND world = ?"
                 + (manager.getDatabase() instanceof MySQLCore ? " LIMIT 1" : "");
         manager.addDelayTask(new DatabaseTask(sqlString, (ps) -> {
@@ -276,7 +268,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     @Override
     public void removeShop(String world, int x, int y, int z) {
         String sqlString = "DELETE FROM "
-                + plugin.getDbPrefix()
+                + manager.getDatabase().getTablePrefix()
                 + "shops WHERE x = ? AND y = ? AND z = ? AND world = ?"
                 + (manager.getDatabase() instanceof MySQLCore ? " LIMIT 1" : "");
         manager.addDelayTask(new DatabaseTask(sqlString, (ps) -> {
@@ -297,7 +289,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     public SimpleWarpedResultSet selectTable(String table) throws SQLException {
         DatabaseConnection databaseConnection = manager.getDatabase().getConnection();
         Statement st = databaseConnection.get().createStatement();
-        String sql = "SELECT * FROM " + plugin.getDbPrefix() + table;
+        String sql = "SELECT * FROM " + manager.getDatabase().getTablePrefix() + table;
         ResultSet resultSet = st.executeQuery(sql);
         //Resource closes will complete in this class
         return new SimpleWarpedResultSet(st, resultSet, databaseConnection);
@@ -311,7 +303,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     @Override
     public void saveOfflineTransactionMessage(@NotNull UUID player, @NotNull String message, long time) {
 
-        String sqlString = "INSERT INTO " + plugin.getDbPrefix() + "messages (owner, message, time) VALUES (?, ?, ?)";
+        String sqlString = "INSERT INTO " + manager.getDatabase().getTablePrefix() + "messages (owner, message, time) VALUES (?, ?, ?)";
         manager.addDelayTask(
                 new DatabaseTask(
                         sqlString,
@@ -324,8 +316,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
 
     @Override
     public void updateOwner2UUID(@NotNull String ownerUUID, int x, int y, int z, @NotNull String worldName) {
-        String sqlString = "UPDATE " + plugin
-                .getDbPrefix() + "shops SET owner = ? WHERE x = ? AND y = ? AND z = ? AND world = ?" + (
+        String sqlString = "UPDATE " + manager.getDatabase().getTablePrefix() + "shops SET owner = ? WHERE x = ? AND y = ? AND z = ? AND world = ?" + (
                 manager.getDatabase() instanceof MySQLCore ? " LIMIT 1" : "");
         manager.addDelayTask(
                 new DatabaseTask(sqlString, ps -> {
@@ -341,7 +332,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     public void updateExternalInventoryProfileCache(@NotNull Shop shop, int space, int stock) {
 
         if (manager.getDatabase() instanceof MySQLCore) {
-            String sqlString = "INSERT INTO " + plugin.getDbPrefix() + "external_cache (x,y,z,world,space,stock) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE space = ?, stock = ?";
+            String sqlString = "INSERT INTO " + manager.getDatabase().getTablePrefix() + "external_cache (x,y,z,world,space,stock) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE space = ?, stock = ?";
             manager.addDelayTask(
                     new DatabaseTask(sqlString, ps -> {
                         ps.setInt(1, shop.getLocation().getBlockX());
@@ -354,7 +345,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
                         ps.setInt(8, stock);
                     }));
         } else {
-            String createString = "INSERT OR IGNORE INTO " + plugin.getDbPrefix() + "external_cache (x,y,z,world,space,stock) VALUES (?,?,?,?,?,?)";
+            String createString = "INSERT OR IGNORE INTO " + manager.getDatabase().getTablePrefix() + "external_cache (x,y,z,world,space,stock) VALUES (?,?,?,?,?,?)";
             manager.addDelayTask(
                     new DatabaseTask(createString, ps -> {
                         ps.setInt(1, shop.getLocation().getBlockX());
@@ -364,7 +355,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
                         ps.setInt(5, space);
                         ps.setInt(6, stock);
                     }));
-            String updateString = "UPDATE " + plugin.getDbPrefix() + "external_cache SET space = ?, stock = ? WHERE x = ? AND y = ? AND z = ? AND world =?";
+            String updateString = "UPDATE " + manager.getDatabase().getTablePrefix() + "external_cache SET space = ?, stock = ? WHERE x = ? AND y = ? AND z = ? AND world =?";
             manager.addDelayTask(
                     new DatabaseTask(updateString, ps -> {
                         ps.setInt(1, space);
@@ -382,8 +373,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
     public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited, int shopType,
                            double price, int x, int y, int z, @NotNull String world, @NotNull String extra,
                            @Nullable String currency, boolean disableDisplay, @Nullable String taxAccount) {
-        String sqlString = "UPDATE " + plugin
-                .getDbPrefix() + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ?," +
+        String sqlString = "UPDATE " + manager.getDatabase().getTablePrefix() + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ?," +
                 " extra = ?, currency = ?, disableDisplay = ?, taxAccount = ?" +
                 " WHERE x = ? AND y = ? and z = ? and world = ?";
         manager.addDelayTask(new DatabaseTask(sqlString, ps -> {
@@ -407,7 +397,7 @@ public class SimpleDatabaseHelper implements DatabaseHelper, Reloadable {
 
     @Override
     public void insertHistoryRecord(Object rec) {
-        String sqlString = "INSERT INTO " + plugin.getDbPrefix() + "logs (time, classname, data) VALUES (?, ?, ?)";
+        String sqlString = "INSERT INTO " + manager.getDatabase().getTablePrefix() + "logs (time, classname, data) VALUES (?, ?, ?)";
         manager.addDelayTask(
                 new DatabaseTask(
                         sqlString,

@@ -25,7 +25,7 @@
     <artifactId>QuickShop</artifactId>
 
     <properties>
-        <pluginver>5.1.2.2</pluginver>
+        <pluginver>5.1.2.3</pluginver>
         <package>org.maxgamer.quickshop</package>
         <developer>Ghost-chu</developer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -484,7 +484,7 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>5.0.0</version>
+            <version>5.1.0</version>
             <scope>provided</scope>
         </dependency>
         <!--JsonConfiguration Dependency Start-->
@@ -577,7 +577,7 @@
         <dependency>
             <groupId>com.github.angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
-            <version>6.29.12</version>
+            <version>6.35.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -590,7 +590,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
+            <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
         <!-- Documentation of MockBukkit: https://github.com/MockBukkit/MockBukkit -->
@@ -652,7 +652,7 @@
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.8</version>
+            <version>7.0.9</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -854,7 +854,7 @@
         <dependency>
             <groupId>com.github.alex9849</groupId>
             <artifactId>advanced-region-market</artifactId>
-            <version>3.5.0</version>
+            <version>3.5.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
