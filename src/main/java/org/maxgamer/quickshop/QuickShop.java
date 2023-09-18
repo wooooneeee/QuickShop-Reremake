@@ -1143,7 +1143,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
             @Override
             public void run() {
                 getLogger().info("Registering bStats metrics...");
-                submitMeritcs();
+                submitMetrics();
             }
         }.runTask(this);
         if (loaded) {
@@ -1237,7 +1237,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
         return true;
     }
 
-    private void submitMeritcs() {
+    private void submitMetrics() {
         if (!getConfig().getBoolean("disabled-metrics")) {
             String vaultVer;
             Plugin vault = Bukkit.getPluginManager().getPlugin("Vault");
