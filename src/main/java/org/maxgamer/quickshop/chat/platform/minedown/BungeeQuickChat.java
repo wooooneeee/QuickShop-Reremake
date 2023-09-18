@@ -430,6 +430,7 @@ public class BungeeQuickChat implements QuickChat {
         private ComponentBuilder append(BaseComponent component, ComponentBuilder.FormatRetention retention) {
             if (!isUsingResetCommitVersion) {
                 builder.append(component, retention);
+                return builder;
             }
 
             List<BaseComponent> parts = builder.getParts();
