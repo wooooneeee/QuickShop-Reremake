@@ -236,7 +236,7 @@ public class QuickShop extends JavaPlugin implements QuickShopAPI {
     @Nullable
     private AbstractEconomy economy;
     /**
-     * Whether or not to limit players shop amounts
+     * Whether to limit players shop amounts
      */
     private boolean limit = false;
     @Nullable
