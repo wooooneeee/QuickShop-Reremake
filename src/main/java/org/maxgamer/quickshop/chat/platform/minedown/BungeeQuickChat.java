@@ -439,6 +439,13 @@ public class BungeeQuickChat implements QuickChat {
             if (component.isReset() && retention == ComponentBuilder.FormatRetention.ALL) {
                 retention = ComponentBuilder.FormatRetention.EVENTS;
             }
+
+            //Hacky method to replace dummy components
+            if (previous == null && builder.getCursor() == -1) {
+                previous = new TextComponent("");
+                builder.append(previous);
+            }
+
             if (previous != null && (!component.isReset() || retention == ComponentBuilder.FormatRetention.EVENTS)) {
                 component.copyFormatting(previous, retention, false);
                 parts.add(component);
